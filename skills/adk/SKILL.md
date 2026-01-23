@@ -1,5 +1,5 @@
 ---
-name: botpress-adk
+name: adk
 description: a set of guidelines to build with Botpress's Agent Development Kit (ADK) - use these whenever you're tasked with building a feature using the ADK
 license: MIT
 ---

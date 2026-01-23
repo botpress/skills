@@ -1,5 +1,5 @@
 ---
-name: botpress-adk-frontend
+name: adk-frontend
 description: Guidelines for building frontend applications that integrate with Botpress ADK bots - covering authentication, type generation, client setup, and calling bot actions
 license: MIT
 ---
