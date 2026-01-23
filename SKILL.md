@@ -1,6 +1,6 @@
 ---
 name: botpress-adk
-description: Fast integration discovery for Botpress ADK - search integrations, list available integrations, get integration details, and route documentation questions to adk-expert agent
+description: a set of guidelines to build with Botpress's Agent Development Kit (ADK) - use these whenever you're tasked with building a feature using the ADK
 license: MIT
 ---
 
