@@ -2,7 +2,7 @@
 
 A skill for AI coding agents that provides comprehensive documentation for the Botpress Agent Development Kit (ADK).
 
-## Installation
+## Procedure
 
 ```bash
 # Using the agent-skills CLI
