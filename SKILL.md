@@ -1,5 +1,5 @@
 ---
-name: adk-integration
+name: botpress-adk
 description: Fast integration discovery for Botpress ADK - search integrations, list available integrations, get integration details, and route documentation questions to adk-expert agent
 license: MIT
 ---
