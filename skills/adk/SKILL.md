@@ -13,6 +13,7 @@ Use this skill when users ask questions about the Botpress Agent Development Kit
 The Botpress ADK is a **convention-based TypeScript framework** where **file structure maps directly to bot behavior**. Place files in the correct directories, and they automatically become available as bot capabilities.
 
 The ADK provides primitives for:
+
 - Actions & Tools (reusable functions and AI-callable tools)
 - Workflows (long-running, resumable processes)
 - Conversations (message handling)
@@ -47,6 +48,7 @@ All primitives must be placed in `src/` directory:
 ## When to Use This Skill
 
 Activate this skill when users ask ADK-related questions like:
+
 - "How do I create an Action/Tool/Workflow/Conversation?"
 - "What is the difference between X and Y?"
 - "Show me an example of..."
@@ -68,6 +70,7 @@ ADK questions fall into two categories: **CLI queries** and **documentation look
 For integration discovery and CLI queries, use the Bash tool to run commands directly:
 
 **Integration Discovery:**
+
 ```bash
 # Search for integrations
 adk search <query>
@@ -83,6 +86,7 @@ adk list
 ```
 
 **Project Info:**
+
 ```bash
 # Check CLI version
 adk --version
@@ -95,6 +99,7 @@ adk --help
 ```
 
 **When to use CLI commands:**
+
 - "What integrations are available?"
 - "Search for Slack integration"
 - "Show me details about the Linear integration"
@@ -103,6 +108,7 @@ adk --help
 - "How do I add an integration?"
 
 **Response pattern:**
+
 1. Use Bash tool to run the appropriate `adk` command
 2. Parse and present the output to the user
 3. Optionally suggest next steps (e.g., "Run `adk add slack@3.0.0` to install")
@@ -112,6 +118,7 @@ adk --help
 For documentation, patterns, and how-to questions, search and reference the documentation files directly:
 
 **When to use documentation:**
+
 - "How do I create a workflow?"
 - "What's the difference between Actions and Tools?"
 - "Show me an example of using Zai"
@@ -122,14 +129,16 @@ For documentation, patterns, and how-to questions, search and reference the docu
 **How to answer documentation questions:**
 
 1. **Find relevant files** - Use Glob to discover documentation:
+
    ```
-   pattern: **/docs/*.md
+   pattern: **/references/*.md
    ```
 
 2. **Search for keywords** - Use Grep to find relevant content:
+
    ```
    pattern: <keyword from user question>
-   path: <path to docs directory from step 1>
+   path: <path to references directory from step 1>
    output_mode: files_with_matches
    ```
 
@@ -137,16 +146,17 @@ For documentation, patterns, and how-to questions, search and reference the docu
 
 4. **Provide answer** with:
    - Concise explanation
-   - Code examples from the docs
+   - Code examples from the references
    - File references (e.g., "From actions-tools.md:215")
    - Common pitfalls if relevant
    - Related topics for further reading
 
 ## Available Documentation
 
-Documentation files in `./docs/`:
+Documentation files in `./references/`:
 
 ### Core Concepts
+
 - **actions.md** - Actions with strong typing and validation
 - **tools.md** - AI-callable tools and Autonomous namespace
 - **workflows.md** - Workflows and step-based execution
@@ -155,6 +165,7 @@ Documentation files in `./docs/`:
 - **messages.md** - Sending messages and events
 
 ### Data & Content
+
 - **tables.md** - Data storage with semantic search
 - **files.md** - File storage and management
 - **knowledge-bases.md** - RAG implementation
@@ -162,6 +173,7 @@ Documentation files in `./docs/`:
 - **zai-agent-reference.md** - Quick ZAI reference
 
 ### Configuration & Integration
+
 - **agent-config.md** - Bot configuration and state management
 - **model-configuration.md** - AI model configuration reference
 - **context-api.md** - Runtime context access
@@ -171,6 +183,7 @@ Documentation files in `./docs/`:
 - **mcp-server.md** - MCP server for AI assistants
 
 ### Frontend Integration
+
 - **frontend/botpress-client.md** - Using @botpress/client in frontends
 - **frontend/calling-actions.md** - Calling bot actions from frontend
 - **frontend/type-generation.md** - Type-safe integration with generated types
@@ -181,15 +194,26 @@ Documentation files in `./docs/`:
 Quick reference for accessing ADK runtime services:
 
 ### Imports
+
 ```typescript
 // Always import from @botpress/runtime
 import {
-  Action, Autonomous, Workflow, Conversation,
-  z, actions, adk, user, bot, conversation, context
+  Action,
+  Autonomous,
+  Workflow,
+  Conversation,
+  z,
+  actions,
+  adk,
+  user,
+  bot,
+  conversation,
+  context,
 } from "@botpress/runtime";
 ```
 
 ### State Management
+
 ```typescript
 // Bot state (defined in agent.config.ts)
 bot.state.maintenanceMode = true;
@@ -200,10 +224,11 @@ user.state.preferredLanguage = "en";
 user.state.onboardingComplete = true;
 
 // User tags
-user.tags.email;  // Access user metadata
+user.tags.email; // Access user metadata
 ```
 
 ### Calling Actions
+
 ```typescript
 // Call bot actions
 await actions.fetchUser({ userId: "123" });
@@ -214,18 +239,20 @@ await actions.slack.sendMessage({ channel: "...", text: "..." });
 await actions.linear.issueList({ teamId: "..." });
 
 // Convert action to tool
-tools: [fetchUser.asTool()]
+tools: [fetchUser.asTool()];
 ```
 
 ### Context API
+
 ```typescript
 // Get runtime services
-const client = context.get("client");        // Botpress client
-const cognitive = context.get("cognitive");  // AI model client
-const citations = context.get("citations");  // Citation manager
+const client = context.get("client"); // Botpress client
+const cognitive = context.get("cognitive"); // AI model client
+const citations = context.get("citations"); // Citation manager
 ```
 
 ### File Naming
+
 - **Actions/Tools/Workflows**: `myAction.ts`, `searchDocs.ts` (camelCase)
 - **Tables**: `Users.ts`, `Orders.ts` (PascalCase)
 - **Conversations/Triggers**: `chat.ts`, `slack.ts` (lowercase)
@@ -235,6 +262,7 @@ const citations = context.get("citations");  // Citation manager
 When answering questions, always verify these patterns against the documentation:
 
 ### Package Management
+
 ```bash
 # All package managers are supported
 bun install       # Recommended (fastest)
@@ -250,16 +278,18 @@ pnpm install      # Works fine
 ```
 
 ### Imports
+
 ```typescript
 // ✅ CORRECT - Always from @botpress/runtime
 import { Action, Autonomous, Workflow, z } from "@botpress/runtime";
 
 // ❌ WRONG - Never from zod or @botpress/sdk
-import { z } from "zod";           // ❌ Wrong
-import { Action } from "@botpress/sdk";  // ❌ Wrong
+import { z } from "zod"; // ❌ Wrong
+import { Action } from "@botpress/sdk"; // ❌ Wrong
 ```
 
 ### Export Patterns
+
 ```typescript
 // ✅ Both patterns work - export const is recommended
 export const myAction = new Action({ ... });  // Recommended
@@ -271,6 +301,7 @@ export default new Action({ ... });           // Also valid
 ```
 
 ### Actions
+
 ```typescript
 // ✅ CORRECT - Handler receives { input, client }
 export const fetchUser = new Action({
@@ -288,16 +319,19 @@ handler({ userId }) {  // ❌ Wrong - must be { input }
 ```
 
 ### Tools
+
 ```typescript
 // ✅ CORRECT - Tools CAN destructure directly
 export const myTool = new Autonomous.Tool({
-  handler: async ({ query, maxResults }) => {  // ✅ Direct destructuring OK
+  handler: async ({ query, maxResults }) => {
+    // ✅ Direct destructuring OK
     return search(query, maxResults);
-  }
+  },
 });
 ```
 
 ### Conversations
+
 ```typescript
 // ✅ CORRECT - Use conversation.send() method
 await conversation.send({
@@ -312,11 +346,13 @@ await client.createMessage({ ... });  // ❌ Wrong
 ## Examples of Questions This Skill Answers
 
 ### Beginner Questions
+
 - "What is an Action?"
 - "How do I create my first workflow?"
 - "What's the difference between Actions and Tools?"
 
 ### Implementation Questions
+
 - "How do I access the Botpress client?"
 - "How do I use citations in RAG?"
 - "What's the syntax for searchable table columns?"
@@ -325,6 +361,7 @@ await client.createMessage({ ... });  // ❌ Wrong
 - "How do I validate content with Zai?"
 
 ### Advanced Pattern Questions
+
 - "How do I add guardrails to prevent hallucinations?"
 - "How do I implement admin authentication?"
 - "How do I add logging and observability?"
@@ -332,11 +369,13 @@ await client.createMessage({ ... });  // ❌ Wrong
 - "How do I manage context in async tool handlers?"
 
 ### Troubleshooting Questions
+
 - "Why am I getting 'Cannot destructure property' error?"
 - "How do I fix import errors?"
 - "What's wrong with my workflow state access?"
 
 ### Best Practices Questions
+
 - "What are common mistakes to avoid?"
 - "How should I structure my project?"
 - "What's the recommended pattern for X?"
@@ -344,24 +383,9 @@ await client.createMessage({ ... });  // ❌ Wrong
 ## Response Format
 
 When answering:
+
 1. Start with a **concise explanation**
-2. Provide **working code examples** from the docs
+2. Provide **working code examples** from the references
 3. Include **file references** (e.g., "From actions-tools.md:215")
 4. Highlight **common pitfalls** if relevant
 5. Link to **related topics** for further reading
-
-## Documentation Maintenance
-
-**IMPORTANT:** These docs are maintained directly in this skill - they are the source of truth for ADK development.
-
-**Location:** `./docs/` in this skill directory
-
-**When documentation needs updates:**
-Edit files directly in `./docs/` - no copying required!
-
-**Use the `/docs:adk-doc-*` commands to manage documentation:**
-- `/docs:adk-doc-create` - Create new documentation
-- `/docs:adk-doc-update` - Update existing documentation
-- `/docs:adk-doc-review` - Review documentation for accuracy
-- `/docs:adk-doc-sync` - Check if docs are in sync with ADK implementation
-
