@@ -6,7 +6,7 @@ A skill for AI coding agents that provides comprehensive documentation for the B
 
 ```bash
 # Using the agent-skills CLI
-npx add-skill botpress/adk-skills
+npx skills add botpress/adk-skills
 ```
 
 Or manually add to your agent's skills directory.
