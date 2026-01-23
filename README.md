@@ -1,3 +1,10 @@
+<p align="center">
+    <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="./assets/dark.png">
+        <img src="./assets/light.png">
+    </picture>
+</p>
+
 # Botpress Skills
 
 A collection of skills for AI coding agents building with Botpress. Skills are packaged instructions and documentation that extend agent capabilities for Botpress development.
