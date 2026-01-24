@@ -4,9 +4,9 @@ description: a set of guidelines to build with Botpress's Agent Development Kit 
 license: MIT
 ---
 
-# ADK Integration & Documentation Router
+# Botpress ADK Guidelines
 
-Use this skill when users ask questions about the Botpress Agent Development Kit (ADK), especially for integration discovery and CLI commands.
+Use this skill when you've got questions about the Botpress Agent Development Kit (ADK) - like when you're building a feature that involves tables, actions, tools, workflows, conversations, files, knowledge bases, triggers, or Zai.
 
 ## What is the ADK?
 
@@ -147,13 +147,13 @@ For documentation, patterns, and how-to questions, search and reference the docu
 4. **Provide answer** with:
    - Concise explanation
    - Code examples from the references
-   - File references (e.g., "From actions-tools.md:215")
+   - File references with line numbers (e.g., "From references/actions.md:215")
    - Common pitfalls if relevant
    - Related topics for further reading
 
 ## Available Documentation
 
-Documentation files in `./references/`:
+Documentation should be located in `./references/` directory relative to this skill. When answering questions, search for these topics:
 
 ### Core Concepts
 
@@ -382,10 +382,26 @@ await client.createMessage({ ... });  // ❌ Wrong
 
 ## Response Format
 
-When answering:
+When answering ADK questions, follow this structure:
 
-1. Start with a **concise explanation**
-2. Provide **working code examples** from the references
-3. Include **file references** (e.g., "From actions-tools.md:215")
-4. Highlight **common pitfalls** if relevant
-5. Link to **related topics** for further reading
+1. **Start with a concise explanation** - Answer the core question directly
+2. **Provide working code examples** - Use examples from references or create based on patterns
+3. **Include file references** - Cite documentation (e.g., "From actions.md:215")
+4. **Highlight common pitfalls** - Reference the troubleshooting section if relevant
+5. **Security & best practices** - Mention security considerations when applicable
+6. **Link to related topics** - Suggest further reading or related concepts
+
+**Example Response Structure:**
+
+```
+Actions are strongly-typed functions that can be called from anywhere in your bot.
+
+**Example:**
+[code example]
+
+**Common Pitfall:** Remember to destructure `input` first (see troubleshooting section)
+
+**Related:** You can convert Actions to Tools using `.asTool()` - see the "When to Use What" decision tree.
+
+**Next Steps:** Create your action in `src/actions/myAction.ts` and it will be auto-registered.
+```
