@@ -5,19 +5,22 @@ Command-line interface for building AI agents with the Botpress ADK.
 ## Quick Start
 
 ```bash
-# 1. Create new agent
-adk init my-bot
+# 1. Log in non-interactively when possible
+export BOTPRESS_TOKEN=pat_abc123
+adk login --token "$BOTPRESS_TOKEN"
+
+# 2. Create a new agent with defaults
+adk init my-bot --yes --skip-link
 cd my-bot
-bun install
 
-# 2. Login
-adk login
+# 3. Link explicitly when you know the IDs
+adk link --workspace ws_123 --bot bot_456
 
-# 3. Start development
-adk dev
+# 4. Start development
+adk dev --logs --no-open
 
-# 4. Deploy
-adk deploy
+# 5. Deploy
+adk deploy --yes
 ```
 
 ## Commands
@@ -33,14 +36,35 @@ adk init [name]
 **Options:**
 
 - `name` - Project name (optional, prompts if omitted)
+- `-t, --template <template>` - Template to use: `blank` or `hello-world`
+- `-y, --yes` - Skip prompts and use sensible defaults
+- `--defaults` - Alias for `--yes`
+- `--skip-link` - Skip the linking step after project creation
 
-**Example:**
+**Defaults when using `--yes` / `--defaults`:**
+
+- Project name: `my-agent` (if omitted)
+- Template: `hello-world` (if omitted)
+- Linking: skipped unless you run `adk link` later
+
+**Examples:**
 
 ```bash
 adk init customer-support
-cd customer-support
-bun install
+
+# Non-interactive setup for AI agents and CI
+adk init customer-support --yes --skip-link
+
+# Use the working starter template
+adk init customer-support --template hello-world
 ```
+
+**Automation notes:**
+
+- `adk init` installs dependencies automatically after scaffolding.
+- The CLI auto-selects a package manager based on lockfiles when possible, otherwise it falls back to the first available manager.
+- If authentication is missing, `adk init` may still invoke login first.
+- The fully non-interactive path is: provide a name, choose a template directly or via `--yes`, and use `--skip-link`.
 
 **Creates:**
 
@@ -78,13 +102,23 @@ adk login [options]
 # Interactive login
 adk login
 
-# With token
+# Non-interactive with token
 adk login --token pat_abc123
+
+# Non-interactive with environment variable
+export BOTPRESS_TOKEN=pat_abc123
+adk login --token "$BOTPRESS_TOKEN"
 
 # Multiple profiles
 adk login --profile staging
 adk login --profile production
 ```
+
+**Automation notes:**
+
+- Preferred AI/CI path: `adk login --token <token>`.
+- `BOTPRESS_TOKEN` is also supported.
+- Without a token, `adk login` falls back to the interactive browser/manual flow.
 
 **Profile Management:**
 
@@ -106,6 +140,7 @@ adk dev [options]
 - `-p, --port <port>` - Bot port (default: 3000)
 - `--port-console <port>` - UI console port (default: 3001)
 - `-l, --logs` - Stream logs to stderr (no TUI)
+- `--no-open` - Do not auto-open the dev console in a browser
 
 **What it does:**
 
@@ -123,7 +158,16 @@ adk dev
 
 # CI mode (no TUI)
 adk dev --logs
+
+# CI mode without opening a browser
+adk dev --logs --no-open
 ```
+
+**Automation notes:**
+
+- `--logs` is the most AI-friendly mode, but `adk dev` is not fully headless.
+- Dev can still hit interactive flows such as preflight, knowledge-base sync, or config prompts depending on project state.
+- Treat `adk dev` as CI-friendly rather than guaranteed prompt-free.
 
 ### adk deploy
 
@@ -156,7 +200,16 @@ adk deploy [options]
 
 ```bash
 adk deploy
+
+# Auto-approve preflight changes
+adk deploy --yes
 ```
+
+**Automation notes:**
+
+- `--yes` only auto-approves preflight changes.
+- Deploy still validates configuration and may require interaction if config values are missing.
+- Do not assume `adk deploy --yes` is fully non-interactive.
 
 ### adk build
 
@@ -190,11 +243,17 @@ adk link [options]
 # Interactive (recommended)
 adk link
 
-# Specify IDs
+# Scriptable when you already know the IDs
 adk link --workspace ws_123 --bot bot_456
 ```
 
 Creates `agent.json` with bot and workspace IDs.
+
+**Automation notes:**
+
+- `adk link --workspace <id> --bot <id>` is the best AI-driven path.
+- If only one workspace exists, `adk link` may auto-select it.
+- Even with flags, the command still uses the interactive Ink flow internally, so do not assume it is safe in every no-TTY environment.
 
 ### adk chat
 

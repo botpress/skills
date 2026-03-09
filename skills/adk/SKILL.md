@@ -98,6 +98,33 @@ adk
 adk --help
 ```
 
+**Prefer non-interactive paths when driving ADK workflows:**
+
+```bash
+# Login without browser prompts
+adk login --token "$BOTPRESS_TOKEN"
+
+# Scaffold with sensible defaults and skip linking
+adk init my-agent --yes --skip-link
+
+# Link directly when IDs are known
+adk link --workspace ws_123 --bot bot_456
+
+# More automation-friendly dev mode
+adk dev --logs --no-open
+
+# Auto-approve preflight changes only
+adk deploy --yes
+```
+
+Use these defaults when relevant:
+
+- Prefer `adk login --token <token>` or `BOTPRESS_TOKEN` over interactive login.
+- Prefer `adk init <name> --yes --skip-link` for AI-driven scaffolding.
+- Treat `adk link --workspace ... --bot ...` as scriptable, but not guaranteed safe in every no-TTY environment.
+- Treat `adk dev --logs --no-open` as CI-friendly, not fully prompt-free.
+- Treat `adk deploy --yes` as auto-approving preflight only; config validation can still block automation.
+
 **When to use CLI commands:**
 
 - "What integrations are available?"
