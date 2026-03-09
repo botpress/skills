@@ -107,7 +107,7 @@ if (user) {
 }
 ```
 
-**Type:** `User | undefined`
+**Type:** `User | null`
 
 ### conversation
 
@@ -122,7 +122,7 @@ if (conversation) {
 }
 ```
 
-**Type:** `Conversation | undefined`
+**Type:** `Conversation | null`
 
 ### message
 
@@ -136,7 +136,7 @@ if (message?.type === "text") {
 }
 ```
 
-**Type:** `AnyIncomingMessage<TBot> | undefined`
+**Type:** `AnyIncomingMessage<TBot> | null`
 
 ### event
 
@@ -151,7 +151,7 @@ if (event) {
 }
 ```
 
-**Type:** `AnyIncomingEvent<TBot> | undefined`
+**Type:** `AnyIncomingEvent<TBot> | null`
 
 See **[Triggers](./triggers.md)** for event handling examples.
 
@@ -168,7 +168,7 @@ if (workflow) {
 }
 ```
 
-**Type:** `Workflow | undefined`
+**Type:** `Workflow | null`
 
 See **[Workflows](./workflows.md)** for workflow context examples.
 
@@ -186,7 +186,7 @@ if (control) {
 }
 ```
 
-**Type:** `WorkflowControlContext | undefined`
+**Type:** `WorkflowControlContext | null`
 
 ### chat
 
@@ -202,7 +202,7 @@ if (chat) {
 }
 ```
 
-**Type:** `BotpressChat | undefined`
+**Type:** `BotpressChat | null`
 
 See **[Conversations](./conversations.md)** for chat context examples.
 

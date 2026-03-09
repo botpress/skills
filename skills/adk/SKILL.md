@@ -119,8 +119,9 @@ adk deploy --yes
 
 Use these defaults when relevant:
 
-- Prefer `adk login --token <token>` or `BOTPRESS_TOKEN` over interactive login.
-- Prefer `adk init <name> --yes --skip-link` for AI-driven scaffolding.
+- Prefer `adk login --token "$BOTPRESS_TOKEN"` or `adk login --token <token>` over interactive login.
+- Treat bare `BOTPRESS_TOKEN` as a no-TTY convenience, not a guaranteed interactive-terminal shortcut.
+- Prefer `adk init <name> --yes --skip-link` for AI-driven scaffolding, but only after login is already completed.
 - Treat `adk link --workspace ... --bot ...` as scriptable, but not guaranteed safe in every no-TTY environment.
 - Treat `adk dev --logs --no-open` as CI-friendly, not fully prompt-free.
 - Treat `adk deploy --yes` as auto-approving preflight only; config validation can still block automation.

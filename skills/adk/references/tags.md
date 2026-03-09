@@ -106,12 +106,14 @@ export default defineConfig({
 ### In Conversations
 
 ```typescript
-import { Conversation, user, conversation } from "@botpress/runtime";
+import { Conversation, user, context } from "@botpress/runtime";
 
 export default new Conversation({
   channel: "webchat.channel",
 
   async handler({ message }) {
+    const conversation = context.get("conversation");
+
     // Read user tags
     console.log(`User tier: ${user.tags.tier}`);
     console.log(`User region: ${user.tags.region}`);
@@ -165,7 +167,7 @@ export const ProcessingWorkflow = new Workflow({
 ### In Actions
 
 ```typescript
-import { Action, z, user, conversation } from "@botpress/runtime";
+import { Action, z, user, context } from "@botpress/runtime";
 
 export default new Action({
   name: "upgradeUser",
@@ -176,12 +178,15 @@ export default new Action({
 
   async handler(input) {
     const oldTier = user.tags.tier;
+    const conversation = context.get("conversation", { optional: true });
 
     // Update user tag
     user.tags.tier = input.newTier;
 
     // Log the upgrade in conversation
-    conversation.tags.category = "upgrade";
+    if (conversation) {
+      conversation.tags.category = "upgrade";
+    }
 
     console.log(`Upgraded user from ${oldTier} to ${input.newTier}`);
 
@@ -349,7 +354,7 @@ export default new Conversation({
 ### Tag Inheritance in Workflows
 
 ```typescript
-import { Workflow, z, user, conversation } from "@botpress/runtime";
+import { Workflow, z, user } from "@botpress/runtime";
 
 export const SupportWorkflow = new Workflow({
   name: "support",

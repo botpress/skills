@@ -63,10 +63,16 @@ await execute({
 ### At Initialization
 
 ```typescript
-import { adk } from "@botpress/runtime";
+import { Zai, adk } from "@botpress/runtime";
 
-const zai = new adk.Zai({
+// Option 1: instantiate Zai directly
+const zai = new Zai({
   client,
+  modelId: "openai:gpt-4o"
+});
+
+// Option 2: start from the runtime-provided helper
+const preciseZai = adk.zai.with({
   modelId: "openai:gpt-4o"
 });
 ```

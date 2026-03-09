@@ -55,7 +55,7 @@ adk init customer-support
 # Non-interactive setup for AI agents and CI
 adk init customer-support --yes --skip-link
 
-# Use the working starter template
+# Use the current hello-world template
 adk init customer-support --template hello-world
 ```
 
@@ -64,7 +64,8 @@ adk init customer-support --template hello-world
 - `adk init` installs dependencies automatically after scaffolding.
 - The CLI auto-selects a package manager based on lockfiles when possible, otherwise it falls back to the first available manager.
 - If authentication is missing, `adk init` may still invoke login first.
-- The fully non-interactive path is: provide a name, choose a template directly or via `--yes`, and use `--skip-link`.
+- The non-interactive path only works after login has already been completed.
+- For unattended setup, log in first with `adk login --token "$BOTPRESS_TOKEN"`, then run `adk init <name> --yes --skip-link`.
 
 **Creates:**
 
@@ -117,7 +118,8 @@ adk login --profile production
 **Automation notes:**
 
 - Preferred AI/CI path: `adk login --token <token>`.
-- `BOTPRESS_TOKEN` is also supported.
+- `BOTPRESS_TOKEN` is best used as `adk login --token "$BOTPRESS_TOKEN"`.
+- Bare `BOTPRESS_TOKEN` is only auto-used in non-interactive or no-TTY contexts.
 - Without a token, `adk login` falls back to the interactive browser/manual flow.
 
 **Profile Management:**
@@ -168,6 +170,7 @@ adk dev --logs --no-open
 - `--logs` is the most AI-friendly mode, but `adk dev` is not fully headless.
 - Dev can still hit interactive flows such as preflight, knowledge-base sync, or config prompts depending on project state.
 - Treat `adk dev` as CI-friendly rather than guaranteed prompt-free.
+- Event-driven integrations are not always perfectly mirrored in local dev; if an event flow behaves strangely, verify it against a deployed bot too.
 
 ### adk deploy
 
@@ -249,6 +252,8 @@ adk link --workspace ws_123 --bot bot_456
 
 Creates `agent.json` with bot and workspace IDs.
 
+Current project scaffolds do not add `agent.json` to `.gitignore` automatically, so add that manually if your team does not want it committed.
+
 **Automation notes:**
 
 - `adk link --workspace <id> --bot <id>` is the best AI-driven path.
@@ -266,7 +271,6 @@ adk chat
 **Requires:**
 
 - `adk dev` run at least once (creates devId)
-- `bp` CLI installed
 
 **Example:**
 

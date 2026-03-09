@@ -70,7 +70,7 @@ export default new Autonomous.Tool({
 
 ## Tool Handler Syntax
 
-Tools receive input directly (not wrapped in `{ input }`) and have automatic access to conversation context through direct imports:
+Tools receive input directly (not wrapped in `{ input }`) and can use global runtime proxies such as `user`, `bot`, `adk`, and `actions`. For optional per-request values like `conversation` or `message`, use the Context API.
 
 ```typescript
 import { Autonomous, z, user, adk, context } from "@botpress/runtime";
@@ -149,10 +149,10 @@ export const anotherTool = new Autonomous.Tool({
 
 ## Accessing Context in Tools
 
-Tools have automatic access to conversation context through direct imports:
+Tools can use global runtime proxies directly, but conversation-specific values should be loaded through `context.get(...)`:
 
 ```typescript
-import { Autonomous, z, user, bot, conversation, adk, actions } from "@botpress/runtime";
+import { Autonomous, z, user, bot, adk, actions, context } from "@botpress/runtime";
 
 export default new Autonomous.Tool({
   name: "upgradeUser",
@@ -164,6 +164,7 @@ export default new Autonomous.Tool({
     // Direct access to context
     const userName = user.state.name;
     const currentTier = user.tags.tier;
+    const conversation = context.get("conversation", { optional: true });
 
     // Update user state and tags
     user.tags.tier = "pro";
@@ -183,9 +184,10 @@ export default new Autonomous.Tool({
 **Commonly used in tools:**
 - `user` - Current user (`.state`, `.tags`)
 - `bot` - Bot object (always available)
-- `conversation` - Current conversation
 - `adk` - ADK utilities (`adk.zai.extract()`, etc.)
 - `actions` - All available actions
+
+Use `context.get("conversation", { optional: true })` or `context.get("message", { optional: true })` when you need those per-request values.
 
 For complete context access details including `client`, `citations`, availability rules, and all context keys, see **[Context API](./context-api.md)**.
 

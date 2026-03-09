@@ -73,7 +73,7 @@ export const UsersTable = new Table({
 
 ### Table with Key Column and Tags
 
-Use `keyColumn` to specify a column for upsert operations and `tags` for table metadata:
+Use `keyColumn` to document the logical key for the table and `tags` for table metadata:
 
 ```typescript
 import { Table, z } from "@botpress/runtime";
@@ -101,10 +101,10 @@ export const ExternalUsersTable = new Table({
 });
 ```
 
-**Key Column Benefits:**
-- Simplifies upsert operations by pre-defining the key
-- Ensures consistency across all upsert calls
-- Enables automatic deduplication during sync
+**Key Column Notes:**
+- `keyColumn` documents the intended unique key for the table.
+- Current runtime upsert helpers may still require `keyColumn` to be passed explicitly per `upsertRows()` call.
+- Do not assume table-level `keyColumn` is automatically applied everywhere.
 
 **Tags Use Cases:**
 - Track data source/origin
@@ -820,13 +820,13 @@ export const ProcessingWorkflow = new Workflow({
 ### In Conversations
 
 ```typescript
-import { Conversation } from "@botpress/runtime";
+import { Conversation, user } from "@botpress/runtime";
 import { ConversationHistoryTable } from "../tables/ConversationHistory";
 
 export const Chat = new Conversation({
   channel: "chat.channel",
 
-  async handler({ message }) {
+  async handler({ message, conversation }) {
     // Store message in history
     if (message?.type === "text") {
       await ConversationHistoryTable.createRows({
@@ -850,7 +850,7 @@ export const Chat = new Conversation({
         limit: 5,
       });
 
-      await this.send({
+      await conversation.send({
         type: "text",
         payload: {
           text: `Found ${rows.length} matching conversations`,

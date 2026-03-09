@@ -173,16 +173,16 @@ const buffer = await response.arrayBuffer();
 
 ```typescript
 type FileStatus =
-  | "UPLOAD_PENDING"      // Awaiting content upload
-  | "UPLOAD_COMPLETED"    // Upload successful
-  | "UPLOAD_FAILED"       // Upload failed
-  | "INDEXING_PENDING"    // Queued for indexing
-  | "INDEXING_COMPLETED"  // Indexed and searchable
-  | "INDEXING_FAILED"     // Indexing failed
+  | "upload_pending"      // Awaiting content upload
+  | "upload_completed"    // Upload successful
+  | "upload_failed"       // Upload failed
+  | "indexing_pending"    // Queued for indexing
+  | "indexing_completed"  // Indexed and searchable
+  | "indexing_failed"     // Indexing failed
 
 // Check file status
 const { file } = await client.getFile({ id: fileId });
-if (file.status === "INDEXING_COMPLETED") {
+if (file.status === "indexing_completed") {
   console.log("File is indexed and searchable");
 }
 ```

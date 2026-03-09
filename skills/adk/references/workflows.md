@@ -928,24 +928,24 @@ export const ZaiWorkflow = new Workflow({
 
 ## Exposing Workflows as Tools (Non-Blocking Pattern)
 
-Workflows cannot be directly converted to tools using `.asTool()` - this method does not exist on workflow instances. To expose workflows to AI agents, wrap the workflow start call in an Action.
+Workflows can be converted to tools using `.asTool()`. This is useful when you want AI to start a long-running workflow without blocking on its completion.
 
-### Why `.asTool()` Doesn't Exist on Workflows
+### Direct Workflow Tool Pattern
 
 ```typescript
-// ❌ DOES NOT EXIST
+// Starts the workflow and returns immediately
 await execute({
   tools: [
-    MyWorkflow.asTool()  // Method not available
+    MyWorkflow.asTool()
   ]
 });
 ```
 
-Workflows are long-running, stateful processes. The `.asTool()` method is only available on Actions.
+When a workflow is exposed this way, the tool starts the workflow and returns a lightweight result such as the workflow ID and current status.
 
-### Action Wrapper Pattern
+### When to Still Use an Action Wrapper
 
-Create an Action that calls `workflow.start()` and returns immediately:
+An Action wrapper is still useful when you want to rename the tool, constrain inputs, add business rules, or hide workflow details from the AI:
 
 ```typescript
 // File: /actions/start-processing.ts
