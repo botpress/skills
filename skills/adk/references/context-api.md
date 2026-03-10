@@ -111,15 +111,21 @@ if (user) {
 
 ### conversation
 
-Current conversation object (available in conversation handlers).
+Current conversation object. Available optionally in Actions, Tools, and Triggers when they are invoked within a conversation context.
+
+> **Note:** In `Conversation` handlers, the `conversation` object is already provided as a handler parameter — use that directly instead of `context.get("conversation")`.
 
 ```typescript
+// In Actions, Tools, or Triggers — use context.get() with { optional: true }
 const conversation = context.get("conversation", { optional: true });
 
 if (conversation) {
   console.log(conversation.id);
   console.log(conversation.tags);
 }
+
+// In Conversation handlers — use the handler parameter directly
+// async handler({ conversation }) { ... }
 ```
 
 **Type:** `Conversation | null`

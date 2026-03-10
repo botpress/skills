@@ -66,6 +66,8 @@ async handler({ message, state, conversation, execute, type, event, request, com
 }
 ```
 
+> **Important:** Inside conversation handlers, always use the `conversation` parameter provided by the handler. Do **not** use `context.get("conversation")` — that pattern is for Actions, Tools, and Triggers that may optionally run within a conversation context. The handler parameter is already properly scoped and typed.
+
 ## Common Channel IDs
 
 Different platforms have different channel IDs:

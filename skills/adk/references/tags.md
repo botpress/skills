@@ -106,14 +106,13 @@ export default defineConfig({
 ### In Conversations
 
 ```typescript
-import { Conversation, user, context } from "@botpress/runtime";
+import { Conversation, user } from "@botpress/runtime";
 
 export default new Conversation({
   channel: "webchat.channel",
 
-  async handler({ message }) {
-    const conversation = context.get("conversation");
-
+  // conversation is provided as a handler parameter — no need for context.get()
+  async handler({ message, conversation }) {
     // Read user tags
     console.log(`User tier: ${user.tags.tier}`);
     console.log(`User region: ${user.tags.region}`);
