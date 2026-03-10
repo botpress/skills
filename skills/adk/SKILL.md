@@ -371,6 +371,26 @@ await conversation.send({
 await client.createMessage({ ... });  // ❌ Wrong
 ```
 
+### Conversation Handler Types
+
+```typescript
+// Handler receives typed context based on the event type:
+// type: "message" | "event" | "workflow_request" | "workflow_callback"
+async handler({ type, message, event, request, completion, conversation, execute }) {
+  if (type === "workflow_request") {
+    // event: WorkflowDataRequestEventType, request: WorkflowRequest
+    await request.workflow.provide("email", { email: "..." });
+  }
+  if (type === "workflow_callback") {
+    // event: WorkflowCallbackEventType, completion: WorkflowCallback
+    console.log(completion.status); // "completed" | "failed" | "canceled" | "timed_out"
+  }
+}
+
+// ⚠️ isWorkflowDataRequest() and isWorkflowCallback() are deprecated
+// Use type === "workflow_request" / "workflow_callback" instead
+```
+
 ## Examples of Questions This Skill Answers
 
 ### Beginner Questions
