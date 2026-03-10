@@ -29,6 +29,8 @@ Once configured, AI assistants gain tools to:
 
 The MCP server exposes its own tool descriptions - your AI assistant will see what's available.
 
+> **Current limitation:** The MCP server is useful for inspection, testing, and project-aware tooling, but its init flow is not the most reliable unattended bootstrap path right now. The MCP `adk_init_project` tool is out of sync with the CLI template names and can still fall into interactive login/link flows. For scripted setup, prefer the shell flow: `adk login --token "$BOTPRESS_TOKEN"`, then `adk init <name> --yes --skip-link`.
+
 ## Commands
 
 ### adk mcp
@@ -81,7 +83,7 @@ The generated config includes `--cwd` to target the correct directory:
 
 - **ADK CLI** installed and in PATH
 - **For project tools:** Valid ADK project with `agent.config.ts`
-- **For messaging/workflow tools:** `adk dev` server running
+- **For messaging/workflow tools:** `adk dev` server running on the default console port `3001`
 
 ## Troubleshooting
 
@@ -90,6 +92,10 @@ The generated config includes `--cwd` to target the correct directory:
 
 **"Dev server is not running"**
 - Start the dev server: `adk dev`
+
+**"MCP can connect, but messaging/workflow tools fail"**
+- Use the default console port: `adk dev --port-console 3001`
+- Current MCP dev-server-backed tools assume `http://localhost:3001`
 
 **"No chat or webchat integration found"**
 - Add an integration: `adk add chat` or `adk add webchat`

@@ -3,6 +3,8 @@
 Triggers allow your bot to react to events from the bot itself or integrated services. They enable event-driven automation and workflow orchestration.
 
 > **⚠️ IMPORTANT:** Always verify integration events exist before using them! Use `adk info <integration> --events` to discover real events. Integration events change between versions.
+>
+> **⚠️ Dev-mode limitation:** `adk dev` is not a perfect mirror of production for every integration event flow. Some private or custom integration events may not register or route locally even when the event name is valid. If an event-driven flow works in docs but not in local dev, verify the event first, then test against a deployed bot before assuming your trigger code is wrong.
 
 ## Basic Concepts
 
@@ -140,6 +142,8 @@ adk info slack --events
 adk info linear --events
 adk info github --events
 ```
+
+Checking `adk info <integration> --events` confirms the event exists, but it does not guarantee that every event source behaves the same in `adk dev` as it does after deployment.
 
 ## Trigger Handlers
 

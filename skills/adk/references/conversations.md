@@ -30,7 +30,7 @@ export const Chat = new Conversation({
     activeWorkflowId: z.string().optional()
   }),
 
-  async handler({ message, state, conversation, execute, type, event, request }) {
+  async handler({ message, state, conversation, execute, type, event, request, completion }) {
     // Access conversation state via the state parameter
     state.count += 1;
 
@@ -53,17 +53,20 @@ export const Chat = new Conversation({
 ### Handler Parameters
 
 ```typescript
-async handler({ message, state, conversation, execute, type, event, request, client }) {
+async handler({ message, state, conversation, execute, type, event, request, completion, client }) {
   // message - Incoming message object
   // state - Conversation state (mutable, automatically tracked)
   // conversation - Conversation instance with send() and other methods
   // execute - AI execution function
-  // type - Event type (message, workflow_request, etc.)
-  // event - Raw event
-  // request - Workflow request object (if applicable)
+  // type - Event type: "message" | "event" | "workflow_request" | "workflow_callback"
+  // event - Raw event (typed per handler type — see workflow sections below)
+  // request - Workflow request object (when type === "workflow_request")
+  // completion - Workflow callback object (when type === "workflow_callback")
   // client - BotClient for API calls
 }
 ```
+
+> **Important:** Inside conversation handlers, always use the `conversation` parameter provided by the handler. Do **not** use `context.get("conversation")` — that pattern is for Actions, Tools, and Triggers that may optionally run within a conversation context. The handler parameter is already properly scoped and typed.
 
 ## Common Channel IDs
 
@@ -384,27 +387,39 @@ type WorkflowRequest = {
 }
 ```
 
-**Pattern 1: Using Request Object (Type-Safe)**
+**Using the Type Discriminant (Recommended)**
+
+When `type === "workflow_request"`, both `request` and `event` are properly typed:
 
 ```typescript
 export const Chat = new Conversation({
   channel: "chat.channel",
 
-  async handler({ type, request, conversation, message }) {
-    // Check request type (type-safe)
-    if (type === "workflow_request" && request.type === "processOrder:email") {
-      // Extract user input
-      const email = message?.payload.text || "user@example.com";
+  async handler({ type, request, event, conversation, message }) {
+    if (type === "workflow_request") {
+      // request is typed as WorkflowRequest
+      // event is typed as WorkflowDataRequestEventType
+      // event.payload.message contains the prompt from step.request()
 
-      // Provide data back to workflow
-      await request.workflow.provide("email", { email });
+      await conversation.send({
+        type: "text",
+        payload: { text: event.payload.message }
+      });
+
+      // Check specific request type
+      if (request.type === "processOrder:email") {
+        const email = message?.payload.text || "user@example.com";
+        await request.workflow.provide("email", { email });
+      }
       return;
     }
   }
 });
 ```
 
-**Pattern 2: Using Event with Type Guard (Access to Prompt)**
+**Legacy: Using `isWorkflowDataRequest` Type Guard (Deprecated)**
+
+> **Deprecated:** Use the `type === "workflow_request"` discriminant instead. It provides the same typed event access plus the `request` object for additional context.
 
 ```typescript
 import { isWorkflowDataRequest } from "@botpress/runtime";
@@ -413,20 +428,152 @@ export const Chat = new Conversation({
   channel: "chat.channel",
 
   async handler({ event, conversation }) {
-    // Type guard gives access to event.payload
+    // ⚠️ Deprecated — prefer type === "workflow_request"
     if (isWorkflowDataRequest(event)) {
-      // event.payload.message contains the prompt from step.request()
       await conversation.send({
         type: "text",
         payload: { text: event.payload.message }
       });
 
-      // Get user input (from state or next message)
       const userInput = getUserInput();
-
-      // Provide data using static method
       await MyWorkflow.provide(event, { data: userInput });
       return;
+    }
+  }
+});
+```
+
+### Handling Workflow Callbacks (Completion Events)
+
+When a workflow completes, fails, is canceled, or times out, the conversation receives a `workflow_callback` event. Use the `completion` object to inspect the result.
+
+**Completion Object Structure:**
+```typescript
+type WorkflowCallback = {
+  type: string;                              // Workflow name
+  workflow: BaseWorkflowInstance;             // Workflow instance
+  status: "completed" | "failed" | "canceled" | "timed_out";
+  output?: z.infer<WorkflowOutput>;          // Workflow output (if completed)
+  error?: string;                            // Error message (if failed)
+}
+```
+
+**Using the Type Discriminant (Recommended)**
+
+```typescript
+export const Chat = new Conversation({
+  channel: "chat.channel",
+
+  async handler({ type, completion, event, conversation }) {
+    if (type === "workflow_callback") {
+      // completion is typed as WorkflowCallback
+      // event is typed as WorkflowCallbackEventType
+
+      switch (completion.status) {
+        case "completed":
+          await conversation.send({
+            type: "text",
+            payload: {
+              text: `Workflow "${completion.type}" completed successfully!`
+            }
+          });
+          // Access workflow output
+          if (completion.output) {
+            console.log("Output:", completion.output);
+          }
+          break;
+
+        case "failed":
+          await conversation.send({
+            type: "text",
+            payload: {
+              text: `Workflow "${completion.type}" failed: ${completion.error}`
+            }
+          });
+          break;
+
+        case "canceled":
+          await conversation.send({
+            type: "text",
+            payload: { text: `Workflow "${completion.type}" was canceled.` }
+          });
+          break;
+
+        case "timed_out":
+          await conversation.send({
+            type: "text",
+            payload: { text: `Workflow "${completion.type}" timed out.` }
+          });
+          break;
+      }
+      return;
+    }
+  }
+});
+```
+
+**Legacy: Using `isWorkflowCallback` Type Guard (Deprecated)**
+
+> **Deprecated:** Use the `type === "workflow_callback"` discriminant instead. It provides a typed `completion` object with workflow instance, status, output, and error information.
+
+```typescript
+import { isWorkflowCallback } from "@botpress/runtime";
+
+export const Chat = new Conversation({
+  channel: "chat.channel",
+
+  async handler({ event, conversation }) {
+    // ⚠️ Deprecated — prefer type === "workflow_callback"
+    if (isWorkflowCallback(event)) {
+      console.log("Workflow completed:", event.payload);
+    }
+  }
+});
+```
+
+### Combined Workflow Event Handling
+
+A single conversation handler can handle all workflow event types:
+
+```typescript
+export const Chat = new Conversation({
+  channel: "chat.channel",
+  state: z.object({
+    activeWorkflowId: z.string().optional()
+  }),
+
+  async handler({ type, message, request, completion, event, conversation, execute }) {
+    // Handle workflow data requests
+    if (type === "workflow_request") {
+      await conversation.send({
+        type: "text",
+        payload: { text: event.payload.message }
+      });
+      // Wait for user input, then provide it back
+      return;
+    }
+
+    // Handle workflow completion/failure
+    if (type === "workflow_callback") {
+      if (completion.status === "completed") {
+        await conversation.send({
+          type: "text",
+          payload: { text: `Done! Result: ${JSON.stringify(completion.output)}` }
+        });
+      } else {
+        await conversation.send({
+          type: "text",
+          payload: { text: `Workflow ended with status: ${completion.status}` }
+        });
+      }
+      return;
+    }
+
+    // Handle regular messages
+    if (type === "message") {
+      await execute({
+        instructions: "You are a helpful assistant"
+      });
     }
   }
 });

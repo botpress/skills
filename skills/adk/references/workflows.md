@@ -605,12 +605,50 @@ async handler({ state, conversation, message }) {
 }
 ```
 
+### 4. Handling Workflow Completion in Conversations
+
+When a workflow completes, fails, is canceled, or times out, the associated conversation handler receives a `workflow_callback` event with a typed `completion` object:
+
+```typescript
+// In Conversation - handle workflow completion
+export const Chat = new Conversation({
+  channel: "chat.channel",
+
+  async handler({ type, completion, conversation }) {
+    if (type === "workflow_callback") {
+      // completion.type — workflow name (e.g., "processOrder")
+      // completion.workflow — workflow instance
+      // completion.status — "completed" | "failed" | "canceled" | "timed_out"
+      // completion.output — workflow output (when completed)
+      // completion.error — error message (when failed)
+
+      if (completion.status === "completed") {
+        await conversation.send({
+          type: "text",
+          payload: {
+            text: `Processing finished! Result: ${JSON.stringify(completion.output)}`
+          }
+        });
+      } else if (completion.status === "failed") {
+        await conversation.send({
+          type: "text",
+          payload: { text: `Processing failed: ${completion.error}` }
+        });
+      }
+    }
+  }
+});
+```
+
+This replaces the need to poll workflow status or use raw event type guards. See **[Conversations — Handling Workflow Callbacks](./conversations.md#handling-workflow-callbacks-completion-events)** for full examples.
+
 ### Communication Best Practices
 
 1. **Always pass conversationId** for workflows that need to communicate
 2. **Wrap client calls in steps** for persistence and retry
 3. **Choose the right pattern**:
    - `step.request()` for required user input
+   - `type === "workflow_callback"` for reacting to workflow completion/failure
    - `client.createMessage()` for status updates
    - Events for decoupled notifications
 
@@ -928,24 +966,24 @@ export const ZaiWorkflow = new Workflow({
 
 ## Exposing Workflows as Tools (Non-Blocking Pattern)
 
-Workflows cannot be directly converted to tools using `.asTool()` - this method does not exist on workflow instances. To expose workflows to AI agents, wrap the workflow start call in an Action.
+Workflows can be converted to tools using `.asTool()`. This is useful when you want AI to start a long-running workflow without blocking on its completion.
 
-### Why `.asTool()` Doesn't Exist on Workflows
+### Direct Workflow Tool Pattern
 
 ```typescript
-// ❌ DOES NOT EXIST
+// Starts the workflow and returns immediately
 await execute({
   tools: [
-    MyWorkflow.asTool()  // Method not available
+    MyWorkflow.asTool()
   ]
 });
 ```
 
-Workflows are long-running, stateful processes. The `.asTool()` method is only available on Actions.
+When a workflow is exposed this way, the tool starts the workflow and returns a lightweight result such as the workflow ID and current status.
 
-### Action Wrapper Pattern
+### When to Still Use an Action Wrapper
 
-Create an Action that calls `workflow.start()` and returns immediately:
+An Action wrapper is still useful when you want to rename the tool, constrain inputs, add business rules, or hide workflow details from the AI:
 
 ```typescript
 // File: /actions/start-processing.ts
@@ -1377,6 +1415,8 @@ export const ResearchWorkflow = new Workflow({
 - `failed`: Terminated due to error
 - `cancelled`: Manually cancelled
 - `timedout`: Exceeded timeout limit
+
+When a workflow reaches a terminal status (`completed`, `failed`, `cancelled`, `timedout`), the associated conversation handler receives a `workflow_callback` event. Use `type === "workflow_callback"` in the conversation handler to react to these transitions — see [Handling Workflow Completion in Conversations](#4-handling-workflow-completion-in-conversations).
 
 ### Managing Lifecycle
 ```typescript

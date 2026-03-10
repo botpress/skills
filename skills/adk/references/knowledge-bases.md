@@ -108,7 +108,7 @@ const llmsTxtSource = DataSource.Website.fromLlmsTxt(
 
 ### 3. Table-Based
 
-Use table data as knowledge source:
+Table-backed knowledge sources are not fully implemented yet. The shape below is useful as a forward-looking pattern, but today you should treat it as experimental and prefer directory- or website-backed sources for production workflows.
 
 ```typescript
 import { FAQTable } from "../tables/FAQ";

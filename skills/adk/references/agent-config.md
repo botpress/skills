@@ -490,7 +490,7 @@ export default defineConfig({
 
 ### agent.json
 
-The `agent.json` file stores bot and workspace IDs for deployment. This file is automatically created by `adk link` or `adk dev` and should be gitignored.
+The `agent.json` file stores bot and workspace IDs for deployment. This file is automatically created by `adk link` or `adk dev`.
 
 ```json
 {
@@ -508,9 +508,10 @@ The `agent.json` file stores bot and workspace IDs for deployment. This file is 
 
 **Important:**
 
-- Add `agent.json` to `.gitignore`
+- Add `agent.json` to `.gitignore` if you do not want environment-specific IDs committed
 - Each developer/environment can have different IDs
 - Created automatically by `adk link` or `adk dev`
+- Current scaffolds do not add `agent.json` to `.gitignore` automatically
 
 ### package.json
 

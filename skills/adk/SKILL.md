@@ -98,6 +98,34 @@ adk
 adk --help
 ```
 
+**Prefer non-interactive paths when driving ADK workflows:**
+
+```bash
+# Login without browser prompts
+adk login --token "$BOTPRESS_TOKEN"
+
+# Scaffold with sensible defaults and skip linking
+adk init my-agent --yes --skip-link
+
+# Link directly when IDs are known
+adk link --workspace ws_123 --bot bot_456
+
+# More automation-friendly dev mode
+adk dev --logs --no-open
+
+# Auto-approve preflight changes only
+adk deploy --yes
+```
+
+Use these defaults when relevant:
+
+- Prefer `adk login --token "$BOTPRESS_TOKEN"` or `adk login --token <token>` over interactive login.
+- Treat bare `BOTPRESS_TOKEN` as a no-TTY convenience, not a guaranteed interactive-terminal shortcut.
+- Prefer `adk init <name> --yes --skip-link` for AI-driven scaffolding, but only after login is already completed.
+- Treat `adk link --workspace ... --bot ...` as scriptable, but not guaranteed safe in every no-TTY environment.
+- Treat `adk dev --logs --no-open` as CI-friendly, not fully prompt-free.
+- Treat `adk deploy --yes` as auto-approving preflight only; config validation can still block automation.
+
 **When to use CLI commands:**
 
 - "What integrations are available?"
@@ -341,6 +369,26 @@ await conversation.send({
 
 // ❌ WRONG - Never use client.createMessage() directly
 await client.createMessage({ ... });  // ❌ Wrong
+```
+
+### Conversation Handler Types
+
+```typescript
+// Handler receives typed context based on the event type:
+// type: "message" | "event" | "workflow_request" | "workflow_callback"
+async handler({ type, message, event, request, completion, conversation, execute }) {
+  if (type === "workflow_request") {
+    // event: WorkflowDataRequestEventType, request: WorkflowRequest
+    await request.workflow.provide("email", { email: "..." });
+  }
+  if (type === "workflow_callback") {
+    // event: WorkflowCallbackEventType, completion: WorkflowCallback
+    console.log(completion.status); // "completed" | "failed" | "canceled" | "timed_out"
+  }
+}
+
+// ⚠️ isWorkflowDataRequest() and isWorkflowCallback() are deprecated
+// Use type === "workflow_request" / "workflow_callback" instead
 ```
 
 ## Examples of Questions This Skill Answers

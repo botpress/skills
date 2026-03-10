@@ -212,12 +212,15 @@ See **[Integration Actions](./integration-actions.md)** for complete guide.
 
 ## Accessing Additional Context
 
-Actions can access additional runtime context through **direct imports** or the **Context API**:
+Actions can access additional runtime context through **direct imports** or the **Context API**.
+
+Direct imports are best for the global proxies that actually exist at runtime, such as `user`, `bot`, `configuration`, and `adk`. For optional per-request values like `conversation` and `message`, use the Context API.
 
 ### Method 1: Direct Imports (Global Context Proxies)
 
 ```typescript
-import { Action, z, user, bot, adk, conversation } from "@botpress/runtime";
+import { Action, z, user, bot, adk } from "@botpress/runtime";
+import { context } from "@botpress/runtime";
 
 export default new Action({
   name: "updateUserProfile",
@@ -233,6 +236,7 @@ export default new Action({
     bot.state.totalUsers += 1;
 
     // Access conversation (when in conversation context)
+    const conversation = context.get("conversation", { optional: true });
     console.log(conversation?.id);
 
     // Use ADK utilities

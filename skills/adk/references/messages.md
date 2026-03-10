@@ -6,7 +6,7 @@ Understanding how to send messages and events is critical for building conversat
 
 **Quick Links:**
 - [Core Concepts](#core-concepts) - Messages vs Events, Agnostic vs Channel-Specific
-- [Sending Messages in Conversations](#sending-messages-in-conversations) - Using `this.send()`
+- [Sending Messages in Conversations](#sending-messages-in-conversations) - Using `conversation.send()`
 - [Message Metadata](#message-metadata-chat-integration) - Adding custom data to messages
 - [All Message Types](#all-message-types) - Complete reference (text, image, file, card, etc.)
   - [File Messages & Metadata](#file-message-metadata) - File-specific metadata usage
@@ -26,7 +26,7 @@ Understanding how to send messages and events is critical for building conversat
 - Appear in chat history
 - Survive page reloads
 - Part of conversation context
-- Sent using `this.send()` in conversations
+- Sent using `conversation.send()` in conversations
 
 **Events** are ephemeral signals that don't persist:
 - NOT in conversation history
@@ -48,7 +48,7 @@ Understanding how to send messages and events is critical for building conversat
 
 ### Basic Syntax
 
-In conversation handlers, use `this.send()`:
+In conversation handlers, use `conversation.send()`:
 
 ```typescript
 import { Conversation } from "@botpress/runtime";
@@ -56,9 +56,9 @@ import { Conversation } from "@botpress/runtime";
 export const Chat = new Conversation({
   channel: "chat.channel",
 
-  async handler({ message }) {
+  async handler({ message, conversation }) {
     // Send a message
-    await this.send({
+    await conversation.send({
       type: "text",
       payload: { text: "Hello!" }
     });
@@ -66,7 +66,7 @@ export const Chat = new Conversation({
 });
 ```
 
-**CRITICAL**: Never use `client.createMessage()` directly in conversations. Always use `this.send()`.
+**CRITICAL**: Never use `client.createMessage()` directly in conversations. Always use `conversation.send()`.
 
 ```typescript
 // ❌ WRONG - Don't use client directly
@@ -76,14 +76,14 @@ await client.createMessage({
   payload: { text: "Hello" }
 });
 
-// ✅ CORRECT - Use this.send()
-await this.send({
+// ✅ CORRECT - Use conversation.send()
+await conversation.send({
   type: "text",
   payload: { text: "Hello" }
 });
 ```
 
-### Why Use `this.send()`?
+### Why Use `conversation.send()`?
 
 - Automatically handles conversation context
 - Type-safe for the channel
@@ -95,7 +95,7 @@ await this.send({
 The **chat** integration supports an optional `metadata` field on **all message types**. This allows you to attach arbitrary custom data that will be available to the frontend.
 
 ```typescript
-await this.send({
+await conversation.send({
   type: "text",
   payload: {
     text: "Your order has been confirmed",
@@ -135,7 +135,7 @@ await this.send({
 Basic text message - works everywhere.
 
 ```typescript
-await this.send({
+await conversation.send({
   type: "text",
   payload: {
     text: "Hello, world!"
@@ -148,7 +148,7 @@ await this.send({
 Formatted text with markdown - **channel support varies**.
 
 ```typescript
-await this.send({
+await conversation.send({
   type: "markdown",
   payload: {
     markdown: "**Bold** _italic_ `code` [link](https://example.com)"
@@ -163,7 +163,7 @@ await this.send({
 Display an image from a URL.
 
 ```typescript
-await this.send({
+await conversation.send({
   type: "image",
   payload: {
     imageUrl: "https://example.com/image.png"
@@ -176,7 +176,7 @@ await this.send({
 Play an audio file.
 
 ```typescript
-await this.send({
+await conversation.send({
   type: "audio",
   payload: {
     audioUrl: "https://example.com/audio.mp3"
@@ -189,7 +189,7 @@ await this.send({
 Display a video player.
 
 ```typescript
-await this.send({
+await conversation.send({
   type: "video",
   payload: {
     videoUrl: "https://example.com/video.mp4"
@@ -202,7 +202,7 @@ await this.send({
 Share a downloadable file with optional metadata.
 
 ```typescript
-await this.send({
+await conversation.send({
   type: "file",
   payload: {
     fileUrl: "https://example.com/document.pdf",
@@ -220,7 +220,7 @@ await this.send({
 Share a geographic location.
 
 ```typescript
-await this.send({
+await conversation.send({
   type: "location",
   payload: {
     latitude: 40.7128,
@@ -236,7 +236,7 @@ await this.send({
 Rich card with image, title, and action buttons.
 
 ```typescript
-await this.send({
+await conversation.send({
   type: "card",
   payload: {
     title: "Product Name",
@@ -268,7 +268,7 @@ await this.send({
 Multiple cards in a scrollable carousel.
 
 ```typescript
-await this.send({
+await conversation.send({
   type: "carousel",
   payload: {
     items: [
@@ -298,7 +298,7 @@ await this.send({
 Quick reply buttons for user selection.
 
 ```typescript
-await this.send({
+await conversation.send({
   type: "choice",
   payload: {
     text: "What would you like to do?",
@@ -317,7 +317,7 @@ await this.send({
 Dropdown/select menu for user selection.
 
 ```typescript
-await this.send({
+await conversation.send({
   type: "dropdown",
   payload: {
     text: "Select your country:",
@@ -336,7 +336,7 @@ await this.send({
 Multiple messages grouped together (composite message).
 
 ```typescript
-await this.send({
+await conversation.send({
   type: "bloc",
   payload: {
     items: [
@@ -362,13 +362,13 @@ await this.send({
 
 ### Custom (Integration-Specific)
 
-Custom messages are **integration-specific** and use the format `type: "{integration}:{messageType}"`.
+Custom message support varies by channel. In webchat conversations, use the plain `custom` message type.
 
 For webchat custom components:
 
 ```typescript
-await this.send({
-  type: "webchat:custom", // Integration-specific format
+await conversation.send({
+  type: "custom",
   payload: {
     url: "https://example.com/my-component.js", // Component URL
     name: "myCustomCard", // Component identifier
@@ -381,13 +381,13 @@ await this.send({
 });
 ```
 
-**Note**: Replace `webchat` with your integration name for custom message types in other channels.
+**Note**: Do not assume custom message types always use the `{integration}:{messageType}` pattern. Check the generated channel typings for the integration you are actually using.
 
 **Frontend handling** (in your webpage):
 
 ```javascript
 window.botpressWebChat.onMessage((message) => {
-  if (message.type === 'webchat:custom' && message.payload.name === 'myCustomCard') {
+  if (message.type === 'custom' && message.payload.name === 'myCustomCard') {
     // Render your custom component
     renderCustomCard(message.payload.data);
   }
@@ -464,7 +464,7 @@ This makes messages ideal for:
 
 ## Sending Messages from Workflows
 
-Workflows can't use `this.send()` - they must use `client.createMessage()`:
+Workflows can't use `conversation.send()` - they must use `client.createMessage()`:
 
 ```typescript
 import { Workflow } from "@botpress/runtime";
@@ -517,7 +517,7 @@ Some integrations provide actions for special message types and events:
 await client.callAction({
   type: "webchat:customEvent",
   input: {
-    conversationId: this.id,
+    conversationId: conversation.id,
     event: JSON.stringify({
       type: "notification",
       message: "Processing..."
@@ -528,19 +528,19 @@ await client.callAction({
 // Webchat - Show/hide widget
 await client.callAction({
   type: "webchat:showWebchat",
-  input: { conversationId: this.id }
+  input: { conversationId: conversation.id }
 });
 
 await client.callAction({
   type: "webchat:hideWebchat",
-  input: { conversationId: this.id }
+  input: { conversationId: conversation.id }
 });
 
 // Webchat - Update configuration
 await client.callAction({
   type: "webchat:configWebchat",
   input: {
-    conversationId: this.id,
+    conversationId: conversation.id,
     config: JSON.stringify({
       theme: { primaryColor: "#ff0000" }
     })
@@ -576,7 +576,7 @@ Not all message types work in all channels:
 | choice | ✅ | ✅ | ✅ | ✅ | ✅ |
 | dropdown | ✅ | ✅ | ❌ | ✅ | ❌ |
 | bloc | ✅ | ✅ | ❌ | ❌ | ❌ |
-| {integration}:custom | Varies | ✅ (webchat:custom) | Varies | Varies | Varies |
+| {integration}:custom | Varies | ✅ (`custom` in webchat conversations) | Varies | Varies | Varies |
 
 **Tip**: Use `text` and `image` for maximum compatibility across channels.
 
@@ -594,8 +594,8 @@ export const Chat = new Conversation({
 
 // ✅ CORRECT
 export const Chat = new Conversation({
-  async handler() {
-    await this.send({ /* ... */ });
+  async handler({ conversation }) {
+    await conversation.send({ /* ... */ });
   }
 });
 ```
@@ -605,13 +605,13 @@ export const Chat = new Conversation({
 ```typescript
 // ❌ WRONG - Events don't persist!
 await client.createEvent({
-  conversationId: this.id,
+  conversationId: conversation.id,
   type: "text",
   payload: { text: "Hello" }
 });
 
 // ✅ CORRECT - Use messages
-await this.send({
+await conversation.send({
   type: "text",
   payload: { text: "Hello" }
 });
@@ -649,12 +649,12 @@ export const MyWorkflow = new Workflow({
 ### 4. Using Integration-Specific Messages in Wrong Channels
 
 ```typescript
-// ❌ WRONG - webchat:custom only works in webchat
+// ❌ WRONG - custom messages only work in webchat conversations
 export const SlackChat = new Conversation({
   channel: "slack.dm",
-  async handler() {
-    await this.send({
-      type: "webchat:custom", // Will fail in Slack!
+  async handler({ conversation }) {
+    await conversation.send({
+      type: "custom", // Will fail in Slack!
       payload: { /* ... */ }
     });
   }
@@ -663,8 +663,8 @@ export const SlackChat = new Conversation({
 // ✅ CORRECT - Use agnostic message types
 export const SlackChat = new Conversation({
   channel: "slack.dm",
-  async handler() {
-    await this.send({
+  async handler({ conversation }) {
+    await conversation.send({
       type: "card", // Works in Slack
       payload: { /* ... */ }
     });
@@ -680,7 +680,7 @@ TypeScript will help you with type-safe payloads:
 
 ```typescript
 // TypeScript knows the payload structure based on type
-await this.send({
+await conversation.send({
   type: "card",
   payload: {
     title: "Required",
@@ -696,16 +696,16 @@ When supporting multiple channels:
 
 ```typescript
 export const Chat = new Conversation({
-  async handler() {
-    if (this.integration === "webchat") {
-      // Webchat supports integration-specific custom messages
-      await this.send({
-        type: "webchat:custom",
+  async handler({ conversation }) {
+    if (conversation.channel === "webchat.channel") {
+      // Webchat supports the plain `custom` message type
+      await conversation.send({
+        type: "custom",
         payload: { /* ... */ }
       });
     } else {
       // Fall back to card for other channels
-      await this.send({
+      await conversation.send({
         type: "card",
         payload: { /* ... */ }
       });
@@ -720,14 +720,14 @@ Always wrap message sending in try-catch:
 
 ```typescript
 try {
-  await this.send({
+  await conversation.send({
     type: "image",
     payload: { imageUrl: maybeInvalidUrl }
   });
 } catch (error) {
   console.error("Failed to send image:", error);
   // Fall back to text
-  await this.send({
+  await conversation.send({
     type: "text",
     payload: { text: "Image unavailable" }
   });
@@ -740,13 +740,13 @@ Break complex messages into parts:
 
 ```typescript
 // Instead of one giant text
-await this.send({
+await conversation.send({
   type: "text",
   payload: { text: "Title\n\nBody text here\n\nFooter" }
 });
 
 // Use bloc for better structure
-await this.send({
+await conversation.send({
   type: "bloc",
   payload: {
     items: [
@@ -760,16 +760,16 @@ await this.send({
 
 ## Summary
 
-**In Conversations**: Use `this.send()` for messages (persistent, type-safe)
+**In Conversations**: Use `conversation.send()` for messages (persistent, type-safe)
 
 **In Workflows**: Use `client.createMessage()` with `conversationId` in input
 
 **Events**: Use integration actions for ephemeral notifications (don't persist)
 
 **Key Rules**:
-1. ✅ Use `this.send()` in conversations, `client.createMessage()` in workflows
+1. ✅ Use `conversation.send()` in conversations, `client.createMessage()` in workflows
 2. ✅ Always pass `conversationId` to workflows that send messages
 3. ✅ Use messages for persistent content, events for ephemeral notifications
-4. ✅ Integration-specific messages use format: `{integration}:{messageType}` (e.g., `webchat:custom`)
+4. ✅ In webchat conversations, use the plain `custom` message type for custom components
 5. ❌ Never use `client.createMessage()` in conversations
 6. ❌ Check channel compatibility for message types (see table above)
