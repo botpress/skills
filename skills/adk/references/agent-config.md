@@ -317,7 +317,7 @@ export default defineConfig({
 
 // In handlers
 export const myAction = new Action({
-  async handler(input) {
+  async handler({ input }) {
     const apiKey = process.env.EXTERNAL_API_KEY;
 
     if (!apiKey) {

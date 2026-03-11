@@ -209,13 +209,16 @@ Documentation should be located in `./references/` directory relative to this sk
 - **tags.md** - Entity tags for bot, user, conversation, and workflow
 - **cli.md** - Complete CLI command reference
 - **mcp-server.md** - MCP server for AI assistants
+- **desk.md** - Desk integration for ticket/support workflows
+
+### Patterns & Best Practices
+
+- **advanced-patterns.md** - Guardrails, admin auth, logging/observability, extension composition
+- **patterns-mistakes.md** - Common mistakes, correct patterns, and context access reference
 
 ### Frontend Integration
 
-- **frontend/botpress-client.md** - Using @botpress/client in frontends
-- **frontend/calling-actions.md** - Calling bot actions from frontend
-- **frontend/type-generation.md** - Type-safe integration with generated types
-- **frontend/authentication.md** - Authentication with PATs
+> **Note:** Frontend integration docs are in the separate **adk-frontend** skill. Install it with `npx skills add botpress/skills --skill adk-frontend` for docs on @botpress/client, calling actions, type generation, and authentication.
 
 ## Runtime Access Patterns
 

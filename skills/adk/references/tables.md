@@ -735,7 +735,7 @@ export const createUser = new Action({
     created: z.boolean(),
   }),
 
-  async handler(input) {
+  async handler({ input }) {
     // Check if user exists
     const existing = await UsersTable.findRows({
       filter: { email: input.email },
@@ -901,7 +901,7 @@ export const fetchPaginatedData = new Action({
     pageSize: z.number().int().positive().max(100).default(20),
   }),
 
-  async handler(input) {
+  async handler({ input }) {
     const offset = (input.page - 1) * input.pageSize;
 
     const { rows } = await MyTable.findRows({

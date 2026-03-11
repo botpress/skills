@@ -376,15 +376,13 @@ export const sendNewMessage = createOptimisticAction<{
         attachments: [],
         computed: {},
         ticketId: props.ticketId,
-        created_at: new Date().toISOString(),
         type: props.messageType,
         createdAt: new Date().toISOString(),
         details: {},
-        external_id: undefined,
+        externalId: undefined,
         messageId: "",
         redacted: false,
         state: "sent",
-        updated_at: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       },
       { optimistic: true }  // ← Marks this as optimistic
@@ -713,7 +711,7 @@ Error: Action "myAction" not found
 **Fix:** Ensure action name in `callAction()` matches the `name` field in your Action definition:
 ```typescript
 // Action definition
-export default Action({ name: "sendMessage", ... });
+export default new Action({ name: "sendMessage", ... });
 
 // Frontend call - must match exactly
 client.callAction({ type: "sendMessage", ... });

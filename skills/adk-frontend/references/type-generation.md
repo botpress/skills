@@ -289,8 +289,7 @@ export type CloseTicketAction = BotActionDefinitions["closeTicket"];
 // Usage in service
 async function sendMessage(input: SendMessageAction["input"]) {
   const result: SendMessageAction["output"] = await client.callAction({
-    type: "action",
-    action: "sendMessage",
+    type: "sendMessage",
     input,
   });
   return result;
@@ -486,8 +485,7 @@ class BotService {
     input: SendMessageAction["input"]
   ): Promise<SendMessageAction["output"]> {
     const result = await this.client.callAction({
-      type: "action",
-      action: "sendMessage",
+      type: "sendMessage",
       input,
     });
     return result.output;

@@ -42,7 +42,7 @@ export const MyWorkflow = new Workflow({
   name: "myWorkflow",
   description: "Description of what this workflow does",
 
-  // Optional: Set workflow timeout (default: 1 hour)
+  // Optional: Set workflow timeout (default: 5 minutes)
   timeout: "6h", // Can be: "30m", "2h", "1d", etc.
 
   // Optional: Schedule for automatic execution
@@ -141,29 +141,23 @@ const instance = await MyWorkflow.getOrCreate({
   input: { userId: user.id, data: "x" }
 });
 
-// 3. Get existing instance
-const instance = await MyWorkflow.get({ key: user.id });
-if (instance) {
-  console.log(instance.status); // "in_progress" | "completed" | "failed"
-}
-
-// 4. List workflow instances
-const instances = await MyWorkflow.list({
-  status: "in_progress", // Optional filter
-  limit: 10,
-  offset: 0
+// 3. Check status via getOrCreate (no standalone get/list methods)
+const instance = await MyWorkflow.getOrCreate({
+  key: user.id,
+  input: { userId: user.id, data: "x" }
 });
+console.log(instance.status); // "in_progress" | "completed" | "failed"
 ```
 
 ### Important Notes
-- There is NO `create()` method - use `start()` or `getOrCreate()`
+- There is NO `create()`, `get()`, or `list()` method - use `start()` or `getOrCreate()`
 - `start()`: Always creates a new instance
 - `getOrCreate()`: Creates only if no instance exists with the given key
 
 ### Instance Properties
 
 ```typescript
-const instance = await MyWorkflow.get({ key: userId });
+const instance = await MyWorkflow.getOrCreate({ key: userId, input: { /* ... */ } });
 
 // Available properties
 console.log(instance.id);           // "wflw_abc123"
@@ -180,7 +174,7 @@ console.log(instance.output);       // Output (undefined if not complete)
 Cancel a running workflow from outside:
 
 ```typescript
-const instance = await MyWorkflow.get({ key: userId });
+const instance = await MyWorkflow.getOrCreate({ key: userId, input: { /* ... */ } });
 
 if (instance && instance.status === "in_progress") {
   await instance.cancel();
@@ -1005,7 +999,7 @@ export default new Action({
     workflowId: z.string()
   }),
 
-  async handler(input) {
+  async handler({ input }) {
     // Calls workflow.start() - returns immediately
     const instance = await DataProcessingWorkflow.start({
       datasetId: input.datasetId,
@@ -1320,7 +1314,6 @@ export const MyWorkflow = new Workflow({
 ```typescript
 import { Workflow, z, Autonomous } from "@botpress/runtime";
 import { actions } from "@botpress/runtime";
-import { ThinkSignal } from "llmz";
 
 export const ResearchWorkflow = new Workflow({
   name: "research",
@@ -1362,7 +1355,7 @@ export const ResearchWorkflow = new Workflow({
           count: 5
         });
         state.sources.push(...results.urls); // State accessible in closure
-        throw new ThinkSignal("Found sources", results);
+        throw new Autonomous.ThinkSignal("Found sources", results);
       }
     });
 
@@ -1421,7 +1414,7 @@ When a workflow reaches a terminal status (`completed`, `failed`, `cancelled`, `
 ### Managing Lifecycle
 ```typescript
 // Check status
-const instance = await MyWorkflow.get({ key: userId });
+const instance = await MyWorkflow.getOrCreate({ key: userId, input: { /* ... */ } });
 if (instance?.status === "failed") {
   // Retry by starting new instance
   await MyWorkflow.start(instance.input);

@@ -1,6 +1,6 @@
 # ZAI Reference for AI Agents
 
-ZAI is pre-configured in your environment. Use `zai.*` to access LLM operations with automatic type safety.
+ZAI is pre-configured in your ADK environment. Use `adk.zai.*` to access LLM operations with automatic type safety. Import `adk` from `@botpress/runtime`.
 
 ## Core Operations
 

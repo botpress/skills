@@ -358,8 +358,9 @@ export const Chat = new Conversation({
 
     if (text === "/status" && state.activeWorkflowId) {
       // Check workflow status
-      const instance = await ProcessWorkflow.get({
-        id: state.activeWorkflowId
+      const instance = await ProcessWorkflow.getOrCreate({
+        key: state.activeWorkflowId,
+        input: { /* required input */ }
       });
 
       await conversation.send({

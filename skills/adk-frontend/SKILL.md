@@ -78,6 +78,19 @@ Documentation files in `./references/`:
 - **calling-actions.md** - Type-safe action calls, mutations, error handling, optimistic updates
 - **type-generation.md** - Triple-slash references, generated types, maintaining type safety
 
+### Architecture & Setup
+
+- **overview.md** - Architecture overview, when to use ADK frontends, project structure
+- **project-setup.md** - Vite + React scaffolding, TypeScript config, environment setup
+- **recommended-stack.md** - Recommended tech stack with rationale
+
+### Data & State Patterns
+
+- **service-layer.md** - Service layer pattern for wrapping API calls with types
+- **data-fetching.md** - TanStack Query patterns, mutations, optimistic updates
+- **state-management.md** - Zustand vs TanStack Query, when to use each
+- **realtime-updates.md** - Polling strategies, interval tiers, performance considerations
+
 ---
 
 ## How to Answer Frontend Questions

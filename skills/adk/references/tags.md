@@ -38,11 +38,12 @@ export default defineConfig({
     }),
 
     // User tags (key-value pairs for categorization)
+    // Tags are defined as { title: string, description?: string } objects, NOT Zod schemas
     tags: {
-      tier: z.enum(["free", "pro", "enterprise"]),
-      region: z.string(),
-      source: z.string(),
-      referralCode: z.string().optional(),
+      tier: { title: "Subscription Tier", description: "User subscription level" },
+      region: { title: "Region", description: "User geographic region" },
+      source: { title: "Acquisition Source" },
+      referralCode: { title: "Referral Code" },
     },
   },
 });
@@ -56,10 +57,10 @@ export default defineConfig({
 
   conversation: {
     tags: {
-      category: z.string(),
-      priority: z.enum(["low", "medium", "high", "urgent"]),
-      assignedTo: z.string().optional(),
-      department: z.string(),
+      category: { title: "Category" },
+      priority: { title: "Priority", description: "Conversation priority level" },
+      assignedTo: { title: "Assigned To" },
+      department: { title: "Department" },
     },
   },
 });
@@ -77,9 +78,9 @@ export default defineConfig({
     }),
 
     tags: {
-      environment: z.enum(["development", "staging", "production"]),
-      region: z.string(),
-      version: z.string(),
+      environment: { title: "Environment", description: "Deployment environment" },
+      region: { title: "Region" },
+      version: { title: "Version" },
     },
   },
 });
@@ -93,9 +94,9 @@ export default defineConfig({
 
   workflow: {
     tags: {
-      type: z.string(),
-      priority: z.enum(["low", "normal", "high"]),
-      createdBy: z.string(),
+      type: { title: "Workflow Type" },
+      priority: { title: "Priority" },
+      createdBy: { title: "Created By" },
     },
   },
 });
@@ -175,7 +176,7 @@ export default new Action({
   }),
   output: z.object({ success: z.boolean() }),
 
-  async handler(input) {
+  async handler({ input }) {
     const oldTier = user.tags.tier;
     const conversation = context.get("conversation", { optional: true });
 
@@ -393,31 +394,31 @@ export const SupportWorkflow = new Workflow({
 ```typescript
 // ✅ Good - clear purpose
 tags: {
-  subscriptionTier: z.enum(["free", "pro", "enterprise"]),
-  acquisitionChannel: z.string(),
-  supportPriority: z.enum(["low", "medium", "high"]),
+  subscriptionTier: { title: "Subscription Tier", description: "User subscription level" },
+  acquisitionChannel: { title: "Acquisition Channel" },
+  supportPriority: { title: "Support Priority" },
 }
 
 // ❌ Bad - unclear
 tags: {
-  t: z.string(),
-  lvl: z.string(),
-  p: z.string(),
+  t: { title: "T" },
+  lvl: { title: "Lvl" },
+  p: { title: "P" },
 }
 ```
 
 ### 2. Use Enums for Constrained Values
 
 ```typescript
-// ✅ Good - constrained values
+// ✅ Good - descriptive titles
 tags: {
-  status: z.enum(["active", "inactive", "suspended"]),
-  tier: z.enum(["free", "pro", "enterprise"]),
+  status: { title: "Account Status", description: "Active, inactive, or suspended" },
+  tier: { title: "Subscription Tier", description: "Free, pro, or enterprise" },
 }
 
-// ❌ Bad - free-form strings prone to typos
+// ❌ Bad - missing descriptions
 tags: {
-  status: z.string(), // Could be "active", "Active", "ACTIVE", etc.
+  status: { title: "Status" }, // Unclear what values are expected
 }
 ```
 
@@ -427,14 +428,9 @@ tags: {
 export default defineConfig({
   user: {
     tags: {
-      /** Customer subscription level for feature gating */
-      tier: z.enum(["free", "pro", "enterprise"]),
-
-      /** Geographic region for compliance and routing */
-      region: z.string(),
-
-      /** How the user discovered the bot */
-      acquisitionSource: z.string(),
+      tier: { title: "Subscription Tier", description: "Customer subscription level for feature gating" },
+      region: { title: "Region", description: "Geographic region for compliance and routing" },
+      acquisitionSource: { title: "Acquisition Source", description: "How the user discovered the bot" },
     },
   },
 });
@@ -506,7 +502,7 @@ user.tags.newTag = "value"; // Warning: Tag not defined
 export default defineConfig({
   user: {
     tags: {
-      newTag: z.string(), // Now it will persist
+      newTag: { title: "New Tag" }, // Now it will persist
     },
   },
 });

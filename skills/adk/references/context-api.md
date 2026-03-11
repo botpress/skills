@@ -312,7 +312,7 @@ if (user && conversation) {
 
 ```typescript
 export const myAction = new Action({
-  async handler(input) {
+  async handler({ input }) {
     const client = context.get("client");
     const user = context.get("user", { optional: true });
 
@@ -398,7 +398,7 @@ const citations = context.get("citations");
 ```typescript
 // ✅ GOOD - Get context when needed
 export const myAction = new Action({
-  async handler(input) {
+  async handler({ input }) {
     const client = context.get("client");  // Get when you need it
     const result = await client.searchFiles({ query: input.query });
     return result;
@@ -408,8 +408,8 @@ export const myAction = new Action({
 // ❌ BAD - Don't store context globally
 let globalClient;  // Don't do this!
 
-export const myAction = new Action({
-  async handler(input) {
+export const badAction = new Action({
+  async handler({ input }) {
     globalClient = context.get("client");  // Context might change
   }
 });

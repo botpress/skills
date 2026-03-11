@@ -315,8 +315,10 @@ const { account: user } = await client.getAccount({});
 Returns basic account information:
 - `id` - Botpress user ID
 - `email` - User's email address
-- `name` - Display name
-- `workspaces` - List of workspace IDs
+- `displayName` - Display name
+- `emailVerified` - Whether email is verified
+- `profilePicture` - Profile picture URL
+- `createdAt` - Account creation date
 
 ### 2. Bot Table Query
 
@@ -752,13 +754,18 @@ if (import.meta.env.PROD && window.location.protocol !== 'https:') {
 Implement automatic logout when tokens expire:
 
 ```typescript
-// Global API client error interceptor
-client.on('error', (error) => {
-  if (error.status === 401) {
-    logout();
-    window.location.href = '/';
+// Wrap API calls with error handling (Client has no event emitter)
+async function safeApiCall<T>(fn: () => Promise<T>): Promise<T> {
+  try {
+    return await fn();
+  } catch (error: any) {
+    if (error.status === 401) {
+      logout();
+      window.location.href = '/';
+    }
+    throw error;
   }
-});
+}
 ```
 
 ### 3. Never Log PATs
