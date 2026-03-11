@@ -225,7 +225,7 @@ export const searchAction = new Action({
   name: "searchDocs",
   input: z.object({ query: z.string() }),
 
-  async handler(input) {
+  async handler({ input }) {
     const client = context.get("client");
 
     // Search knowledge base

@@ -196,7 +196,7 @@ For complete context access details including `client`, `citations`, availabilit
 `ThinkSignal` allows tools to return results with additional instructions for the AI. When thrown, it provides context that guides how the AI should use the information.
 
 ```typescript
-import { Autonomous, z, ThinkSignal } from "@botpress/runtime";
+import { Autonomous, z } from "@botpress/runtime";
 
 export default new Autonomous.Tool({
   name: "searchKnowledge",
@@ -209,7 +209,7 @@ export default new Autonomous.Tool({
 
     // Handle no results case
     if (!results.length) {
-      throw new ThinkSignal(
+      throw new Autonomous.ThinkSignal(
         "No results found",
         "No results were found. Try rephrasing or ask something else. Do NOT make up an answer."
       );
@@ -221,7 +221,7 @@ export default new Autonomous.Tool({
       .join("\n\n");
 
     // Return results with instructions for the AI
-    throw new ThinkSignal(
+    throw new Autonomous.ThinkSignal(
       "Search complete - use these results to answer",
       formatted
     );

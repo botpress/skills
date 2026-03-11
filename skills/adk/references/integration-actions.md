@@ -45,7 +45,7 @@ adk add linear@2.0.0 --alias my-linear
 adk dev
 ```
 
-Then configure the integration in the UI at `localhost:3001` or in `dependencies.json`.
+Then configure the integration in the UI at `localhost:3001` or in `agent.config.ts`.
 
 ## Basic Usage
 
@@ -550,8 +550,8 @@ The actions proxy automatically determines whether you're calling a bot action (
 
 **Solutions:**
 1. Add integration: `adk add slack@2.5.5`
-2. Enable in dependencies.json: `"enabled": true`
-3. Configure credentials in UI or dependencies.json
+2. Enable in agent.config.ts: `enabled: true`
+3. Configure credentials in UI (localhost:3001) or in agent.config.ts
 4. Restart dev server: `adk dev`
 
 ### Action Not Found
@@ -584,7 +584,7 @@ The actions proxy automatically determines whether you're calling a bot action (
 
 **Solutions:**
 1. Configure credentials in UI (localhost:3001 during dev)
-2. Set credentials in dependencies.json
+2. Set credentials in agent.config.ts dependencies config
 3. Check environment variables are set
 4. Verify API keys/tokens are valid
 
