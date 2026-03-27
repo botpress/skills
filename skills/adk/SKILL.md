@@ -239,6 +239,7 @@ import {
   user,
   bot,
   conversation,
+  configuration,
   context,
 } from "@botpress/runtime";
 ```

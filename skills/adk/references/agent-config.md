@@ -97,16 +97,17 @@ export default defineConfig({
 });
 ```
 
-Access via Context API:
+Access via direct import from `@botpress/runtime`:
 
 ```typescript
-const config = context.get("configuration");
-if (config.featureFlags.enableBetaFeatures) {
+import { configuration } from "@botpress/runtime";
+
+if (configuration.featureFlags.enableBetaFeatures) {
   // Use beta features
 }
 ```
 
-See **[Context API](./context-api.md)** for details on accessing configuration at runtime.
+See **[Context API](./context-api.md)** for details on accessing other runtime values.
 
 ### Model Configuration
 
