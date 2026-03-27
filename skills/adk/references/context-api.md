@@ -258,21 +258,6 @@ console.log(`Running in bot: ${botId}`);
 
 **Type:** `string`
 
-### configuration
-
-Bot configuration from `agent.config.ts`.
-
-```typescript
-const config = context.get("configuration");
-
-// Access custom configuration values
-if (config.myCustomSetting) {
-  // Use the setting
-}
-```
-
-**Type:** `Config` (defined in your agent.config.ts)
-
 ## Using context.get()
 
 ### Basic Syntax
@@ -382,8 +367,6 @@ const citations = context.get("citations");
 - `cognitive` - AI model client
 - `logger` - Structured logger
 - `botId` - Current bot ID
-- `configuration` - Bot configuration
-
 **Conditionally available (use `{ optional: true }`):**
 - `user` - Only in conversation context
 - `conversation` - Only in conversation context
