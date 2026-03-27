@@ -6,7 +6,7 @@ license: MIT
 
 # Botpress ADK Guidelines
 
-Use this skill when you've got questions about the Botpress Agent Development Kit (ADK) - like when you're building a feature that involves tables, actions, tools, workflows, conversations, files, knowledge bases, triggers, or Zai.
+Use this skill when you've got questions about the Botpress Agent Development Kit (ADK) - like when you're building a feature that involves tables, actions, tools, workflows, conversations, files, knowledge bases, triggers, evals, or Zai.
 
 ## What is the ADK?
 
