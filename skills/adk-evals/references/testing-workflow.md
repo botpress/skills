@@ -11,7 +11,7 @@ cd my-agent
 adk dev
 ```
 
-If `adk dev` isn't running, `adk evals` auto-starts a lightweight server automatically.
+If `adk dev` isn't running, `adk evals` auto-starts a lightweight server automatically — fine for one-off runs, but for repeated eval invocations always use `adk dev` to avoid the startup latency on every run.
 
 ---
 
@@ -48,7 +48,7 @@ adk evals --tag tools --type regression
 
 ```bash
 adk evals --verbose    # show all assertions including passing ones
-adk evals --json       # machine-readable JSON output (for CI)
+adk evals --format json # machine-readable JSON output (for CI)
 ```
 
 ### Exit codes
@@ -63,6 +63,8 @@ Use this in CI to gate merges on eval results.
 ---
 
 ## Interpreting Output
+
+> Always run with `--format json` when consuming output programmatically — structured output is more reliable than parsing text.
 
 ### Passing eval
 

@@ -270,8 +270,10 @@ export default new Eval({
 export default new Eval({
   name: 'table-read',
   tags: ['tables'],
-
-  // Note: seed the table via a setup tool or prior state if needed
+  setup: {
+    // Tables cannot be seeded via setup.state — seed data must already exist in the dev bot's table,
+    // or be written by a prior eval turn before the assertions run.
+  },
   conversation: [
     {
       user: 'List my open tickets',

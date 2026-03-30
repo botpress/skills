@@ -20,8 +20,10 @@ Use this skill when the developer asks about:
 - **Running evals** — CLI commands, filtering, output interpretation
 - **Testing specific primitives** — how to test actions, tools, workflows, conversations, tables, state
 - **The testing loop** — write → run → inspect traces → iterate
-- **CI integration** — exit codes, `--json` flag, tagging strategies
+- **CI integration** — exit codes, `--format json` flag, tagging strategies
 - **Eval configuration** — idleTimeout, judgePassThreshold, judgeModel
+
+Or when you are developing an ADK bot and need to write the equivalent of unit/end-to-end tests.
 
 **Trigger questions:**
 - "How do I write an eval?"
@@ -98,7 +100,7 @@ export default new Eval({
 |------|------------|
 | `user: 'message'` | Standard user message |
 | `event: { type, payload }` | Non-message trigger (webhook, integration event) |
-| `+ expectSilence: true` | Assert bot does NOT respond |
+| `expectSilence: true` | Assert bot does NOT respond |
 
 ### Assertion categories
 
@@ -119,7 +121,7 @@ adk evals <name>                 # run one eval
 adk evals --tag <tag>            # filter by tag
 adk evals --type regression      # filter by type
 adk evals --verbose              # show all assertions
-adk evals --json                 # JSON output for CI
+adk evals --format json          # JSON output for CI
 
 adk evals runs                   # list recent runs
 adk evals runs --latest          # most recent run

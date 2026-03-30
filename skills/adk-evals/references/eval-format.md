@@ -217,7 +217,13 @@ Used in tool params, table conditions, and state values:
 | `matches` | `{ matches: '\\d+' }` | Regex |
 | `in` | `{ in: ['high', 'urgent'] }` | One of |
 | `exists` | `{ exists: true }` | Property exists |
-| `gte` / `lte` | `{ gte: 1 }` | Numeric comparison |
+
+**Numeric-only operators** (for `timing` and numeric state values):
+
+| Operator | Example | Description |
+|----------|---------|-------------|
+| `gte` | `{ gte: 100 }` | Greater than or equal |
+| `lte` | `{ lte: 5000 }` | Less than or equal |
 
 ---
 
