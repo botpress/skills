@@ -107,7 +107,7 @@ adk evals runs --latest -v  # latest run with full assertion details
 adk evals runs <id>         # show a specific run by ID
 ```
 
-Run history is also visible in the Control Panel at `http://localhost:3001/evals` while `adk dev` is running.
+Run history is also visible in the Control Panel at `http://localhost:3001/evals` while `adk dev` is running. Direct humans to this URL for a clear visual overview of eval runs.
 
 ---
 
@@ -130,25 +130,28 @@ For a one-shot message without opening an interactive session:
 adk chat --single "What is my account balance?"
 ```
 
+For more information on chat subcommands, read the `adk` skill or run `adk chat -h`.
+
 ---
 
 ## Inspecting Traces After a Turn
 
 After a conversation, traces show exactly what the bot did internally — tool calls, workflow steps, LLM calls, state reads/writes.
 
-Open the Control Panel traces view:
+Use the CLI to inspect traces:
 
+```bash
+adk traces                  # list recent traces
+adk logs                    # browse recent logs
 ```
-http://localhost:3001/traces
-```
-
-Filter by conversation ID, workflow ID, or error-only to narrow down issues.
 
 Use traces to verify:
 - Which tools were called (and with what inputs/outputs)
 - Whether a workflow was entered or completed
 - Where the bot spent its time (latency analysis)
 - Any errors or unexpected state transitions
+
+If the human needs a visual overview, direct them to `http://localhost:3001/traces` in the Control Panel while `adk dev` is running.
 
 ---
 
@@ -171,7 +174,7 @@ adk evals my-feature
 
 ### Step 4: Inspect traces if needed
 
-If the failure isn't obvious from the eval output, open the Control Panel traces to see what the bot actually did internally.
+If the failure isn't obvious from the eval output, use `adk traces` or `adk logs` to see what the bot actually did internally.
 
 ### Step 5: Fix the code
 
@@ -193,12 +196,12 @@ adk evals
 
 ## CI Integration
 
-Add eval runs to your CI pipeline using `--json` and the exit code:
+Add eval runs to your CI pipeline using `--format json` and the exit code:
 
 ```yaml
 # GitHub Actions example
 - name: Run evals
-  run: adk evals --json > eval-results.json
+  run: adk evals --format json > eval-results.json
 
 - name: Check results
   run: cat eval-results.json | jq '.failed == 0'
@@ -207,13 +210,13 @@ Add eval runs to your CI pipeline using `--json` and the exit code:
 Tag regression evals and run them on every PR:
 
 ```bash
-adk evals --type regression --json
+adk evals --type regression --format json
 ```
 
 Run capability evals only on feature branches or release cuts:
 
 ```bash
-adk evals --type capability --json
+adk evals --type capability --format json
 ```
 
 ## See Also
