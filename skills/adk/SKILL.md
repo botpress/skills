@@ -210,15 +210,24 @@ Documentation should be located in `./references/` directory relative to this sk
 - **cli.md** - Complete CLI command reference
 - **mcp-server.md** - MCP server for AI assistants
 - **desk.md** - Desk integration for ticket/support workflows
+- **integrations.md** - Integration management overview (points to adk-integrations skill)
 
 ### Patterns & Best Practices
 
 - **advanced-patterns.md** - Guardrails, admin auth, logging/observability, extension composition
 - **patterns-mistakes.md** - Common mistakes, correct patterns, and context access reference
 
+### Integration Management
+
+> **Note:** Full integration lifecycle docs (discovery, adding, configuring, and using integrations) are in the separate **adk-integrations** skill. Install it with `npx skills add botpress/skills --skill adk-integrations`. The `adk-integrations` skill covers `adk search`, `adk add`, `adk info`, configuration types, and common integrations. You need it if you are touching integrations.
+
 ### Frontend Integration
 
-> **Note:** Frontend integration docs are in the separate **adk-frontend** skill. Install it with `npx skills add botpress/skills --skill adk-frontend` for docs on @botpress/client, calling actions, type generation, and authentication.
+> **Note:** Frontend integration docs are in the separate **adk-frontend** skill. Install it with `npx skills add botpress/skills --skill adk-frontend`. The `adk-frontend` skill covers @botpress/client, calling actions, type generation, and authentication. You need it if you are touching any frontend code.
+
+### Evals
+
+> **Note:** Detailed eval docs are in the separate **adk-evals** skill. Install it with `npx skills add botpress/skills --skill adk-evals`. The `adk-evals` skill covers writing evals, assertion types, testing workflows, and CLI usage. You usually always need it, for testing and evaluations.
 
 ## Runtime Access Patterns
 
