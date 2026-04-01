@@ -14,7 +14,7 @@ adk search <query>
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--format json` | `json` | Output format |
+| `--format` | `json` | Output format |
 | `--limit <number>` | `20` | Maximum results to return |
 
 **Example:**
@@ -40,7 +40,7 @@ adk list --available
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--format json` | `json` | Output format |
+| `--format <json>` | `json` | Output format |
 | `--limit <number>` | `50` | Maximum results to return |
 
 Returns: name, version, and title for each integration.
@@ -57,7 +57,7 @@ adk list
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--format json` | `json` | Output format |
+| `--format <json>` | `json` | Output format |
 | `--limit <number>` | `50` | Maximum results to return |
 
 Returns: alias, name, version, and status for each installed integration.
@@ -80,7 +80,7 @@ adk info <name>
 | `--channels` | off | Show only the channels section |
 | `--events` | off | Show only the events section |
 | `--full` | off | Show all sections (overrides individual flags) |
-| `--format json` | `json` | Output format |
+| `--format <json>` | `json` | Output format |
 
 When no section flag is provided, all sections are shown by default.
 
