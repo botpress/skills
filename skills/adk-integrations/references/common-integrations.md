@@ -4,7 +4,7 @@ Quick-reference for popular Botpress integrations. Details verified via `adk inf
 
 ## chat
 
-**Version:** 0.7.7 | **Config:** Optional only (encryptionKey, webhookUrl, webhookSecret — none required)
+**Config:** Optional only (encryptionKey, webhookUrl, webhookSecret — none required)
 
 | | Count |
 |--|-------|
@@ -16,7 +16,7 @@ Used internally by `adk chat` CLI command. Good default for basic messaging duri
 
 ## webchat
 
-**Version:** 0.3.0 | **Config:** Optional only (~38 theming/behavior props — none required)
+**Config:** Optional only (~38 theming/behavior props — none required)
 
 | | Count |
 |--|-------|
@@ -28,7 +28,7 @@ Embeddable web chat widget. Config props control appearance (primaryColor, fontF
 
 ## browser
 
-**Version:** 0.8.6 | **Config:** None (zero config properties)
+**Config:** None (zero config properties)
 
 | | Count |
 |--|-------|
@@ -40,7 +40,7 @@ Most commonly used integration for RAG, web search, and page scraping. No config
 
 ## slack
 
-**Version:** latest | **Config:** OAuth + required `replyBehaviour` field
+**Config:** OAuth + required `replyBehaviour` field
 
 | | Count |
 |--|-------|
@@ -59,7 +59,7 @@ After adding, you must:
 
 ## whatsapp
 
-**Version:** latest | **Config:** 3 modes (OAuth, sandbox, manual)
+**Config:** 3 modes (OAuth, sandbox, manual)
 
 | | Count |
 |--|-------|
@@ -92,7 +92,7 @@ Because it's private, use the full name when searching: `adk info agi/linear`.
 
 ## webhook
 
-**Version:** 1.1.5 | **Config:** Optional only (secret, allowedOrigins — none required)
+**Config:** Optional only (secret, allowedOrigins — none required)
 
 | | Count |
 |--|-------|
