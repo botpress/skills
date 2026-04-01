@@ -72,7 +72,7 @@ If `configurations` has multiple entries, the integration supports multiple mode
 
 ## agent.config.ts Structure
 
-Integrations are declared in the `integrations` block of `agent.config.ts`.
+Integrations are declared in the `dependencies.integrations` block of `agent.config.ts`.
 
 ### String Format
 
