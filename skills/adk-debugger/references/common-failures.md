@@ -52,10 +52,7 @@ adk chat --single "Hello" --format json
 
 | Cause | How to Verify |
 |-------|--------------|
-| `adk dev` not running | No log output or very old logs; start it with `adk dev` |
-| Bot not linked | Check that `agent.json` exists with `botId` and `workspaceId` |
-| No dev bot created | Check that `agent.local.json` has `devId` (set by `adk link [--local]` run, which is always interactive and must be done by the human) |
-| No conversation handler for the channel | Verify a conversation export exists for the channel you're testing on |
+| No dev bot created | Check that `agent.local.json` has `devId` (set automatically on the first `adk dev` run, or manually via `adk link --local`) | Run `adk dev` at least once to create the dev bot |
 | Integration not configured | Check Control Panel at localhost:3001 — look for unconfigured integrations |
 
 **Fix:** Work through the checklist top to bottom. Most "bot not responding" issues are missing config or a stopped dev server.
