@@ -63,6 +63,64 @@ Production-tested patterns for building frontend applications that integrate wit
 - React Query (optional, recommended for mutations)
 - Zustand (for client state management)
 
+### botpress-adk-evals
+
+Complete reference for writing, running, and iterating on evals (automated conversation tests) for ADK agents. Covers eval file format, all assertion types, CLI usage, and per-primitive testing patterns.
+
+**Use when:**
+
+- Writing automated tests for an ADK agent
+- Learning the eval file format and assertion types
+- Running evals and interpreting results
+- Testing specific primitives (actions, tools, workflows, conversations, tables)
+- Integrating evals into CI pipelines
+
+**Categories covered:**
+
+- **Eval Format** - File structure, turn types, all assertion categories (response, tools, state, tables, workflow, timing)
+- **Testing Workflow** - Running evals, interpreting output, using traces, the write-test-iterate loop
+- **Test Patterns** - Per-primitive testing patterns for actions, tools, workflows, conversations, tables, and state
+
+### botpress-adk-integrations
+
+Discovering, adding, configuring, and using Botpress integrations in ADK projects. Covers the full integration lifecycle from search to production use.
+
+**Use when:**
+
+- Searching for available integrations
+- Adding an integration to an ADK project
+- Configuring integration credentials and settings
+- Using integration actions, events, and channels in code
+- Troubleshooting integration issues
+
+**Categories covered:**
+
+- **Discovery** - `adk search`, `adk list --available`, `adk info` for exploring the integration hub
+- **Lifecycle** - End-to-end workflow from search to production use
+- **Configuration** - Config types (no-config, OAuth, API key), agent.config.ts setup
+- **Common Integrations** - Quick reference for Slack, WhatsApp, Linear, and more
+
+### botpress-adk-debugger
+
+Systematic debugging for ADK agents. Teaches the AI assistant how to read traces and logs, diagnose common failures, debug LLM behavior issues, and follow a structured debug workflow.
+
+**Use when:**
+
+- Bot isn't responding or behaves unexpectedly
+- Tool calls are failing or the wrong tool is selected
+- Workflows are stuck or steps aren't executing
+- LLM is hallucinating, refusing, or looping
+- Build or deploy errors occur
+- Need to read and interpret traces or logs
+- Debugging config issues (agent.json vs agent.local.json)
+
+**Categories covered:**
+
+- **Traces & Logs** - CLI tools (`adk check`, `adk logs`, `adk traces`, `adk chat`), trace structure, span types, `onTrace` hooks
+- **Common Failures** - Runtime failure patterns with symptom-to-fix workflows
+- **LLM Debugging** - Wrong tool selection, hallucinated parameters, refusals, looping, reading model reasoning
+- **Debug Workflow** - Systematic 8-step loop: validate, reproduce, logs, traces, classify, fix, verify, prevent
+
 ## Installation
 
 ```bash
@@ -91,6 +149,14 @@ Show me how to call my bot's actions from a Next.js frontend
 Set up authentication for my React app with Botpress
 ```
 
+```
+My bot isn't responding — how do I debug this?
+```
+
+```
+Write an eval that tests my createTicket tool
+```
+
 ## Skill Structure
 
 Each skill contains:
@@ -100,20 +166,21 @@ Each skill contains:
 
 ```
 skills/
-├── adk/
+├── adk/                  # Core ADK framework (23 reference docs)
 │   ├── SKILL.md
 │   └── references/
-│       ├── actions.md
-│       ├── tools.md
-│       ├── workflows.md
-│       └── ...
-└── adk-frontend/
+├── adk-frontend/         # Frontend integration (11 reference docs)
+│   ├── SKILL.md
+│   └── references/
+├── adk-evals/            # Testing & evals (3 reference docs)
+│   ├── SKILL.md
+│   └── references/
+├── adk-integrations/     # Integration lifecycle (4 reference docs)
+│   ├── SKILL.md
+│   └── references/
+└── adk-debugger/         # Debugging & observability (4 reference docs)
     ├── SKILL.md
     └── references/
-        ├── authentication.md
-        ├── botpress-client.md
-        ├── calling-actions.md
-        └── type-generation.md
 ```
 
 ## License
