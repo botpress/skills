@@ -156,14 +156,18 @@ Look for repeated `tool_call` spans with the same `tool_name` in sequence.
 - **Add `onBeforeTool` guardrail:** Detect repeated calls and abort
 
   ```typescript
-  const seen = new Set<string>();
-  const onBeforeTool: Autonomous.Hooks["onBeforeTool"] = async ({ tool, input, controller }) => {
-    const key = `${tool.name}:${JSON.stringify(input)}`;
-    if (seen.has(key)) {
-      controller.abort("Already called this tool with these parameters");
-      return;
-    }
-    seen.add(key);
+  // Create per-conversation to avoid leaking state across turns
+  const makeLoopGuard = () => {
+    const seen = new Set<string>();
+    const onBeforeTool: Autonomous.Hooks["onBeforeTool"] = async ({ tool, input, controller }) => {
+      const key = `${tool.name}:${JSON.stringify(input)}`;
+      if (seen.has(key)) {
+        controller.abort("Already called this tool with these parameters");
+        return;
+      }
+      seen.add(key);
+    };
+    return { onBeforeTool };
   };
   ```
 
