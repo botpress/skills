@@ -63,6 +63,64 @@ Production-tested patterns for building frontend applications that integrate wit
 - React Query (optional, recommended for mutations)
 - Zustand (for client state management)
 
+### botpress-adk-evals
+
+Complete reference for writing, running, and iterating on evals (automated conversation tests) for ADK agents. Covers eval file format, all assertion types, CLI usage, and per-primitive testing patterns.
+
+**Use when:**
+
+- Writing automated tests for an ADK agent
+- Learning the eval file format and assertion types
+- Running evals and interpreting results
+- Testing specific primitives (actions, tools, workflows, conversations, tables)
+- Integrating evals into CI pipelines
+
+**Categories covered:**
+
+- **Eval Format** - File structure, turn types, all assertion categories (response, tools, state, tables, workflow, timing)
+- **Testing Workflow** - Running evals, interpreting output, using traces, the write-test-iterate loop
+- **Test Patterns** - Per-primitive testing patterns for actions, tools, workflows, conversations, tables, and state
+
+### botpress-adk-integrations
+
+Discovering, adding, configuring, and using Botpress integrations in ADK projects. Covers the full integration lifecycle from search to production use.
+
+**Use when:**
+
+- Searching for available integrations
+- Adding an integration to an ADK project
+- Configuring integration credentials and settings
+- Using integration actions, events, and channels in code
+- Troubleshooting integration issues
+
+**Categories covered:**
+
+- **Discovery** - `adk search`, `adk list --available`, `adk info` for exploring the integration hub
+- **Lifecycle** - End-to-end workflow from search to production use
+- **Configuration** - Config types (no-config, OAuth, API key), agent.config.ts setup
+- **Common Integrations** - Quick reference for Slack, WhatsApp, Linear, and more
+
+## Commands
+
+Commands are thin Claude Code slash commands that load skills. They are the quick entry point - type `/adk-debug` instead of describing what you need.
+
+| Command | What it does |
+|---------|-------------|
+| `/adk-init` | Scaffold a new ADK project |
+| `/adk-debug` | Debug bot issues using traces, logs, and the debug loop |
+| `/adk-eval` | Write, run, or debug evals |
+| `/adk-frontend` | Build frontend apps that integrate with ADK bots |
+| `/adk-integration` | Discover, add, and configure integrations |
+
+### Installing commands
+
+Install the plugin in Claude Code to get all skills and commands:
+
+```
+/plugin marketplace add botpress/botpress-claude-marketplace
+/plugin install skills@botpress-marketplace
+```
+
 ## Installation
 
 ```bash
@@ -99,21 +157,26 @@ Each skill contains:
 - `references/` - Supporting documentation files
 
 ```
-skills/
-├── adk/
+skills/                       # Heavy knowledge (skills)
+├── adk/                      # Core ADK framework (23 reference docs)
 │   ├── SKILL.md
 │   └── references/
-│       ├── actions.md
-│       ├── tools.md
-│       ├── workflows.md
-│       └── ...
-└── adk-frontend/
+├── adk-frontend/             # Frontend integration (11 reference docs)
+│   ├── SKILL.md
+│   └── references/
+├── adk-evals/                # Testing & evals (3 reference docs)
+│   ├── SKILL.md
+│   └── references/
+└── adk-integrations/         # Integration lifecycle (4 reference docs)
     ├── SKILL.md
     └── references/
-        ├── authentication.md
-        ├── botpress-client.md
-        ├── calling-actions.md
-        └── type-generation.md
+
+commands/                     # Thin slash commands (load skills)
+├── adk-init.md               # /adk-init - scaffolding
+├── adk-debug.md              # /adk-debug - loads adk-debugger skill
+├── adk-eval.md               # /adk-eval - loads adk-evals skill
+├── adk-frontend.md           # /adk-frontend - loads adk-frontend skill
+└── adk-integration.md        # /adk-integration - loads adk-integrations skill
 ```
 
 ## License
