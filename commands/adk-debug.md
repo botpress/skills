@@ -1,7 +1,7 @@
 ---
 name: adk-debug
 description: Debug ADK bot issues
-argument-hint: [error or problem description]
+argument-hint: "[error or problem description]"
 ---
 
 Help the user debug issues with their Botpress ADK bot.

@@ -1,7 +1,7 @@
 ---
 name: adk-frontend
 description: Build frontend apps that integrate with ADK bots
-argument-hint: [what to build or question]
+argument-hint: "[what to build or question]"
 ---
 
 Help the user build frontend integrations for Botpress ADK bots.

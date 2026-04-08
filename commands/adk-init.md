@@ -1,7 +1,7 @@
 ---
 name: adk-init
 description: Scaffold a new Botpress ADK project
-argument-hint: [project-name]
+argument-hint: "[project-name]"
 ---
 
 Help the user initialize a new Botpress ADK project.

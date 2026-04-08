@@ -1,7 +1,7 @@
 ---
 name: adk-integration
 description: Discover, add, and configure Botpress integrations
-argument-hint: [integration name or question]
+argument-hint: "[integration name or question]"
 ---
 
 Help the user manage Botpress integrations in their ADK project.
