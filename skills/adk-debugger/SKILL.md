@@ -45,6 +45,10 @@ Use this skill when the developer asks about:
 | `references/common-failures.md` | Runtime failure patterns — validation, bot not responding, tool errors, workflow stuck, integration failures, build errors, config confusion |
 | `references/llm-debugging.md` | LLM behavior issues — wrong tool, hallucinated params, refusals, token limits, looping, reading model reasoning |
 | `references/debug-workflow.md` | The systematic 8-step debug loop: validate → reproduce → logs → traces → classify → fix → verify → prevent |
+
+## How to Answer
+
+1. **"How do I read traces/logs?"** → Read `traces-and-logs.md` for CLI commands and trace structure
 2. **Something is broken, known pattern** → Read `common-failures.md` for the matching failure pattern
 3. **LLM is misbehaving** → Read `llm-debugging.md` for the matching behavior issue
 4. **Systematic investigation needed** → Read `debug-workflow.md` and follow the 8-step loop
