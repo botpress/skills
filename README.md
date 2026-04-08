@@ -100,6 +100,25 @@ Discovering, adding, configuring, and using Botpress integrations in ADK project
 - **Configuration** - Config types (no-config, OAuth, API key), agent.config.ts setup
 - **Common Integrations** - Quick reference for Slack, WhatsApp, Linear, and more
 
+### botpress-adk-docs
+
+Guidelines and commands for creating, reviewing, updating, and maintaining documentation for your ADK bot. Helps you document your own workflows, actions, and features with accurate, searchable guides.
+
+**Use when:**
+
+- Creating documentation for your bot's features and workflows
+- Reviewing existing project docs for accuracy and completeness
+- Updating docs after changing your bot's code
+- Checking if your docs are in sync with implementation
+- Searching your project documentation
+
+**Categories covered:**
+
+- **Documentation Standards** - Document types (reference, conceptual, comprehensive), templates, quality checklists
+- **Creation** - Research-first workflow for writing docs with verified code examples from your bot
+- **Review** - Code accuracy, searchability, completeness, and ADK-specific concerns
+- **Maintenance** - Updating, syncing, and searching your project documentation
+
 ### botpress-adk-debugger
 
 Systematic debugging for ADK agents. Teaches the AI assistant how to read traces and logs, diagnose common failures, debug LLM behavior issues, and follow a structured debug workflow.
@@ -132,6 +151,11 @@ Commands are thin Claude Code slash commands that load skills. They are the quic
 | `/adk-eval` | Write, run, or debug evals |
 | `/adk-frontend` | Build frontend apps that integrate with ADK bots |
 | `/adk-integration` | Discover, add, and configure integrations |
+| `/adk-doc-create` | Create documentation for a feature in your bot |
+| `/adk-doc-review` | Review project docs for accuracy and completeness |
+| `/adk-doc-update` | Update project docs after code changes |
+| `/adk-doc-sync` | Check if project docs are in sync with your bot's code |
+| `/adk-doc-search` | Search your project documentation |
 
 ### Installing commands
 
@@ -199,7 +223,10 @@ skills/                       # Heavy knowledge (skills)
 ├── adk-integrations/         # Integration lifecycle (4 reference docs)
 │   ├── SKILL.md
 │   └── references/
-└── adk-debugger/         # Debugging & observability (4 reference docs)
+├── adk-debugger/             # Debugging & observability (4 reference docs)
+│   ├── SKILL.md
+│   └── references/
+└── adk-docs/                 # Documentation management (1 reference doc)
     ├── SKILL.md
     └── references/
 
@@ -208,7 +235,12 @@ commands/                     # Thin slash commands (load skills)
 ├── adk-debug.md              # /adk-debug - loads adk-debugger skill
 ├── adk-eval.md               # /adk-eval - loads adk-evals skill
 ├── adk-frontend.md           # /adk-frontend - loads adk-frontend skill
-└── adk-integration.md        # /adk-integration - loads adk-integrations skill
+├── adk-integration.md        # /adk-integration - loads adk-integrations skill
+├── adk-doc-create.md         # /adk-doc-create - loads adk-docs skill
+├── adk-doc-review.md         # /adk-doc-review - loads adk-docs skill
+├── adk-doc-update.md         # /adk-doc-update - loads adk-docs skill
+├── adk-doc-sync.md           # /adk-doc-sync - loads adk-docs skill
+└── adk-doc-search.md         # /adk-doc-search - loads adk-docs skill
 ```
 
 ## License
