@@ -119,6 +119,23 @@ Guidelines and commands for creating, reviewing, updating, and maintaining docum
 - **Review** - Code accuracy, searchability, completeness, and ADK-specific concerns
 - **Maintenance** - Updating, syncing, and searching your project documentation
 
+### botpress-agent-visualizer
+
+Generates a dark-themed HTML flow diagram that visualizes any Botpress ADK bot's architecture. Analyzes the codebase and produces a single self-contained HTML file showing conversations, tools, actions, workflows, knowledge bases, tables, and triggers.
+
+**Use when:**
+
+- Wanting a visual overview of a bot's architecture
+- Onboarding new team members who need to understand a bot
+- Creating architecture documentation
+- Understanding how a bot's components connect end to end
+
+**Categories covered:**
+
+- **Analysis** - Reads agent.config.ts, conversations, actions, tools, workflows, knowledge, tables, and triggers
+- **Visualization** - Dark-themed HTML diagram with color-coded component types, arrows, and layout
+- **Adaptation** - Handles bots of any size, skipping empty sections and listing placeholders
+
 ### botpress-adk-debugger
 
 Systematic debugging for ADK agents. Teaches the AI assistant how to read traces and logs, diagnose common failures, debug LLM behavior issues, and follow a structured debug workflow.
@@ -151,6 +168,7 @@ Commands are thin Claude Code slash commands that load skills. They are the quic
 | `/adk-eval` | Write, run, or debug evals |
 | `/adk-frontend` | Build frontend apps that integrate with ADK bots |
 | `/adk-integration` | Discover, add, and configure integrations |
+| `/adk-visualize` | Generate a visual architecture diagram for an ADK bot |
 | `/adk-doc-create` | Create documentation for a feature in your bot |
 | `/adk-doc-review` | Review project docs for accuracy and completeness |
 | `/adk-doc-update` | Update project docs after code changes |
@@ -214,6 +232,9 @@ skills/                       # Heavy knowledge (skills)
 ├── adk/                      # Core ADK framework (23 reference docs)
 │   ├── SKILL.md
 │   └── references/
+├── agent-visualizer/         # Architecture visualization (1 reference doc)
+│   ├── SKILL.md
+│   └── references/
 ├── adk-frontend/             # Frontend integration (11 reference docs)
 │   ├── SKILL.md
 │   └── references/
@@ -232,6 +253,7 @@ skills/                       # Heavy knowledge (skills)
 
 commands/                     # Thin slash commands (load skills)
 ├── adk-init.md               # /adk-init - scaffolding
+├── adk-visualize.md          # /adk-visualize - loads agent-visualizer skill
 ├── adk-debug.md              # /adk-debug - loads adk-debugger skill
 ├── adk-eval.md               # /adk-eval - loads adk-evals skill
 ├── adk-frontend.md           # /adk-frontend - loads adk-frontend skill
