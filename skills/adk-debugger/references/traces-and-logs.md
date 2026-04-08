@@ -159,14 +159,16 @@ export default new Conversation({
 ```typescript
 export const makePerformanceMonitor = () => {
   const startTime = Date.now();
+  const toolStartTimes = new Map<string, number>();
   const toolMetrics = new Map<string, number[]>();
 
   const onBeforeTool: Autonomous.Hooks["onBeforeTool"] = async ({ tool }) => {
-    (tool as any)._startTime = Date.now();
+    toolStartTimes.set(tool.name, Date.now());
   };
 
   const onAfterTool: Autonomous.Hooks["onAfterTool"] = async ({ tool }) => {
-    const duration = Date.now() - ((tool as any)._startTime || 0);
+    const start = toolStartTimes.get(tool.name);
+    const duration = start ? Date.now() - start : 0;
     const metrics = toolMetrics.get(tool.name) || [];
     metrics.push(duration);
     toolMetrics.set(tool.name, metrics);
