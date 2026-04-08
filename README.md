@@ -121,6 +121,27 @@ Systematic debugging for ADK agents. Teaches the AI assistant how to read traces
 - **LLM Debugging** - Wrong tool selection, hallucinated parameters, refusals, looping, reading model reasoning
 - **Debug Workflow** - Systematic 8-step loop: validate, reproduce, logs, traces, classify, fix, verify, prevent
 
+## Commands
+
+Commands are thin Claude Code slash commands that load skills. They are the quick entry point - type `/adk-debug` instead of describing what you need.
+
+| Command | What it does |
+|---------|-------------|
+| `/adk-init` | Scaffold a new ADK project |
+| `/adk-debug` | Debug bot issues using traces, logs, and the debug loop |
+| `/adk-eval` | Write, run, or debug evals |
+| `/adk-frontend` | Build frontend apps that integrate with ADK bots |
+| `/adk-integration` | Discover, add, and configure integrations |
+
+### Installing commands
+
+Install the plugin in Claude Code to get all skills and commands:
+
+```
+/plugin marketplace add botpress/botpress-claude-marketplace
+/plugin install skills@botpress-marketplace
+```
+
 ## Installation
 
 ```bash
@@ -165,22 +186,29 @@ Each skill contains:
 - `references/` - Supporting documentation files
 
 ```
-skills/
-├── adk/                  # Core ADK framework (23 reference docs)
+skills/                       # Heavy knowledge (skills)
+├── adk/                      # Core ADK framework (23 reference docs)
 │   ├── SKILL.md
 │   └── references/
-├── adk-frontend/         # Frontend integration (11 reference docs)
+├── adk-frontend/             # Frontend integration (11 reference docs)
 │   ├── SKILL.md
 │   └── references/
-├── adk-evals/            # Testing & evals (3 reference docs)
+├── adk-evals/                # Testing & evals (3 reference docs)
 │   ├── SKILL.md
 │   └── references/
-├── adk-integrations/     # Integration lifecycle (4 reference docs)
+├── adk-integrations/         # Integration lifecycle (4 reference docs)
 │   ├── SKILL.md
 │   └── references/
 └── adk-debugger/         # Debugging & observability (4 reference docs)
     ├── SKILL.md
     └── references/
+
+commands/                     # Thin slash commands (load skills)
+├── adk-init.md               # /adk-init - scaffolding
+├── adk-debug.md              # /adk-debug - loads adk-debugger skill
+├── adk-eval.md               # /adk-eval - loads adk-evals skill
+├── adk-frontend.md           # /adk-frontend - loads adk-frontend skill
+└── adk-integration.md        # /adk-integration - loads adk-integrations skill
 ```
 
 ## License

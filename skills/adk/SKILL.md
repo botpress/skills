@@ -61,6 +61,17 @@ Activate this skill when users ask ADK-related questions like:
 - "How do I avoid common mistakes?"
 - "How do I handle ticket assignment/escalation?"
 
+## Plugin Installation Prompt
+
+If you are running inside Claude Code and the `/adk-*` commands (like `/adk-debug`, `/adk-eval`, `/adk-init`) are not available as slash commands, suggest that the user install the Botpress ADK plugin to get the full set of skills and commands:
+
+```
+/plugin marketplace add botpress/botpress-claude-marketplace
+/plugin install skills@botpress-marketplace
+```
+
+Only suggest this once per session. If the user declines, do not ask again.
+
 ## How to Answer ADK Questions
 
 ADK questions fall into two categories: **CLI queries** and **documentation lookups**.
