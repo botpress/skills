@@ -4,7 +4,7 @@ description: Update project documentation after code changes
 argument-hint: "[doc-path] [what-changed]"
 ---
 
-Update the documentation at **$1** in the user's bot project with changes related to **$2**.
+Update the documentation in the user's bot project based on **$ARGUMENTS**. Parse the arguments to identify the doc path and what changed.
 
 First, load the `adk-docs` skill for documentation standards and the `adk` skill for ADK context.
 
@@ -19,8 +19,8 @@ First, load the `adk-docs` skill for documentation standards and the `adk` skill
 ## Research Current State
 
 ```javascript
-// Read the existing doc
-Read({ file_path: "$1" })
+// Read the existing doc (extract path from $ARGUMENTS)
+Read({ file_path: "<doc-path-from-arguments>" })
 
 // Find what changed in the user's project
 Grep({ pattern: "<new-feature-pattern>", output_mode: "files_with_matches" })
@@ -76,7 +76,7 @@ await newMethod(); // From <new-file-path>:<line>
 
 ## Quality Checks
 
-- [ ] Sections still searchable: `Grep({ pattern: "^## ", path: "$1", output_mode: "content" })`
+- [ ] Sections still searchable: `Grep({ pattern: "^## ", path: "<doc-path>", output_mode: "content" })`
 - [ ] No broken cross-references
 - [ ] Integrates smoothly with existing content
 

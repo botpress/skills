@@ -14,7 +14,7 @@ First, load the `adk-docs` skill for documentation standards and the `adk` skill
 
 ```javascript
 // Check runtime exports
-Grep({ pattern: "export.*class.*Conversation|Workflow|Action|Tool", output_mode: "files_with_matches" })
+Grep({ pattern: "export.*class.*(Conversation|Workflow|Action|Tool)", output_mode: "files_with_matches" })
 
 // Find new or deprecated features
 Grep({ pattern: "TODO|FIXME|@deprecated", output_mode: "files_with_matches" })
