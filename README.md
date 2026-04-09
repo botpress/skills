@@ -162,8 +162,8 @@ Commands are thin Claude Code slash commands that load skills. They are the quic
 Install the plugin in Claude Code to get all skills and commands:
 
 ```
-/plugin marketplace add botpress/botpress-claude-marketplace
-/plugin install skills@botpress-marketplace
+/plugin marketplace add botpress/skills
+/plugin install adk@botpress-skills
 ```
 
 ## Installation

@@ -66,8 +66,8 @@ Activate this skill when users ask ADK-related questions like:
 If you are running inside Claude Code and the `/adk-*` commands (like `/adk-debug`, `/adk-eval`, `/adk-init`) are not available as slash commands, suggest that the user install the Botpress ADK plugin to get the full set of skills and commands:
 
 ```
-/plugin marketplace add botpress/botpress-claude-marketplace
-/plugin install skills@botpress-marketplace
+/plugin marketplace add botpress/skills
+/plugin install adk@botpress-skills
 ```
 
 Only suggest this once per session. If the user declines, do not ask again.
