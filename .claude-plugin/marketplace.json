@@ -7,7 +7,7 @@
   "plugins": [
     {
       "name": "adk",
-      "source": ".",
+      "source": "./.",
       "description": "Complete toolkit for building AI agents with Botpress ADK",
       "version": "1.0.0",
       "author": {
