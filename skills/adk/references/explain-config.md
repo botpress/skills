@@ -206,7 +206,7 @@ dependencies: {
     slack: {
       version: "slack@2.5.5",
       enabled: true,
-      config: { botToken: process.env.SLACK_BOT_TOKEN },
+      config: { botToken: "{{secrets.SLACK_BOT_TOKEN}}" },
     },
     browser: "browser@0.8.7",
   },
@@ -228,7 +228,7 @@ adk info slack
 
 **Potential issues:**
 - Integration with `status: "unconfigured"` and `missing` fields — needs configuration before it works.
-- Integration using hardcoded secrets instead of `process.env.*` or the ADK secrets API — security risk.
+- Integration using hardcoded secrets instead of the ADK secrets API — security risk.
 - Integration with `enabled: false` — installed but not active.
 
 ### State Schemas
@@ -281,20 +281,19 @@ bot: {
 
 ### Variables and Secrets
 
-Look for `process.env.*` references in `agent.config.ts` and handler files.
+Check the `secrets` block in `agent.config.ts` for declared secrets, and look for hardcoded string literals in integration configs.
 
 **How to explain:**
 
-> Your config references these environment variables:
+> Your config declares these secrets:
 > - `SLACK_BOT_TOKEN` — Used to authenticate the Slack integration
 > - `LINEAR_API_KEY` — Used to authenticate the Linear integration
 >
-> Make sure these are set in your `.env` file or deployment environment.
+> Secrets are managed via `adk secrets` and injected at runtime. Make sure they're set for both dev and production environments.
 
 **Potential issues:**
-- `process.env.*` references without a `.env` file — the integration won't work in development.
-- Hardcoded secrets in `agent.config.ts` — should use environment variables or the ADK secrets API.
-- Missing `.env.example` — other developers won't know which variables to set.
+- Hardcoded secrets in `agent.config.ts` — should use the ADK secrets API instead.
+- Declared secrets that aren't set — the integration won't work at runtime.
 
 ### Registered Primitives
 
@@ -366,7 +365,7 @@ When reviewing the config, check for:
 | Check | How to Detect | Severity |
 |-------|--------------|----------|
 | Unconfigured integrations | `status: "unconfigured"` in `adk status` output | High — integration won't work |
-| Hardcoded secrets | String literals in `config` blocks instead of `process.env.*` or secrets API | High — security risk |
+| Hardcoded secrets | String literals in `config` blocks instead of ADK secrets API | High — security risk |
 | Missing default models | No `defaultModels` in `agent.config.ts` | Low — ADK defaults apply |
 | No conversation handler | `conversations.count === 0` in status | High — bot can't respond to messages |
 | No tools registered | `tools.count === 0` in status | Medium — LLM can't take autonomous actions |
