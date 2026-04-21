@@ -13,7 +13,7 @@ Use the `adk traces` CLI with filters to get the raw data.
 adk traces trace=<trace-id> --include-llm --format json
 
 # All traces for a conversation
-adk traces --conversation-id <id> --include-llm --format json
+adk traces conversation=<id> --include-llm --format json
 
 # Recent traces (start here if you don't have an ID)
 adk traces --include-llm --format json
