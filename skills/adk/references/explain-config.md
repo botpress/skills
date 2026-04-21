@@ -228,7 +228,7 @@ adk info slack
 
 **Potential issues:**
 - Integration with `status: "unconfigured"` and `missing` fields — needs configuration before it works.
-- Integration using hardcoded secrets instead of `process.env.*` — security risk.
+- Integration using hardcoded secrets instead of `process.env.*` or the ADK secrets API — security risk.
 - Integration with `enabled: false` — installed but not active.
 
 ### State Schemas
@@ -293,7 +293,7 @@ Look for `process.env.*` references in `agent.config.ts` and handler files.
 
 **Potential issues:**
 - `process.env.*` references without a `.env` file — the integration won't work in development.
-- Hardcoded secrets in `agent.config.ts` — should be moved to environment variables.
+- Hardcoded secrets in `agent.config.ts` — should use environment variables or the ADK secrets API.
 - Missing `.env.example` — other developers won't know which variables to set.
 
 ### Registered Primitives
@@ -366,7 +366,7 @@ When reviewing the config, check for:
 | Check | How to Detect | Severity |
 |-------|--------------|----------|
 | Unconfigured integrations | `status: "unconfigured"` in `adk status` output | High — integration won't work |
-| Hardcoded secrets | String literals in `config` blocks instead of `process.env.*` | High — security risk |
+| Hardcoded secrets | String literals in `config` blocks instead of `process.env.*` or secrets API | High — security risk |
 | Missing default models | No `defaultModels` in `agent.config.ts` | Low — ADK defaults apply |
 | No conversation handler | `conversations.count === 0` in status | High — bot can't respond to messages |
 | No tools registered | `tools.count === 0` in status | Medium — LLM can't take autonomous actions |
