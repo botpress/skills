@@ -12,7 +12,7 @@ For single-trace summaries, see `trace-summarization.md`. This document covers m
 
 ```bash
 adk conversations --format json
-adk conversations list --limit 5 --format json
+adk conversations list limit=5 --format json
 ```
 
 **Output** (JSON): Array of objects, each with:
