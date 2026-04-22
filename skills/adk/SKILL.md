@@ -60,6 +60,11 @@ Activate this skill when users ask ADK-related questions like:
 - "What are the best practices for...?"
 - "How do I avoid common mistakes?"
 - "How do I handle ticket assignment/escalation?"
+- "Explain my config"
+- "What does my bot do?"
+- "What models am I using?"
+- "What integrations do I have?"
+- "What state does my bot track?"
 
 ## Plugin Installation Prompt
 
@@ -190,6 +195,26 @@ For documentation, patterns, and how-to questions, search and reference the docu
    - Common pitfalls if relevant
    - Related topics for further reading
 
+### Option 3: Config Explanation (CLI + File Reading)
+
+For questions about what a bot does, how it's configured, or what it's capable of, combine CLI and file reading:
+
+**When to use:**
+
+- "What does my bot do?"
+- "Explain my config"
+- "What models am I using?"
+- "What integrations do I have?"
+- "What state does my bot track?"
+
+**Response pattern:**
+
+1. Run `adk status --format json` to get the structured project overview
+2. Read `agent.config.ts` for full configuration details
+3. Follow the explanation patterns in **references/explain-config.md**
+4. Produce a structured explanation covering metadata, models, integrations, state, and primitives
+5. Flag any issues (unconfigured integrations, missing models, hardcoded secrets)
+
 ## Available Documentation
 
 Documentation should be located in `./references/` directory relative to this skill. When answering questions, search for these topics:
@@ -214,6 +239,7 @@ Documentation should be located in `./references/` directory relative to this sk
 ### Configuration & Integration
 
 - **agent-config.md** - Bot configuration and state management
+- **explain-config.md** - How to interpret and explain an agent's configuration to developers
 - **model-configuration.md** - AI model configuration reference
 - **context-api.md** - Runtime context access
 - **integration-actions.md** - Using integration actions
