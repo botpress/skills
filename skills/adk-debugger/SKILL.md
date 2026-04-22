@@ -35,6 +35,11 @@ Use this skill when the developer asks about:
 - "Something broke after my last change"
 - "My deploy failed"
 - "`adk check` found errors"
+- "Summarize this trace"
+- "What happened in trace X?"
+- "Give me an overview of this conversation turn"
+- "Why did the bot do X in this trace?"
+- "Walk me through what happened"
 - "How do I debug this?"
 
 ## Available Documentation
@@ -45,6 +50,7 @@ Use this skill when the developer asks about:
 | `references/common-failures.md` | Runtime failure patterns — validation, bot not responding, tool errors, workflow stuck, integration failures, build errors, config confusion |
 | `references/llm-debugging.md` | LLM behavior issues — wrong tool, hallucinated params, refusals, token limits, looping, reading model reasoning |
 | `references/debug-workflow.md` | The systematic 8-step debug loop: validate → reproduce → logs → traces → classify → fix → verify → prevent |
+| `references/trace-summarization.md` | How to fetch, walk, and summarize traces as free-form natural-language narratives — adapting depth to context |
 
 ## How to Answer
 
@@ -52,7 +58,8 @@ Use this skill when the developer asks about:
 2. **Something is broken, known pattern** → Read `common-failures.md` for the matching failure pattern
 3. **LLM is misbehaving** → Read `llm-debugging.md` for the matching behavior issue
 4. **Systematic investigation needed** → Read `debug-workflow.md` and follow the 8-step loop
-5. **After fixing, need to prevent regression** → Point to the `adk-evals` skill for writing evals
+5. **"Summarize this trace" / "What happened?"** → Read `trace-summarization.md` for how to fetch, walk, and narrate traces
+6. **After fixing, need to prevent regression** → Point to the `adk-evals` skill for writing evals
 
 ---
 
