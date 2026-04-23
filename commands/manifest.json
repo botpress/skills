@@ -1,0 +1,14 @@
+{ "generatedAt": "2026-04-23", "commands": [
+    { "name": "adk-debug", "path": "commands/adk-debug.md", "description": "Debug ADK bot issues" },
+    { "name": "adk-doc-create", "path": "commands/adk-doc-create.md", "description": "Create documentation for a feature in the user's ADK bot" },
+    { "name": "adk-doc-review", "path": "commands/adk-doc-review.md", "description": "Review project documentation for accuracy and completeness" },
+    { "name": "adk-doc-search", "path": "commands/adk-doc-search.md", "description": "Search project documentation for specific topics or patterns" },
+    { "name": "adk-doc-sync", "path": "commands/adk-doc-sync.md", "description": "Check if project documentation is in sync with the bot's code" },
+    { "name": "adk-doc-update", "path": "commands/adk-doc-update.md", "description": "Update project documentation after code changes" },
+    { "name": "adk-eval", "path": "commands/adk-eval.md", "description": "Write, run, or debug evals for an ADK bot" },
+    { "name": "adk-frontend", "path": "commands/adk-frontend.md", "description": "Build frontend apps that integrate with ADK bots" },
+    { "name": "adk-init", "path": "commands/adk-init.md", "description": "Scaffold a new Botpress ADK project" },
+    { "name": "adk-integration", "path": "commands/adk-integration.md", "description": "Discover, add, and configure Botpress integrations" }
+  ]
+}
+
