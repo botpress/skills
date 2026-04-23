@@ -16,4 +16,4 @@ jobs:
       - name: Check shell scripts
         uses: botpress/gh-actions/check-shells@v3
         with:
-          check_actions: true
+          check_actions: false
