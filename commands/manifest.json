@@ -1,4 +1,6 @@
-{ "generatedAt": "2026-04-23", "commands": [
+{
+  "generatedAt": "2026-04-23",
+  "commands": [
     { "name": "adk-debug", "path": "commands/adk-debug.md", "description": "Debug ADK bot issues" },
     { "name": "adk-doc-create", "path": "commands/adk-doc-create.md", "description": "Create documentation for a feature in the user's ADK bot" },
     { "name": "adk-doc-review", "path": "commands/adk-doc-review.md", "description": "Review project documentation for accuracy and completeness" },
@@ -11,4 +13,3 @@
     { "name": "adk-integration", "path": "commands/adk-integration.md", "description": "Discover, add, and configure Botpress integrations" }
   ]
 }
-

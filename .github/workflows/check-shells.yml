@@ -1,0 +1,19 @@
+name: Check Shell Scripts
+
+on:
+  pull_request:
+    paths:
+      - '**/*.sh'
+      - .github/workflows/**
+
+jobs:
+  check-shells:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Check shell scripts
+        uses: botpress/gh-actions/check-shells@v3
+        with:
+          check_actions: false
