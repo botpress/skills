@@ -1,0 +1,23 @@
+name: Check commands manifest
+
+on:
+  pull_request:
+    paths:
+      - "commands/**"
+      - "scripts/generate-manifest.sh"
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify manifest is up to date
+        run: |
+          ./scripts/generate-manifest.sh
+          if ! git diff --quiet commands/manifest.json; then
+            echo "::error::commands/manifest.json is out of date. Run ./scripts/generate-manifest.sh and commit the result."
+            git diff commands/manifest.json
+            exit 1
+          fi
+          echo "manifest.json is up to date."
