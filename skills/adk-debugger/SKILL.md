@@ -41,6 +41,11 @@ Use this skill when the developer asks about:
 - "Why did the bot do X in this trace?"
 - "Walk me through what happened"
 - "How do I debug this?"
+- "Summarize this conversation"
+- "Explain what happened in conversation X"
+- "Why did the bot respond that way?"
+- "Walk me through this conversation"
+- "What went wrong in this conversation?"
 
 ## Available Documentation
 
@@ -51,6 +56,7 @@ Use this skill when the developer asks about:
 | `references/llm-debugging.md` | LLM behavior issues — wrong tool, hallucinated params, refusals, token limits, looping, reading model reasoning |
 | `references/debug-workflow.md` | The systematic 8-step debug loop: validate → reproduce → logs → traces → classify → fix → verify → prevent |
 | `references/trace-summarization.md` | How to fetch, walk, and summarize traces as free-form natural-language narratives — adapting depth to context |
+| `references/conversation-analysis.md` | How to summarize and explain full conversations — listing conversations, timeline analysis, correlating with traces, common patterns |
 
 ## How to Answer
 
@@ -59,7 +65,8 @@ Use this skill when the developer asks about:
 3. **LLM is misbehaving** → Read `llm-debugging.md` for the matching behavior issue
 4. **Systematic investigation needed** → Read `debug-workflow.md` and follow the 8-step loop
 5. **"Summarize this trace" / "What happened?"** → Read `trace-summarization.md` for how to fetch, walk, and narrate traces
-6. **After fixing, need to prevent regression** → Point to the `adk-evals` skill for writing evals
+6. **"Summarize this conversation" / "Explain what happened"** → Read `conversation-analysis.md` for multi-turn conversation summaries and explanations
+7. **After fixing, need to prevent regression** → Point to the `adk-evals` skill for writing evals
 
 ---
 
@@ -81,6 +88,9 @@ adk traces --format json                         # recent traces
 adk traces --conversation-id <id> --format json  # specific conversation
 adk chat --single "msg" --format json            # test message
 adk dev --non-interactive --format json          # structured dev output
+adk conversations --format json                  # list recent conversations
+adk conversations show <id> --format json        # conversation timeline
+adk conversations show <id> --include-llm --format json  # timeline with LLM reasoning
 ```
 
 ### Span Types
