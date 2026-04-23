@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "commands/**"
+      - "scripts/generate-manifest.sh"
 
 jobs:
   check:
