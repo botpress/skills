@@ -1,0 +1,35 @@
+name: Generate commands manifest
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "commands/*.md"
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate manifest.json
+        run: |
+          manifest='{ "generatedAt": "'$(date -u +%Y-%m-%d)'", "commands": ['
+          first=true
+          for f in commands/*.md; do
+            name=$(awk '/^name:/{print $2; exit}' "$f")
+            desc=$(awk -F': ' '/^description:/{print $2; exit}' "$f" | sed 's/^["'"'"']//;s/["'"'"']$//')
+            if [ "$first" = true ]; then first=false; else manifest="$manifest,"; fi
+            manifest="$manifest"$'\n    { "name": "'"$name"'", "path": "'"$f"'", "description": "'"$desc"'" }'
+          done
+          manifest="$manifest"$'\n  ]\n}\n'
+          echo "$manifest" > commands/manifest.json
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add commands/manifest.json
+          git diff --cached --quiet || git commit -m "chore: regenerate commands manifest" && git push
