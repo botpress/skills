@@ -12,6 +12,6 @@ If `$ARGUMENTS` asks to run evals, run `adk evals` with appropriate flags.
 
 If `$ARGUMENTS` mentions a failure ("failing", "broken", "wrong"), inspect the failing eval's traces and identify whether the issue is the eval's assertions or the bot's behavior.
 
-If `$ARGUMENTS` is empty, check existing eval coverage (`Glob({ pattern: "evals/**" }}`)) and the user's primitives in `src/`, then suggest writing evals for untested primitives.
+If `$ARGUMENTS` is empty, check existing eval coverage (`Glob({ pattern: "evals/**" })`) and the user's primitives in `src/`, then suggest writing evals for untested primitives.
 
 Follow the eval format, assertion types, and per-primitive testing patterns from the skill documentation.

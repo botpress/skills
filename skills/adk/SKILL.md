@@ -60,7 +60,7 @@ If the user asks "what can you help with?", "what commands are available?", or i
 - **Build**: `/adk-init` (scaffold project), `/adk-integration` (add services), `/adk-frontend` (build UI)
 - **Test & Debug**: `/adk-debug` (fix issues), `/adk-eval` (write tests)
 - **Document**: `/adk-document` (create, review, update, sync, search)
-- **Understand**: `/adk-explain` (explain bot architecture and components)
+- **Understand**: `/adk-explain` (explain bot architecture and components), `/adk-dev-console` (navigate the Dev Console)
 
 Then ask: *"What are you working on?"*
 
