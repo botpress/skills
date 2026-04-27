@@ -3,7 +3,7 @@
     {
       "name": "adk-build",
       "path": "commands/adk-build.md",
-      "description": "Interview the user about a new ADK primitive, then build it"
+      "description": "Interview the user about a new ADK primitive or feature, then build it"
     },
     {
       "name": "adk-debug",
