@@ -880,7 +880,7 @@ adk remove slack
 
 **DON'T:**
 
-- Don't edit `.adk/` directory (auto-generated)
+- Don't edit `.adk/` directory (auto-generated) — **except** `.adk/scratch/`, which is reserved for disposable user/agent files (one-off runners, throwaway probes). `adk dev` does not touch `.adk/scratch/`. Production code, persistent helpers, and anything you'd commit belong outside `.adk/`.
 - Don't commit `agent.json` (add to .gitignore)
 - Don't commit `.env` files
 - Don't skip integration configuration in UI

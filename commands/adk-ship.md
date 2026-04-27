@@ -18,7 +18,7 @@ This is a deploy-to-production command — treat it as destructive-by-default. C
 
 2. **Summarize.** Show a tight pre-flight report: ✅ checks passed, ⚠️ warnings, ❌ blockers. Include the linked bot and a one-line diff summary if there are uncommitted changes.
 
-3. **Confirm.** If there are blockers, stop and offer to fix each. If only warnings, ask: *"Ship to <bot>? (yes / no)"*. Do not assume consent from the original `/adk-ship` invocation.
+3. **Confirm.** Always ask before deploying — the original `/adk-ship` invocation is not consent. If there are blockers, stop and offer to fix each. Otherwise (warnings or fully green), ask: *"Ship to <bot>? (yes / no)"*.
 
 4. **Deploy.** Run `adk deploy`. Stream output. If `adk deploy` prompts for preflight approval, surface the prompt to the user — do not auto-approve.
 
