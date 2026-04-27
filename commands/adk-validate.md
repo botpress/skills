@@ -1,7 +1,7 @@
 ---
 name: adk-validate
 description: Validate an ADK primitive's schema, types, imports, and config dependencies
-argument-hint: "[primitive name] [--fix]"
+argument-hint: "[primitive name]"
 ---
 
 Load the `adk` skill, then validate the named primitive immediately.
@@ -22,6 +22,4 @@ This is the proactive counterpart to `/adk-debug`: nothing is necessarily broken
    - Any referenced model is available in the project's model config.
    - Any referenced sibling primitive (table, action, tool) actually exists in `src/`.
    - No hardcoded secrets, tokens, or API keys.
-6. **Report.** Group findings as ❌ Errors → ⚠️ Warnings → ✅ Passed. For each error/warning, include the file:line and the suggested fix. End with one line: *"Run `/adk-test <name>` to actually invoke it."*
-
-If `$ARGUMENTS` contains the literal flag `--fix` (e.g., `/adk-validate search --fix`), apply the suggested fixes for errors after reporting them, then re-run the baseline checks from step 1. Match `--fix` only as a flag — never treat a bare `fix` token as the mode, because a primitive may legitimately be named `fix`.
+6. **Report.** Group findings as ❌ Errors → ⚠️ Warnings → ✅ Passed. For each error/warning, include the file:line and the suggested fix. End with one line: *"Run `/adk-test <name>` to actually invoke it."* Do not apply fixes from this command — let the user decide which to take.
