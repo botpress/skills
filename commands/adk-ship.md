@@ -23,7 +23,7 @@ This is a deploy-to-production command — treat it as destructive-by-default. C
 
 4. **Deploy.** Run `adk deploy` (add `--env <env>` if the user passed one). Stream output. If `adk deploy` prompts for preflight approval, surface the prompt to the user — do not auto-approve.
 
-5. **Verify.** After deploy, run `adk status --format json` to confirm the deployed version. Run a smoke test: `adk chat --single "<minimal hello>" --format json`. Report deployed version, environment, and any post-deploy warnings.
+5. **Verify.** After deploy, run `adk status --format json` to confirm the deployed version. Report deployed version, environment, and any post-deploy warnings. Note: `adk chat` runs against the local dev bot, not the deployed one — do not use it as a production smoke test. Direct the user to the Dev Console for live verification.
 
 6. **Wrap up.** Link the user to the Dev Console (control panel) if a URL is in the deploy output. Suggest writing a regression eval if the ship fixed a bug, or scheduling a soak check if the deploy changed user-facing behavior.
 
