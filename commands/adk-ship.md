@@ -1,7 +1,7 @@
 ---
 name: adk-ship
 description: Run pre-flight checks and deploy an ADK bot to production
-argument-hint: "[--env <env>] [message]"
+argument-hint: "[--env <env>]"
 ---
 
 Load the `adk` skill, then run pre-flight checks before deploying.
@@ -27,4 +27,4 @@ This is a deploy-to-production command — treat it as destructive-by-default. C
 
 6. **Wrap up.** Link the user to the Dev Console (control panel) if a URL is in the deploy output. Suggest writing a regression eval if the ship fixed a bug, or scheduling a soak check if the deploy changed user-facing behavior.
 
-If the user invokes `/adk-ship` again within the same session and pre-flight already ran clean, you may skip re-running checks that have not changed — but always confirm before the second `adk deploy`.
+Always re-run pre-flight on every `/adk-ship` invocation. The filesystem may have changed between invocations (manual edits, `git pull`, codegen) and there is no reliable way to detect that from inside the conversation.
