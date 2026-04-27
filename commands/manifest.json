@@ -58,7 +58,7 @@
     {
       "name": "adk-validate",
       "path": "commands/adk-validate.md",
-      "description": "Validate an ADK primitive's schema, types, imports, and config dependencies"
+      "description": "Validate an ADK primitive or a feature (a set of related primitives)"
     }
   ]
 }
