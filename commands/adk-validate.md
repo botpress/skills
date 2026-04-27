@@ -10,10 +10,11 @@ This is the proactive counterpart to `/adk-debug`: nothing is necessarily broken
 
 ## Workflow
 
-1. **Locate the primitive.** Glob `src/**/<name>.ts` to find it. If multiple matches, list them and ask which one. If no match, search by partial name and suggest the closest hits.
-2. **Read it.** Open the file and identify its type from the directory (`actions/`, `tools/`, `workflows/`, etc.).
-3. **Run offline validation.** `adk check --format json`. Filter the output for issues that mention the primitive's name or its file path.
-4. **Static checks** (read the source and verify):
+1. **Run baseline checks first, in parallel.** TypeScript type check (the project's `typecheck` / `type-check` script in `package.json` if defined, otherwise `tsc --noEmit`) and `adk check --format json`. Capture both outputs. If either fails project-wide for reasons unrelated to the named primitive, surface that up front — the primitive's own issues are noise until the project compiles.
+2. **Locate the primitive.** Glob `src/**/<name>.ts` to find it. If multiple matches, list them and ask which one. If no match, search by partial name and suggest the closest hits.
+3. **Read it.** Open the file and identify its type from the directory (`actions/`, `tools/`, `workflows/`, etc.).
+4. **Filter the baseline output.** From the type-check and `adk check` output captured in step 1, pull out diagnostics that mention the primitive's name or file path.
+5. **Static checks** (read the source and verify):
    - Imports come from `@botpress/runtime` (not the SDK).
    - The primitive is exported in the shape the ADK expects for its type (see references in the `adk` skill).
    - Zod / schema definitions cover all inputs and outputs the code uses.
@@ -21,6 +22,6 @@ This is the proactive counterpart to `/adk-debug`: nothing is necessarily broken
    - Any referenced model is available in the project's model config.
    - Any referenced sibling primitive (table, action, tool) actually exists in `src/`.
    - No hardcoded secrets, tokens, or API keys.
-5. **Report.** Group findings as ❌ Errors → ⚠️ Warnings → ✅ Passed. For each error/warning, include the file:line and the suggested fix. End with one line: *"Run `/adk-test <name>` to actually invoke it."*
+6. **Report.** Group findings as ❌ Errors → ⚠️ Warnings → ✅ Passed. For each error/warning, include the file:line and the suggested fix. End with one line: *"Run `/adk-test <name>` to actually invoke it."*
 
-If the user adds the word "fix" to `$ARGUMENTS` (e.g., `/adk-validate search fix`), apply the suggested fixes for errors after reporting them, then re-run `adk check --format json`.
+If the user adds the word "fix" to `$ARGUMENTS` (e.g., `/adk-validate search fix`), apply the suggested fixes for errors after reporting them, then re-run the baseline checks from step 1.
