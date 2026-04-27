@@ -286,6 +286,113 @@ adk chat
 Bot: Hi! How can I help you today?
 ```
 
+### adk check
+
+Offline validation of the project — schema correctness, ADK convention compliance, integration availability — without contacting Botpress Cloud. Use before `adk dev`, before `adk deploy`, and after any code change.
+
+```bash
+adk check [options]
+```
+
+**Options:**
+
+- `--format <format>` - Output format: `text` (default) or `json`
+
+**Examples:**
+
+```bash
+adk check
+adk check --format json    # machine-readable for automation
+```
+
+### adk status
+
+Report the project's current link state (workspace + bot), deployed version metadata, and any pending sync issues. Read-only.
+
+```bash
+adk status [options]
+```
+
+**Options:**
+
+- `--format <format>` - Output format: `text` or `json`
+
+### adk logs
+
+Read recent log entries from the linked bot.
+
+```bash
+adk logs [level] [options]
+```
+
+**Options:**
+
+- `level` - Filter by severity: `error`, `warning`, `info` (positional, optional)
+- `--format <format>` - `text` or `json`
+- `--follow` - Stream live
+- `since=<duration>` - Filter to a recent window (e.g., `since=1h`)
+
+**Examples:**
+
+```bash
+adk logs                           # recent entries, all levels
+adk logs error --format json       # errors as JSON
+adk logs --follow --format json    # stream live
+adk logs warning since=1h          # last hour of warnings
+```
+
+### adk traces
+
+Read execution traces — tool calls, action invocations, LLM steps, error context — for understanding *what happened* during a turn, beyond what `adk logs` reports.
+
+```bash
+adk traces [options]
+```
+
+**Options:**
+
+- `--format <format>` - `text` or `json`
+- `--conversation-id <id>` - Filter to a specific conversation
+
+**Examples:**
+
+```bash
+adk traces --format json
+adk traces --conversation-id <id> --format json
+```
+
+### adk evals
+
+Run automated conversation tests defined under `evals/`.
+
+```bash
+adk evals [name] [options]
+```
+
+**Options:**
+
+- `name` - Run a specific eval by name (positional, optional)
+- `--tag <tag>` - Filter by tag
+- `--type <type>` - Filter by type (e.g., `regression`)
+- `--verbose` / `-v` - Show all assertions
+- `--format <format>` - `text` (default) or `json`
+
+**Subcommands:**
+
+- `adk evals runs` - List recent runs
+- `adk evals runs --latest` - Most recent run
+- `adk evals runs --latest -v` - Most recent run with full details
+
+**Examples:**
+
+```bash
+adk evals                           # run all evals
+adk evals checkout                  # one eval by name
+adk evals --tag smoke
+adk evals --format json             # for CI
+adk evals runs --latest -v
+```
+
 ### adk add
 
 Add integration to agent.
