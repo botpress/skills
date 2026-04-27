@@ -15,7 +15,7 @@ If `$ARGUMENTS` is empty or only a primitive type with no description, ask what 
 
 ## Workflow
 
-1. **Read context first.** Read `agent.config.ts` for available integrations and models. Glob `src/` and skim 1–2 existing primitives in each directory you expect to touch, to match the project's naming, file structure, and import style.
+1. **Read context first.** Read `agent.config.ts` for available integrations and models. Glob `src/` and skim 1–2 existing primitives in each directory you expect to touch, to match the project's naming, file structure, and import style. **Conversation handlers are the special case:** Glob `src/conversations/*.ts` first — if any exist, the new conversation behavior must extend an existing handler instead of creating a new file. Pick the handler whose scope fits and edit that. Only create a new conversation file when none exists, or when the user has explicitly asked for a separate channel- or use-case-specific handler.
 2. **Interview only about *what*, never *how*.** Ask only outcome and behavior questions — what should this do, when should it happen from the user's perspective, what does success look like. Do not ask about schemas, return types, durability, retry policy, channel routing, storage shape, or *which primitives to use* — infer those from the description, existing primitives, and sensible defaults.
 
    Examples of acceptable questions:
@@ -28,6 +28,6 @@ If `$ARGUMENTS` is empty or only a primitive type with no description, ask what 
    Ask 1–3 questions max, only when the description leaves a genuine outcome-level gap. If the description already conveys intent, skip the interview entirely.
 3. **Decompose (feature mode only).** From the outcome, identify the primitives needed and the directories they belong in (`src/workflows/`, `src/actions/`, `src/tables/`, etc.). State the decomposition explicitly in the plan — *"This needs a `checkout` workflow, a `process-payment` action, and an `orders` table because …"*.
 4. **Propose a plan.** List every file to create or modify (full path), the exports, and any dependencies (integrations to add, models needed, `agent.config.ts` edits). For features, also describe how the primitives wire together. Wait for approval if the plan is non-trivial or touches `agent.config.ts`.
-5. **Build it.** Write the files under the right `src/<dir>/` paths. Use `@botpress/runtime` imports. Match the conventions you read in step 1. For a feature, build the primitives in dependency order (table → action → workflow → conversation), so each file's imports resolve as it's written.
-6. **Validate.** Run `adk check --format json`. If errors, fix them before reporting done.
+5. **Build it.** Write the files under the right `src/<dir>/` paths. Use `@botpress/runtime` imports. Match the conventions you read in step 1. For a feature, build the primitives in dependency order (table → action → workflow → conversation), so each file's imports resolve as it's written. For conversation handlers, edit the existing file identified in step 1 — do not spawn a new one unless step 1 determined no handler exists or the user asked for a separate one.
+6. **Validate — always.** Run `adk check --format json` after every build, no exceptions. If it reports errors or warnings, fix them in this same turn and re-run. Do not report the task done until the check passes.
 7. **Suggest next steps.** Offer `/adk-validate <name>` to confirm wiring (especially for a feature), `/adk-test <name>` to run it once, and `/adk-eval <name>` to pin its behavior with assertions.
