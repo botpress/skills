@@ -57,8 +57,9 @@ The first time you help with an ADK project in a session, silently check the pro
 
 If the user asks "what can you help with?", "what commands are available?", or invokes `/adk-explain` without arguments, present:
 
-- **Build**: `/adk-init` (scaffold project), `/adk-integration` (add services), `/adk-frontend` (build UI)
-- **Test & Debug**: `/adk-debug` (fix issues), `/adk-eval` (write tests)
+- **Build**: `/adk-init` (scaffold project), `/adk-build` (interview & build a primitive), `/adk-integration` (add services), `/adk-frontend` (build UI)
+- **Test & Debug**: `/adk-validate` (check a primitive's schema/types/config), `/adk-test` (invoke a primitive once), `/adk-eval` (write assertion tests), `/adk-debug` (fix issues)
+- **Ship**: `/adk-ship` (pre-flight checks + deploy)
 - **Document**: `/adk-document` (create, review, update, sync, search)
 - **Understand**: `/adk-explain` (explain bot architecture and components), `/adk-dev-console` (navigate the Dev Console)
 
