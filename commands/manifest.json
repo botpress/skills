@@ -1,6 +1,11 @@
 {
   "commands": [
     {
+      "name": "adk-build",
+      "path": "commands/adk-build.md",
+      "description": "Interview the user about a new ADK primitive or feature, then build it"
+    },
+    {
       "name": "adk-debug",
       "path": "commands/adk-debug.md",
       "description": "Debug ADK bot issues"
@@ -39,6 +44,21 @@
       "name": "adk-integration",
       "path": "commands/adk-integration.md",
       "description": "Discover, add, and configure Botpress integrations"
+    },
+    {
+      "name": "adk-ship",
+      "path": "commands/adk-ship.md",
+      "description": "Run pre-flight checks and deploy an ADK bot to production"
+    },
+    {
+      "name": "adk-test",
+      "path": "commands/adk-test.md",
+      "description": "Invoke an ADK primitive end-to-end with realistic input to confirm it works"
+    },
+    {
+      "name": "adk-validate",
+      "path": "commands/adk-validate.md",
+      "description": "Validate an ADK primitive or a feature (a set of related primitives)"
     }
   ]
 }
