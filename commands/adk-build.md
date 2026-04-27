@@ -11,15 +11,17 @@ Resolve shorthand for the primitive type: "kb" / "knowledge" = knowledge base, "
 ## Workflow
 
 1. **Read context first.** Glob `src/<primitive-dir>/` and read 1–2 existing primitives of the same type to match the project's naming, file structure, and import style. Read `agent.config.ts` to know which integrations and models are available.
-2. **Interview only the gaps.** The user's description usually covers intent, not the schema. Ask focused questions about what is *not* in the description — input/output shape, trigger condition, integrations to call, durability, channel, etc. Match the primitive's needs:
-   - **Action / Tool:** input schema, return type, side effects, which integration actions it calls. For tools, also: when should the AI call this (the LLM-facing description).
-   - **Workflow:** entry point, steps, resume points, what completion looks like.
-   - **Conversation:** channel(s), intents handled, expected response style.
-   - **Table:** columns and types, semantic-search fields, row-level access.
-   - **Trigger:** event source, filter conditions, downstream action.
-   - **Knowledge base:** source documents, chunking, retrieval mode.
+2. **Interview only about *what*, never *how*.** Ask only outcome and behavior questions — what should this do, when should it happen from the user's perspective, what does success look like. Do not ask about schemas, return types, durability, retry policy, channel routing, storage shape, or any other implementation detail — infer those from the description, existing primitives, and sensible defaults.
 
-   Ask 1–3 questions at most. Do not interrogate. If the description is detailed enough, skip the interview.
+   Examples of acceptable questions:
+   - **Action / Tool:** "What should this do, in plain language?" "When should the agent reach for this?"
+   - **Workflow:** "What outcome marks this as done?" "Can this pause and wait for a human, or is it fully automatic?"
+   - **Conversation:** "What kind of user messages should this handle?"
+   - **Table:** "What information does this need to remember about each row?"
+   - **Trigger:** "What real-world event should kick this off?"
+   - **Knowledge base:** "What questions should users be able to ask of this?"
+
+   Ask 1–3 questions max, only when the description leaves a genuine outcome-level gap. If the description already conveys intent, skip the interview entirely.
 3. **Propose a plan.** State the file path, the exports, the schema, and any dependencies (integrations to add, models needed). Wait for approval if the primitive is non-trivial or touches `agent.config.ts`.
 4. **Build it.** Write the file under `src/<primitive-dir>/<name>.ts`. Use `@botpress/runtime` imports. Match the conventions you read in step 1.
 5. **Validate.** Run `adk check --format json`. If errors, fix them before reporting done.
