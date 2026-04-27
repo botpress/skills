@@ -237,7 +237,15 @@ export default new Eval({
 
 ## Response Format
 
-When helping a developer debug:
+**Match depth to the question.**
+
+### Simple questions ("how do I check logs?", "what are trace spans?")
+
+Answer directly — one sentence + the CLI command or concept. Don't run the full debug loop for informational questions.
+
+### Active debugging ("my bot is broken", "X isn't working")
+
+Follow the full loop:
 
 1. **Check prerequisites** — verify dev server, config files, project validation
 2. **Start with `adk check --format json`** — rule out offline issues
@@ -246,4 +254,4 @@ When helping a developer debug:
 5. **Identify the root cause** — point to the specific span, log entry, or config issue
 6. **Suggest a targeted fix** — reference the appropriate failure pattern doc
 7. **Verify** — re-run the reproduction, confirm clean output
-8. **Suggest a regression eval** — point to the `adk-evals` skill
+8. **Write a regression eval** — load the `adk-evals` skill and generate the eval file automatically

@@ -54,6 +54,11 @@
       "name": "adk-integration",
       "path": "commands/adk-integration.md",
       "description": "Discover, add, and configure Botpress integrations"
+    },
+    {
+      "name": "adk-dev-console",
+      "path": "commands/adk-panel.md",
+      "description": "Explain ADK Dev Console features, tabs, and UI concepts"
     }
   ]
 }

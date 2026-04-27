@@ -8,28 +8,31 @@ Create documentation for **$ARGUMENTS** — a feature, workflow, or component in
 
 First, load the `adk-docs` skill for documentation standards and the `adk` skill for ADK context.
 
+If `$ARGUMENTS` is a broad term (e.g., "workflows", "tools", "actions"), read `src/<relevant-dir>/` to enumerate the user's actual primitives of that type first. Document *their specific implementations* using their actual file names, function names, and patterns — not generic concepts.
+
 ## Process
 
 ### 1. Research Phase
 
-Understand the topic before writing:
+Understand the topic by reading the user's actual code:
 
 ```javascript
 // Find the user's ADK project
 Glob({ pattern: "**/agent.config.ts" })
 
+// Find and read the specific primitives they want documented
+Glob({ pattern: "src/**/*" })
+Read({ file_path: "<each relevant source file>" })
+
 // Search for topic patterns in the user's project
 Grep({ pattern: "$ARGUMENTS", path: "<user-project-dir>" })
-
-// Find official ADK examples if available locally
-Glob({ pattern: "**/adk/examples/**/*.ts" })
 
 // Check existing project docs
 Glob({ pattern: "./{docs,guides}/**/*.md" })
 ```
 
 **Priority order for code examples:**
-1. The user's own ADK project — BEST
+1. The user's own ADK project — BEST (use their actual code, not generic examples)
 2. Official ADK repo examples (find locally or reference public repo)
 3. ADK runtime source (`@botpress/runtime` packages)
 
