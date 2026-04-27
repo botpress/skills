@@ -262,10 +262,14 @@ Current project scaffolds do not add `agent.json` to `.gitignore` automatically,
 
 ### adk chat
 
-Chat with your development bot.
+Chat with your **local development bot**.
+
+> ⚠️ `adk chat` (and `adk chat --single`) targets the linked dev bot — the one started by `adk dev` and identified by `devId`. It does **not** hit the deployed production bot. Never use it as a post-deploy smoke test or as any kind of "did the deploy work?" verification: a `--single` round-trip can pass against the dev bot while production is broken. For deployed bots, use `adk status --format json` for metadata and direct the user to the Dev Console for live verification.
 
 ```bash
-adk chat
+adk chat                                # interactive
+adk chat --single "<message>"           # one-shot
+adk chat --single "<message>" --format json
 ```
 
 **Requires:**
