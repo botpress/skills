@@ -2,62 +2,62 @@
   "commands": [
     {
       "name": "adk-build",
-      "path": "commands/adk-build.md",
+      "path": "adk-build.md",
       "description": "Interview the user about a new ADK primitive or feature, then build it"
     },
     {
       "name": "adk-debug",
-      "path": "commands/adk-debug.md",
+      "path": "adk-debug.md",
       "description": "Debug ADK bot issues"
     },
     {
       "name": "adk-dev-console",
-      "path": "commands/adk-dev-console.md",
+      "path": "adk-dev-console.md",
       "description": "Explain ADK Dev Console features, tabs, and UI concepts"
     },
     {
       "name": "adk-document",
-      "path": "commands/adk-document.md",
+      "path": "adk-document.md",
       "description": "Create, review, update, sync, or search project documentation for an ADK bot"
     },
     {
       "name": "adk-eval",
-      "path": "commands/adk-eval.md",
+      "path": "adk-eval.md",
       "description": "Write, run, or debug evals for an ADK bot"
     },
     {
       "name": "adk-explain",
-      "path": "commands/adk-explain.md",
+      "path": "adk-explain.md",
       "description": "Explain an ADK bot's architecture, flow, and components"
     },
     {
       "name": "adk-frontend",
-      "path": "commands/adk-frontend.md",
+      "path": "adk-frontend.md",
       "description": "Build frontend apps that integrate with ADK bots"
     },
     {
       "name": "adk-init",
-      "path": "commands/adk-init.md",
+      "path": "adk-init.md",
       "description": "Scaffold a new Botpress ADK project"
     },
     {
       "name": "adk-integration",
-      "path": "commands/adk-integration.md",
+      "path": "adk-integration.md",
       "description": "Discover, add, and configure Botpress integrations"
     },
     {
       "name": "adk-ship",
-      "path": "commands/adk-ship.md",
+      "path": "adk-ship.md",
       "description": "Run pre-flight checks and deploy an ADK bot to production"
     },
     {
       "name": "adk-test",
-      "path": "commands/adk-test.md",
+      "path": "adk-test.md",
       "description": "Invoke an ADK primitive end-to-end with realistic input to confirm it works"
     },
     {
       "name": "adk-validate",
-      "path": "commands/adk-validate.md",
+      "path": "adk-validate.md",
       "description": "Validate an ADK primitive or a feature (a set of related primitives)"
     }
   ]
