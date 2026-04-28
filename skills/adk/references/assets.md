@@ -58,6 +58,8 @@ The global `assets` object is available in any action, tool, workflow, or conver
 
 ### Get an Asset
 
+`assets.get()` throws an `Error` if the path does not match any known asset.
+
 ```typescript
 const logo = assets.get("logo.png");
 console.log(logo.url); // CDN URL
@@ -190,6 +192,7 @@ export const getBranding = new Autonomous.Tool({
 import { Action, z } from "@botpress/runtime";
 
 export const checkAssets = new Action({
+  name: "checkAssets",
   input: {},
   output: { synced: z.boolean(), issues: z.array(z.string()) },
   async handler() {
