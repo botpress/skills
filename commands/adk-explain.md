@@ -4,14 +4,19 @@ description: Explain an ADK bot's architecture, flow, and components
 argument-hint: "[component or question about the bot]"
 ---
 
-Help the user understand their Botpress ADK agent's architecture, flow, and specific components.
+Load the `adk` skill, then answer the user's question about **$ARGUMENTS** immediately.
 
-First, load the `adk` skill for general ADK context.
+Resolve shorthand first: "kbs" = knowledge bases, "convos" = conversations, "wf" = workflows, "int" = integrations, "config" = agent.config.ts.
 
-1. Run `adk status --format json` to get a structured overview of the project.
-2. Read `agent.config.ts` for full configuration details.
-3. Read `agent.json` for bot and workspace IDs (if present).
-4. Read `agent.local.json` for the dev bot ID (if present).
-5. Follow the explanation patterns in **references/explain-config.md** from the `adk` skill.
-6. If `$ARGUMENTS` targets a specific component (e.g. a workflow, action, or integration), focus the explanation there. Otherwise, produce a full architecture overview covering metadata, models, integrations, state, and primitives.
-7. Flag any issues found (unconfigured integrations, missing models, hardcoded secrets).
+If the user named a specific ADK concept or primitive, look it up in the `adk` skill's references and explain it. Match depth to the question — a one-word topic like "kbs" is a conceptual question: give a one-sentence explanation and a short code example from the references, then stop.
+
+If the user is in an ADK project (check for `agent.config.ts`), also check whether their project uses the component they asked about. If it does, read the relevant source files in `src/` and explain *their specific setup* — not just the generic concept.
+
+If the user asks a broad question ("explain my bot", "what does this do?", or no arguments):
+
+1. Run `adk status --format json`.
+2. Read `agent.config.ts` and relevant source files in `src/`.
+3. Identify the bot archetype (RAG assistant, support agent, ticket router, automation, etc.).
+4. Map the flow: channels → conversations → tools/actions → tables/KBs.
+5. Flag any issues (unconfigured integrations, missing models, hardcoded secrets).
+6. Follow the explanation patterns in **references/explain-config.md** from the `adk` skill.

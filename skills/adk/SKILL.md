@@ -45,6 +45,26 @@ All primitives must be placed in `src/` directory:
 
 > **Critical:** Files outside `src/` are not discovered. Location = behavior.
 
+## Session Start
+
+The first time you help with an ADK project in a session, silently check the project's health:
+
+1. Run `adk check --format json` and `adk status --format json`.
+2. If there are errors or warnings (unconfigured integrations, missing models, validation issues), proactively mention them before answering the user's question: *"Before we start — I noticed [issue]. Want me to help fix that?"*
+3. Only do this once per session. Don't re-run on every question.
+
+## Available Commands
+
+If the user asks "what can you help with?", "what commands are available?", or invokes `/adk-explain` without arguments, present:
+
+- **Build**: `/adk-init` (scaffold project), `/adk-build` (interview & build a primitive), `/adk-integration` (add services), `/adk-frontend` (build UI)
+- **Test & Debug**: `/adk-validate` (check a primitive's schema/types/config), `/adk-test` (invoke a primitive once), `/adk-eval` (write assertion tests), `/adk-debug` (fix issues)
+- **Ship**: `/adk-ship` (pre-flight checks + deploy)
+- **Document**: `/adk-document` (create, review, update, sync, search)
+- **Understand**: `/adk-explain` (explain bot architecture and components), `/adk-dev-console` (navigate the Dev Console)
+
+Then ask: *"What are you working on?"*
+
 ## When to Use This Skill
 
 Activate this skill when users ask ADK-related questions like:
@@ -480,26 +500,37 @@ async handler({ type, message, event, request, completion, conversation, execute
 
 ## Response Format
 
-When answering ADK questions, follow this structure:
+**Match your response depth to the question depth.** Not every question needs a full walkthrough.
 
-1. **Start with a concise explanation** - Answer the core question directly
-2. **Provide working code examples** - Use examples from references or create based on patterns
-3. **Include file references** - Cite documentation (e.g., "From actions.md:215")
-4. **Highlight common pitfalls** - Reference the troubleshooting section if relevant
-5. **Security & best practices** - Mention security considerations when applicable
-6. **Link to related topics** - Suggest further reading or related concepts
+### Conceptual Questions ("what is X?", "what's the difference between X and Y?")
 
-**Example Response Structure:**
+One sentence definition + one short code example. That's it.
 
 ```
-Actions are strongly-typed functions that can be called from anywhere in your bot.
+Knowledge bases add RAG to your bot — place markdown or PDF files in `src/knowledge/` and they become queryable with semantic search.
 
-**Example:**
-[code example]
-
-**Common Pitfall:** Remember to destructure `input` first (see troubleshooting section)
-
-**Related:** You can convert Actions to Tools using `.asTool()` - see the "When to Use What" decision tree.
-
-**Next Steps:** Create your action in `src/actions/myAction.ts` and it will be auto-registered.
+import { Autonomous } from '@botpress/runtime'
+export default new Autonomous.Tool({
+  handler: async ({ query }) => adk.knowledgeBase.search({ query }),
+})
 ```
+
+### How-To Questions ("how do I create X?", "how do I use X?")
+
+Brief explanation + working code example + one critical pitfall only if it's a common trap.
+
+### Implementation Questions ("implement X in my project", "add X to my bot")
+
+Read the user's existing files first (`src/actions/`, `src/tools/`, `src/tables/`, `agent.config.ts`). Generate code that uses their actual names, patterns, and conventions. Only mention pitfalls they're likely to hit given their specific code.
+
+### Architecture Questions ("explain my bot", "how does X work in my project?")
+
+Full structured response: read `adk status --format json`, `agent.config.ts`, and relevant source files. Map the data flow and identify the bot's archetype (RAG assistant, support agent, automation, etc.).
+
+### Troubleshooting Questions ("X is broken", "why is X failing?")
+
+Don't answer with documentation. Run `adk check --format json` and `adk logs error --format json`, show evidence, and point to the root cause. Follow the debug loop from the `adk-debugger` skill.
+
+### Default Rule
+
+If the answer fits in one sentence and a code snippet, don't add headers, pitfall sections, or related topics. More structure ≠ more helpful.

@@ -262,10 +262,14 @@ Current project scaffolds do not add `agent.json` to `.gitignore` automatically,
 
 ### adk chat
 
-Chat with your development bot.
+Chat with your **local development bot**.
+
+> ⚠️ `adk chat` (and `adk chat --single`) targets the linked dev bot — the one started by `adk dev` and identified by `devId`. It does **not** hit the deployed production bot. Never use it as a post-deploy smoke test or as any kind of "did the deploy work?" verification: a `--single` round-trip can pass against the dev bot while production is broken. For deployed bots, use `adk status --format json` for metadata and direct the user to the Dev Console for live verification.
 
 ```bash
-adk chat
+adk chat                                # interactive
+adk chat --single "<message>"           # one-shot
+adk chat --single "<message>" --format json
 ```
 
 **Requires:**
@@ -280,6 +284,113 @@ adk chat
 # Output:
 > Hello!
 Bot: Hi! How can I help you today?
+```
+
+### adk check
+
+Offline validation of the project — schema correctness, ADK convention compliance, integration availability — without contacting Botpress Cloud. Use before `adk dev`, before `adk deploy`, and after any code change.
+
+```bash
+adk check [options]
+```
+
+**Options:**
+
+- `--format <format>` - Output format: `text` (default) or `json`
+
+**Examples:**
+
+```bash
+adk check
+adk check --format json    # machine-readable for automation
+```
+
+### adk status
+
+Report the project's current link state (workspace + bot), deployed version metadata, and any pending sync issues. Read-only.
+
+```bash
+adk status [options]
+```
+
+**Options:**
+
+- `--format <format>` - Output format: `text` or `json`
+
+### adk logs
+
+Read recent log entries from the linked bot.
+
+```bash
+adk logs [level] [options]
+```
+
+**Options:**
+
+- `level` - Filter by severity: `error`, `warning`, `info` (positional, optional)
+- `--format <format>` - `text` or `json`
+- `--follow` - Stream live
+- `since=<duration>` - Filter to a recent window (e.g., `since=1h`)
+
+**Examples:**
+
+```bash
+adk logs                           # recent entries, all levels
+adk logs error --format json       # errors as JSON
+adk logs --follow --format json    # stream live
+adk logs warning since=1h          # last hour of warnings
+```
+
+### adk traces
+
+Read execution traces — tool calls, action invocations, LLM steps, error context — for understanding *what happened* during a turn, beyond what `adk logs` reports.
+
+```bash
+adk traces [options]
+```
+
+**Options:**
+
+- `--format <format>` - `text` or `json`
+- `--conversation-id <id>` - Filter to a specific conversation
+
+**Examples:**
+
+```bash
+adk traces --format json
+adk traces --conversation-id <id> --format json
+```
+
+### adk evals
+
+Run automated conversation tests defined under `evals/`.
+
+```bash
+adk evals [name] [options]
+```
+
+**Options:**
+
+- `name` - Run a specific eval by name (positional, optional)
+- `--tag <tag>` - Filter by tag
+- `--type <type>` - Filter by type (e.g., `regression`)
+- `--verbose` / `-v` - Show all assertions
+- `--format <format>` - `text` (default) or `json`
+
+**Subcommands:**
+
+- `adk evals runs` - List recent runs
+- `adk evals runs --latest` - Most recent run
+- `adk evals runs --latest -v` - Most recent run with full details
+
+**Examples:**
+
+```bash
+adk evals                           # run all evals
+adk evals checkout                  # one eval by name
+adk evals --tag smoke
+adk evals --format json             # for CI
+adk evals runs --latest -v
 ```
 
 ### adk add
@@ -876,7 +987,7 @@ adk remove slack
 
 **DON'T:**
 
-- Don't edit `.adk/` directory (auto-generated)
+- Don't edit `.adk/` directory (auto-generated) — **except** `.adk/scratch/`, which is reserved for disposable user/agent files (one-off runners, throwaway probes). `adk dev` does not touch `.adk/scratch/`. Production code, persistent helpers, and anything you'd commit belong outside `.adk/`.
 - Don't commit `agent.json` (add to .gitignore)
 - Don't commit `.env` files
 - Don't skip integration configuration in UI

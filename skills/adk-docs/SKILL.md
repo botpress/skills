@@ -18,7 +18,7 @@ Activate this skill when users:
 - Need to check if docs are in sync with their code ("Are my docs current?")
 - Want to search their project documentation ("Find docs about my payment handler")
 - Ask about documentation standards or templates
-- Mention `/adk-doc-create`, `/adk-doc-review`, `/adk-doc-update`, `/adk-doc-sync`, or `/adk-doc-search`
+- Mention `/adk-document`
 
 ## Available Documentation
 
@@ -28,13 +28,13 @@ Activate this skill when users:
 
 ## Available Commands
 
-| Command | Description |
+| Command (and suggested subcommand) | Description |
 |---------|-------------|
-| `/adk-doc-create [topic]` | Create documentation for a feature in the user's bot |
-| `/adk-doc-review [doc-path]` | Review project docs for accuracy and completeness |
-| `/adk-doc-update [doc-path] [what-changed]` | Update project docs after code changes |
-| `/adk-doc-sync [optional-doc-path]` | Check if project docs are in sync with the bot's code |
-| `/adk-doc-search [search-term]` | Search project documentation for specific topics |
+| `/adk-document create [topic]` | Create documentation for a feature in the user's bot |
+| `/adk-document review [doc-path]` | Review project docs for accuracy and completeness |
+| `/adk-document update [doc-path] [what-changed]` | Update project docs after code changes |
+| `/adk-document sync [optional-doc-path]` | Check if project docs are in sync with the bot's code |
+| `/adk-document search [search-term]` | Search project documentation for specific topics |
 
 ## Shared Principles
 

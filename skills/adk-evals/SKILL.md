@@ -238,15 +238,20 @@ conversation: [
 
 ## Response Format
 
-When helping a developer write an eval:
+**Match depth to the question.**
+
+### Simple questions ("what assertions are available?", "how do I run evals?")
+
+Answer directly — show the relevant table or CLI command. Don't generate a full eval file for an informational question.
+
+### Writing an eval
 
 1. Show the complete `new Eval({})` call with realistic field values
 2. Include imports (`import { Eval } from '@botpress/adk'`)
-3. Explain each assertion and why it's the right choice for that scenario
-4. Point out any mutual exclusivity rules if relevant (`expectSilence` vs `assert.response`, `user` vs `event`)
-5. Suggest the CLI command to run it: `adk evals <name>`
+3. Briefly explain non-obvious assertions — skip if the assertion is self-explanatory
+4. Suggest the CLI command to run it: `adk evals <name>`
 
-When helping debug a failing eval:
+### Debugging a failing eval
 
 1. Ask for or show the failing assertion (`expected` / `actual` diff)
 2. Suggest opening traces in the Control Panel to see what the bot did

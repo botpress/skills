@@ -4,13 +4,12 @@ description: Discover, add, and configure Botpress integrations
 argument-hint: "[integration name or question]"
 ---
 
-Help the user manage Botpress integrations in their ADK project.
+Load the `adk-integrations` and `adk` skills, then help with integrations immediately.
 
-First, load the `adk-integrations` skill for integration patterns. Also load the `adk` skill for general context.
+If `$ARGUMENTS` names a specific integration (e.g., "slack", "linear", "whatsapp"), check the current state first by running `adk list --format json`. If it's already installed, show its status — version, whether it's configured, and available actions. If installed but unconfigured, flag the issue and guide configuration. If not installed, run `adk info <name> --format json` and offer to add it with a pinned version.
 
-1. Understand what the user needs from `$ARGUMENTS`.
-2. Use CLI commands to get live data: `adk search`, `adk info`, `adk list`.
-3. Confirm before running `adk add` or `adk rm` and always pin versions.
-4. Explain configuration requirements (OAuth, API keys, Control Panel setup).
+If `$ARGUMENTS` is a general question ("what's available?", "messaging") or empty, run `adk list --format json` to show what's installed, then `adk search <query> --format json` for discovery.
+
+Always confirm before running `adk add` or `adk rm`. Always pin versions: `adk add <name>@<version>`.
 
 Follow the integration lifecycle patterns from the skill documentation.
