@@ -6,7 +6,7 @@ license: MIT
 
 # Botpress ADK Guidelines
 
-Use this skill when you've got questions about the Botpress Agent Development Kit (ADK) - like when you're building a feature that involves tables, actions, tools, workflows, conversations, files, knowledge bases, triggers, evals, or Zai.
+Use this skill when you've got questions about the Botpress Agent Development Kit (ADK) - like when you're building a feature that involves tables, actions, tools, workflows, conversations, files, knowledge bases, triggers, assets, evals, or Zai.
 
 ## What is the ADK?
 
@@ -21,14 +21,16 @@ The ADK provides primitives for:
 - Files (file storage with semantic search)
 - Knowledge Bases (RAG implementation)
 - Triggers (event-driven automation)
+- Assets (static files with permanent URLs)
 - **Zai** (production-ready LLM utility library for common AI operations)
 
 ### Project Structure (Convention-Based)
 
-All primitives must be placed in `src/` directory:
+Most primitives must be placed in `src/` directory (assets use the `assets/` directory at the project root):
 
 ```
 /                      # Project root
+├── assets/            # Static files → synced to Botpress Cloud with permanent URLs
 ├── src/
 │   ├── actions/       # Strongly-typed functions → auto-registered
 │   ├── tools/         # AI-callable tools → available via execute()
@@ -253,6 +255,7 @@ Documentation should be located in `./references/` directory relative to this sk
 - **tables.md** - Data storage with semantic search
 - **files.md** - File storage and management
 - **knowledge-bases.md** - RAG implementation
+- **assets.md** - Static files with permanent URLs and sync lifecycle
 - **zai-complete-guide.md** - Complete ZAI developer guide
 - **zai-agent-reference.md** - Quick ZAI reference
 
