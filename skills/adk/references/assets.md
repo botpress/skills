@@ -58,10 +58,10 @@ The global `assets` object is available in any action, tool, workflow, or conver
 
 ### Get an Asset
 
-`assets.get()` throws an `Error` if the path does not match any known asset.
+`assets.get()` is async and throws an `Error` if the path does not match any known asset.
 
 ```typescript
-const logo = assets.get("logo.png");
+const logo = await assets.get("logo.png");
 console.log(logo.url); // CDN URL
 console.log(logo.mime); // "image/png"
 console.log(logo.size); // bytes
@@ -159,7 +159,7 @@ import { Conversation } from "@botpress/runtime";
 export default new Conversation({
   channel: "webchat",
   async handler({ conversation }) {
-    const logo = assets.get("logo.png");
+    const logo = await assets.get("logo.png");
     await conversation.send({
       type: "image",
       payload: { imageUrl: logo.url },
@@ -176,8 +176,8 @@ import { Autonomous } from "@botpress/runtime";
 export const getBranding = new Autonomous.Tool({
   description: "Returns branding assets",
   handler: async () => {
-    const logo = assets.get("logo.png");
-    const header = assets.get("images/header.webp");
+    const logo = await assets.get("logo.png");
+    const header = await assets.get("images/header.webp");
     return {
       logoUrl: logo.url,
       headerUrl: header.url,
@@ -228,10 +228,10 @@ Assets with placeholder URLs will not be accessible at runtime. Always run `adk 
 
 ```typescript
 // ❌ Wrong
-assets.get("/assets/logo.png");
-assets.get("assets/logo.png");
+await assets.get("/assets/logo.png");
+await assets.get("assets/logo.png");
 
 // ✅ Correct — use the path relative to assets/
-assets.get("logo.png");
-assets.get("images/header.webp");
+await assets.get("logo.png");
+await assets.get("images/header.webp");
 ```
