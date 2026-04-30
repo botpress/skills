@@ -53,7 +53,7 @@ adk chat --single "Hello" --format json
 | Cause | How to Verify |
 |-------|--------------|
 | No dev bot created | Check that `agent.local.json` has `devId` (set automatically on the first `adk dev` run, or manually via `adk link --local`). If missing, run `adk dev` at least once to create the dev bot. |
-| Integration not configured | Check Control Panel at localhost:3001 — look for unconfigured integrations |
+| Integration not configured | Check Dev Console at localhost:3001 — look for unconfigured integrations |
 
 **Fix:** Work through the checklist top to bottom. Most "bot not responding" issues are missing config or a stopped dev server.
 
@@ -84,8 +84,8 @@ Look for `tool_call` spans with `success: false`. Some tools could be workflows 
 
 - **Handler error:** Read the error message, fix the handler code
 - **Schema mismatch:** Compare `input` in the trace against the tool's input schema definition
-- **Auth expired:** Reconfigure the integration in the Control Panel (localhost:3001) which must be done interactively
-- **Missing config:** Run `adk info <integration> --format json` to see required config, then configure in Control Panel which must also be done interactively
+- **Auth expired:** Reconfigure the integration in the Dev Console (localhost:3001) which must be done interactively
+- **Missing config:** Run `adk info <integration> --format json` to see required config, then configure in Dev Console which must also be done interactively
 
 ---
 
@@ -127,7 +127,7 @@ adk logs error --format json
 adk traces --format json
 ```
 
-Also check the Control Panel at localhost:3001 for integration status.
+Also check the Dev Console at localhost:3001 for integration status.
 
 **Common causes:**
 
@@ -141,9 +141,9 @@ Also check the Control Panel at localhost:3001 for integration status.
 
 **Fix:**
 
-- **Auth:** Reconfigure the integration in Control Panel
+- **Auth:** Reconfigure the integration in Dev Console
 - **Rate limits:** Add retry logic or reduce request frequency
-- **Config:** Run `adk info <integration> --format json` to verify required fields, update in Control Panel
+- **Config:** Run `adk info <integration> --format json` to verify required fields, update in Dev Console
 - **Events in dev:** Restart `adk dev` — event registration sometimes needs a fresh start
 
 ---

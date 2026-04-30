@@ -16,7 +16,7 @@ Activate this skill when users:
 - Want to connect an external service (Slack, WhatsApp, Linear, etc.)
 - Mention `adk add`, `adk search`, `adk info`, or `adk list`
 - Ask about `agent.config.ts` dependencies or the `dependencies.integrations` block
-- Need help configuring an integration (OAuth, API keys, Control Panel)
+- Need help configuring an integration (OAuth, API keys, Dev Console)
 - Ask about calling integration actions in code (`actions.slack.*`, etc.)
 - Mention specific platforms or services they want their agent to interact with
 - Get errors related to integration registration or configuration
@@ -36,7 +36,7 @@ Activate this skill when users:
 2. **Confirm before running `adk add`** — Always ask the user before adding an integration to their project.
 3. **Always specify version** — Use `adk add <name>@<version>` rather than just `adk add <name>`.
 4. **Explain configuration requirements** — After adding, tell the user what configuration is needed (OAuth link, API key, etc.) based on `adk info --format json` output.
-5. **Point to Control Panel** — OAuth flows and credential entry happen in the Botpress Control Panel, not in code.
+5. **Point to Dev Console** — OAuth flows and credential entry happen in the Botpress Dev Console, not in code.
 
 ## CLI Quick Reference
 

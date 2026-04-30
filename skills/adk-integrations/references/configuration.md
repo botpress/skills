@@ -1,6 +1,6 @@
 # Integration Configuration
 
-How integrations are configured after being added to an ADK project. After adding an integration with `adk add`, if the dev server is not running, start it so everything syncs, then tell the user to open the Botpress Control Panel and update the integration configuration there.
+How integrations are configured after being added to an ADK project. After adding an integration with `adk add`, if the dev server is not running, start it so everything syncs, then tell the user to open the Botpress Dev Console and update the integration configuration there.
 
 ## Configuration Types
 
@@ -23,7 +23,7 @@ The integration has configuration properties, but none are required. It can be e
 
 ### OAuth (Link-Based)
 
-The default configuration includes an `identifier` with a `linkTemplateScript`. The user clicks a generated URL in the Control Panel to authorize the integration via OAuth.
+The default configuration includes an `identifier` with a `linkTemplateScript`. The user clicks a generated URL in the Dev Console to authorize the integration via OAuth.
 
 **Examples:** `whatsapp` (default config), `linear` (default config)
 
@@ -35,7 +35,7 @@ Some OAuth integrations also have required configuration fields that must be set
 
 ### API Key / Manual
 
-The configuration schema contains required string fields, often marked with `x-zui.secret: true` for sensitive values. The user enters these values directly in the Control Panel.
+The configuration schema contains required string fields, often marked with `x-zui.secret: true` for sensitive values. The user enters these values directly in the Dev Console.
 
 **Examples:** `linear` (apiKey config), `whatsapp` (manual config)
 
@@ -88,6 +88,6 @@ Each key is the **alias** used to access the integration in code (e.g., `actions
 ### Important Notes
 
 - After adding an integration, if the dev server is not running, start it so the project syncs with Botpress
-- After adding an integration, tell the user to open the Botpress Control Panel and update the integration configuration there
+- After adding an integration, tell the user to open the Botpress Dev Console and update the integration configuration there
 - Add integrations with `adk add` instead of manually editing `agent.config.ts`
 - The alias determines the code accessor: `actions.<alias>.<actionName>()`
