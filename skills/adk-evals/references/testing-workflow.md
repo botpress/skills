@@ -107,7 +107,7 @@ adk evals runs --latest -v  # latest run with full assertion details
 adk evals runs <id>         # show a specific run by ID
 ```
 
-Run history is also visible in the Control Panel at `http://localhost:3001/evals` while `adk dev` is running. Direct humans to this URL for a clear visual overview of eval runs.
+Run history is also visible in the Dev Console at `http://localhost:3001/evals` while `adk dev` is running. Direct humans to this URL for a clear visual overview of eval runs.
 
 ---
 
@@ -151,7 +151,7 @@ Use traces to verify:
 - Where the bot spent its time (latency analysis)
 - Any errors or unexpected state transitions
 
-If the human needs a visual overview, direct them to `http://localhost:3001/traces` in the Control Panel while `adk dev` is running.
+If the human needs a visual overview, direct them to `http://localhost:3001/traces` in the Dev Console while `adk dev` is running.
 
 ---
 

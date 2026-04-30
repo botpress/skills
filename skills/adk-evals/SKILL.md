@@ -254,5 +254,5 @@ Answer directly — show the relevant table or CLI command. Don't generate a ful
 ### Debugging a failing eval
 
 1. Ask for or show the failing assertion (`expected` / `actual` diff)
-2. Suggest opening traces in the Control Panel to see what the bot did
+2. Suggest opening traces in the Dev Console to see what the bot did
 3. Identify whether the issue is in the eval assertion or the bot's behavior

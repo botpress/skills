@@ -112,7 +112,7 @@ Before debugging, verify:
 - [ ] **Dev server running?** `adk dev` (or `adk dev --non-interactive --format json` for structured output)
 - [ ] **Bot linked?** `agent.json` exists with `botId` and `workspaceId` (created by `adk link`)
 - [ ] **Dev bot created?** `agent.local.json` has `devId` (set automatically by the first `adk dev` run)
-- [ ] **Integration configured?** Check Control Panel at localhost:3001 for unconfigured integrations
+- [ ] **Integration configured?** Check Dev Console at localhost:3001 for unconfigured integrations
 
 ---
 

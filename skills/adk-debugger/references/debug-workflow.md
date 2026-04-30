@@ -143,7 +143,7 @@ Apply a targeted fix based on the classification:
 | Hallucinated params | Input schemas, validation | `llm-debugging.md` § Hallucinated Parameters |
 | Model refusal | Instructions, tool descriptions | `llm-debugging.md` § Refusal |
 | Model looping | `onBeforeTool` guard, output clarity | `llm-debugging.md` § Looping |
-| Integration failure | Control Panel config, `adk add` | `common-failures.md` § Integration Failures |
+| Integration failure | Dev Console config, `adk add` | `common-failures.md` § Integration Failures |
 | Config issue | `agent.json`, `agent.local.json` | `common-failures.md` § Config Confusion |
 
 ---

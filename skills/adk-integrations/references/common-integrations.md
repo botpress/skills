@@ -50,10 +50,10 @@ Most commonly used integration for RAG, web search, and page scraping. No config
 
 Alternative config modes: `manifestAppCredentials`, `refreshToken`.
 
-Requires completing the OAuth flow in the Control Panel. If you see "No credentials found", the OAuth link hasn't been clicked yet.
+Requires completing the OAuth flow in the Dev Console. If you see "No credentials found", the OAuth link hasn't been clicked yet.
 
 After adding, you must:
-1. Enable in Control Panel
+1. Enable in Dev Console
 2. Set `replyBehaviour` config value
 3. Complete OAuth authorization
 
@@ -68,7 +68,7 @@ After adding, you must:
 | Events | Multiple |
 
 **Configuration modes:**
-- **OAuth (default):** Click authorization link in Control Panel
+- **OAuth (default):** Click authorization link in Dev Console
 - **Sandbox:** Testing mode with shared Botpress phone number (+1-581-701-9840)
 - **Manual:** Provide API credentials directly
 
@@ -85,7 +85,7 @@ Sandbox mode is useful for quick testing without setting up your own WhatsApp Bu
 | Events | Multiple |
 
 **Configuration modes:**
-- **OAuth (default):** Click authorization link in Control Panel
+- **OAuth (default):** Click authorization link in Dev Console
 - **API Key:** Provide a Linear API key directly
 
 Because it's private, use the full name when searching: `adk info agi/linear`.

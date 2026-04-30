@@ -68,7 +68,7 @@ Without `--alias`, the integration name becomes the alias (e.g., `actions.slack.
 
 ## 3. Configure
 
-After adding, configure the integration via the Botpress Control Panel:
+After adding, configure the integration via the Botpress Dev Console:
 
 1. **Enable** the integration (toggle `enabled` to `true`)
 2. **Set configuration** values if required (depends on integration type)
@@ -138,7 +138,7 @@ adk info slack --full
 # 3. Add it to your project
 adk add slack@3.0.0
 
-# 4. Configure in Control Panel (enable, set replyBehaviour, complete OAuth) by the human
+# 4. Configure in Dev Console (enable, set replyBehaviour, complete OAuth) by the human
 
 # 5. Use in code
 ```
