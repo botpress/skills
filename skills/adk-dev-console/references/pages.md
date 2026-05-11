@@ -23,6 +23,32 @@ Real-time conversation interface for testing the agent.
 
 ## Components
 
+### Webchat Components (`/components`)
+
+Browse the component registry and inspect components installed in the agent.
+
+**Layout:** Two-tab interface (Installed / Registry) + masonry card grid + detail overlay
+
+**Tabs:**
+
+**Installed** — Components present in the agent's `src/components/` directory:
+- Masonry card layout with component preview (rendered in shadow DOM)
+- Click a card to open overlay with full details
+- Empty state: "No components installed yet" with guidance
+
+**Registry** — Available components from the external component registry:
+- Same masonry layout
+- Click a card to open overlay with installation instructions and metadata
+- Empty state: "Registry is empty" (requires CI to publish a manifest first)
+
+**Features:**
+- Live reload on component source changes
+- Preview rendering via shadow DOM isolation
+- Error states for load/fetch failures
+- Loading skeletons while fetching
+
+See `component-registry.md` for details on the registry model and component lifecycle.
+
 ### Actions (`/actions`) — dev only
 
 Browse and test bot actions and integration actions.

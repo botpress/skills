@@ -12,12 +12,13 @@ The Dev Console is a local app served at port `3001` (by default, but can be cus
 
 Activate when users ask about:
 
-- **UI concepts** — "What are Agent Steps?", "What does the Observe tab show?", "What is a turn?"
+- **UI concepts** — "What are Agent Steps?", "What does the Observe tab show?", "What is a turn?", "What is the component registry?"
 - **Dev Console navigation** — "What tabs are available?", "Where do I find traces?", "How do I test RAG?"
 - **Reading execution data** — "What do the steps mean?", "Why is my step red?", "What's the cost shown?"
+- **Component registry** — "Where do I find custom components?", "How do I install a component?", "What components are available?"
 - **Specific pages** — "How do I use the evals page?", "Where do I configure integrations?", "How do I search knowledge?"
 - **Comparing UI vs CLI** — "Should I use the Dev Console or CLI for debugging?"
-- Mentions of `localhost:3001`, "dev console", "Dev Console", or specific tab names (Chat, Build, Components, Data, Test, Observe, Config)
+- Mentions of `localhost:3001`, "dev console", "Dev Console", "component registry", or specific tab names (Chat, Build, Components, Data, Test, Observe, Config)
 
 ## Available Documentation
 
@@ -25,6 +26,7 @@ Activate when users ask about:
 |------|----------|
 | `references/agent-steps.md` | Agent Steps visualization — turns, iterations, tools, messages, state mutations, cost tracking, status indicators |
 | `references/pages.md` | Every page/tab in the Dev Console — what it shows, key features, layout |
+| `references/component-registry.md` | Component Registry — installed vs registry tabs, component lifecycle, runtime registry internals, UI features |
 
 ## How to Answer
 
@@ -43,7 +45,7 @@ Match depth to the question:
 |-------|-------|---------|
 | **Chat** | Chat | Test the agent via webchat + see Agent Steps |
 | **Build** | Story | Visual agent flow graph (feature-flagged) |
-| **Components** | Actions, Workflows, Triggers | Browse and test bot primitives |
+| **Components** | Webchat Components, Actions, Workflows, Triggers | Browse component registry, test bot primitives |
 | **Test** | RAG Search, Evals | Test knowledge search and run automated evals |
 | **Data** | Knowledge, Tables, Files | Manage knowledge bases, tables, and files |
 | **Observe** | Conversations, Traces, Logs | View conversation history, execution traces, runtime logs |
@@ -70,6 +72,7 @@ The right panel of the Chat page shows **Agent Steps** — a real-time visualiza
 | Path | Page |
 |------|------|
 | `/chat` | Chat + Agent Steps |
+| `/components` | Component registry + installed components |
 | `/actions` | Actions browser |
 | `/workflows` | Workflows + run history |
 | `/search` | RAG search testing |
