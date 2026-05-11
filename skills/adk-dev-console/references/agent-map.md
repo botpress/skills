@@ -51,8 +51,9 @@ The graph is built from an `AgentSnapshot` — a structured representation of al
 | Shape | Types |
 |-------|-------|
 | Square | Conversation, Workflow, Trigger (handlers) |
-| Circle | Action, Tool, Table, Knowledge, CustomComponent, IntegrationAction (leaves) |
+| Circle | Action, Tool, Table, Knowledge, CustomComponent, IntegrationAction, Model Node (leaves) |
 | Wide rectangle | AIAgent (with bottom sub-handles for model, tool, knowledge ports) |
+| Pill/tile | Trigger Entry (with lightning-bolt accent on left edge) |
 
 ### Node colors
 
@@ -68,6 +69,8 @@ The graph is built from an `AgentSnapshot` — a structured representation of al
 | CustomComponent | Light purple (`#A78BFA`) |
 | IntegrationAction | Medium purple (`#C084FC`) |
 | AIAgent | Indigo (`#6366F1`) |
+| Trigger Entry | Blue accent (`#3B82F6`) with integration icon |
+| Model Node | Indigo (`#6366F1`), same as AIAgent |
 
 ### Visual states
 

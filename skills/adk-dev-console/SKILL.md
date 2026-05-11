@@ -48,7 +48,7 @@ Match depth to the question:
 | **Components** | Actions, Workflows, Triggers | Browse and test bot primitives |
 | **Test** | RAG Search, Evals | Test knowledge search and run automated evals |
 | **Data** | Knowledge, Tables, Files | Manage knowledge bases, tables, and files |
-| **Observe** | Conversations, Traces, Logs | View conversation history, execution traces, runtime logs |
+| **Observe** | Agent Map, Conversations, Traces, Logs | Agent Map also accessible here (feature-flagged); conversation history, execution traces, runtime logs |
 | **Config** | Settings, Integrations | Agent config, secrets, LLM settings, integration management |
 
 ### Agent Steps (Chat Page)
