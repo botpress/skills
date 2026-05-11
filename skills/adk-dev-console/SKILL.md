@@ -12,12 +12,13 @@ The Dev Console is a local app served at port `3001` (by default, but can be cus
 
 Activate when users ask about:
 
-- **UI concepts** — "What are Agent Steps?", "What does the Observe tab show?", "What is a turn?"
-- **Dev Console navigation** — "What tabs are available?", "Where do I find traces?", "How do I test RAG?"
-- **Reading execution data** — "What do the steps mean?", "Why is my step red?", "What's the cost shown?"
+- **UI concepts** — "What are Agent Steps?", "What does the Observe tab show?", "What is a turn?", "What is the agent map?"
+- **Dev Console navigation** — "What tabs are available?", "Where do I find traces?", "How do I test RAG?", "Where is the agent map?"
+- **Reading execution data** — "What do the steps mean?", "Why is my step red?", "What's the cost shown?", "What do the nodes mean on the agent map?"
+- **Agent map** — "How do I read the graph?", "What are the node types?", "What do the edges mean?", "Why is a node dimmed?"
 - **Specific pages** — "How do I use the evals page?", "Where do I configure integrations?", "How do I search knowledge?"
 - **Comparing UI vs CLI** — "Should I use the Dev Console or CLI for debugging?"
-- Mentions of `localhost:3001`, "dev console", "Dev Console", or specific tab names (Chat, Build, Components, Data, Test, Observe, Config)
+- Mentions of `localhost:3001`, "dev console", "Dev Console", "agent map", or specific tab names (Chat, Build, Components, Data, Test, Observe, Config)
 
 ## Available Documentation
 
@@ -25,6 +26,7 @@ Activate when users ask about:
 |------|----------|
 | `references/agent-steps.md` | Agent Steps visualization — turns, iterations, tools, messages, state mutations, cost tracking, status indicators |
 | `references/pages.md` | Every page/tab in the Dev Console — what it shows, key features, layout |
+| `references/agent-map.md` | Agent Map — data model (AgentSnapshot, primitives, edges), visual mapping (shapes, colors), interactions, real-time updates |
 
 ## How to Answer
 
@@ -42,7 +44,7 @@ Match depth to the question:
 | Group | Pages | Purpose |
 |-------|-------|---------|
 | **Chat** | Chat | Test the agent via webchat + see Agent Steps |
-| **Build** | Story | Visual agent flow graph (feature-flagged) |
+| **Build** | Agent Map | Interactive graph of agent architecture — primitives and relationships (feature-flagged) |
 | **Components** | Actions, Workflows, Triggers | Browse and test bot primitives |
 | **Test** | RAG Search, Evals | Test knowledge search and run automated evals |
 | **Data** | Knowledge, Tables, Files | Manage knowledge bases, tables, and files |
@@ -70,6 +72,7 @@ The right panel of the Chat page shows **Agent Steps** — a real-time visualiza
 | Path | Page |
 |------|------|
 | `/chat` | Chat + Agent Steps |
+| `/agent-map` | Agent Map (feature-flagged) |
 | `/actions` | Actions browser |
 | `/workflows` | Workflows + run history |
 | `/search` | RAG search testing |

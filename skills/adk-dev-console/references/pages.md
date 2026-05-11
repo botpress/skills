@@ -21,6 +21,32 @@ Real-time conversation interface for testing the agent.
 
 ---
 
+## Build
+
+### Agent Map (`/agent-map`) — dev only, feature-flagged (`enable_agent_forge`)
+
+Bird's-eye interactive graph of the agent's architecture — all primitives and their relationships.
+
+**Layout:** Full-screen React Flow canvas + optional detail panel (right sidebar)
+
+**Features:**
+- Nodes represent every primitive: actions, tools, workflows, conversations, triggers, tables, knowledge bases, custom components, AI agents, integration actions
+- Edges show relationships: `invokes` (logic calls), `reads`/`writes`/`queries` (table access), `uses_component` (conversation → custom component)
+- Synthetic nodes: **AI Agents** (one per `execute()` call site), **Integration Actions** (one per `actions.<alias>.<name>()` call), **Trigger Entries** (channel messages, events, cron schedules), **Model Nodes** (one per unique model)
+- Auto-layout via ElkJS — deterministic graph positioning
+- Drag nodes to reposition (persisted in localStorage)
+- Click a node to open detail panel with metadata, definition location, and action buttons (invoke, open page, open source)
+- Node shapes: square for handlers (conversation, workflow, trigger), circle for leaves (action, tool, table, knowledge, custom component), wide rectangle for AI agents
+- Color-coded by type (e.g., green=conversation, amber=workflow, purple=tool, cyan=table, pink=knowledge, indigo=AI agent)
+- Orphan nodes (unconnected primitives) shown at reduced opacity
+- Real-time updates via SSE stream (`/api/agent-map/stream`) — reflects source file changes automatically
+- Parse warnings shown if static analysis is incomplete (best-effort AST extraction)
+- Reset layout button to recompute positions
+
+See `agent-map.md` for the full data model and visual reference.
+
+---
+
 ## Components
 
 ### Actions (`/actions`) — dev only
@@ -142,6 +168,10 @@ Browse agent files.
 ---
 
 ## Observe
+
+### Agent Map (`/agent-map`) — dev only, feature-flagged
+
+See the Build section above for the Agent Map page. It also appears in the Observe tab group navigation.
 
 ### Conversations (`/conversations`) — dev only
 
