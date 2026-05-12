@@ -8,7 +8,7 @@ license: MIT
 
 ## What are Evals?
 
-Evals are automated conversation tests for ADK agents. Each eval defines a scenario — a sequence of user messages or events — and asserts on what the bot should do: what it says, which tools it calls, how state changes, what gets written to tables, and more.
+Evals are automated conversation tests for ADK agents. Each eval defines a scenario — a sequence of user messages or events — and asserts on what the bot should do: what it says, which tools it calls, how state changes, which workflows run, and more.
 
 Evals run against a live dev bot (`adk dev`), so they test the full stack — not mocks.
 
@@ -18,7 +18,7 @@ Use this skill when the developer asks about:
 
 - **Writing evals** — file format, assertions, turn types, setup
 - **Running evals** — CLI commands, filtering, output interpretation
-- **Testing specific primitives** — how to test actions, tools, workflows, conversations, tables, state
+- **Testing specific primitives** — how to test actions, tools, workflows, conversations, state
 - **The testing loop** — write → run → inspect traces → iterate
 - **CI integration** — exit codes, `--format json` flag, tagging strategies
 - **Eval configuration** — idleTimeout, judgePassThreshold, judgeModel
@@ -41,7 +41,7 @@ Or when you are developing an ADK bot and need to write the equivalent of unit/e
 |------|----------|
 | `references/eval-format.md` | Complete file format — all fields, turn types, assertion categories, match operators, setup, outcome, options |
 | `references/testing-workflow.md` | Running evals, interpreting output, using traces, the write → test → iterate loop, CI integration |
-| `references/test-patterns.md` | Per-primitive patterns for actions, tools, workflows, conversations, tables, and state |
+| `references/test-patterns.md` | Per-primitive patterns for actions, tools, workflows, conversations, and state |
 
 ## How to Answer
 
@@ -57,7 +57,7 @@ Or when you are developing an ADK bot and need to write the equivalent of unit/e
 ### Eval file structure
 
 ```typescript
-import { Eval } from '@botpress/adk'
+import { Eval } from '@botpress/evals'
 
 export default new Eval({
   name: 'greeting',
@@ -106,10 +106,9 @@ export default new Eval({
 
 | Category | What it checks |
 |----------|---------------|
-| `response` | Bot reply text (contains, matches, llm_judge, similar_to) |
+| `response` | Bot reply text (contains, not_contains, matches, llm_judge) |
 | `tools` | Tool calls (called, not_called, call_order, params) |
 | `state` | Bot/user/conversation state (equals, changed) |
-| `tables` | Table rows (row_exists, row_count) |
 | `workflow` | Workflow execution (entered, completed) |
 | `timing` | Response time in ms (lte, gte) |
 
@@ -165,26 +164,14 @@ adk evals runs --latest -v       # with full details
 
 ---
 
-✅ **Use `outcome` for post-conversation state and table assertions**
+✅ **Use `outcome` for post-conversation state and workflow assertions**
 
 ```typescript
 // CORRECT — final state checked once after all turns
 outcome: {
   state: [{ path: 'conversation.resolved', equals: true }],
-  tables: [{ table: 'ticketsTable', row_exists: { status: { equals: 'open' } } }],
+  workflow: [{ name: 'ticketFlow', completed: true }],
 }
-```
-
-❌ **Checking tables in per-turn assertions when the write happens at the end**
-
-```typescript
-// WRONG — table may not be written until after all turns
-conversation: [
-  {
-    user: 'Create a ticket',
-    assert: { tables: [{ table: 'ticketsTable', row_exists: { status: { equals: 'open' } } }] },
-  },
-]
 ```
 
 ---
@@ -231,7 +218,6 @@ conversation: [
 
 **Per-primitive:**
 - "How do I test a workflow that uses step.sleep()?"
-- "How do I verify a row was written to a table after a conversation?"
 - "How do I test that state changed from the seeded value?"
 
 ---
@@ -247,7 +233,7 @@ Answer directly — show the relevant table or CLI command. Don't generate a ful
 ### Writing an eval
 
 1. Show the complete `new Eval({})` call with realistic field values
-2. Include imports (`import { Eval } from '@botpress/adk'`)
+2. Include imports (`import { Eval } from '@botpress/evals'`)
 3. Briefly explain non-obvious assertions — skip if the assertion is self-explanatory
 4. Suggest the CLI command to run it: `adk evals <name>`
 

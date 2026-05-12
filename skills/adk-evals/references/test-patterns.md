@@ -9,7 +9,7 @@ How to write evals for each ADK primitive type. Each section shows the recommend
 Actions are strongly-typed functions callable from conversations, workflows, other actions, or exposed as AI-callable tools. Test them by triggering a conversation that invokes the action and asserting on the response.
 
 ```typescript
-import { Eval } from '@botpress/adk'
+import { Eval } from '@botpress/evals'
 
 export default new Eval({
   name: 'lookup-order-action',
@@ -159,7 +159,7 @@ setup: {
 - `workflow.entered` — workflow was triggered
 - `workflow.completed` — workflow ran to completion (use in `outcome`)
 - `state` — final state after the workflow completes
-- `tables` — any records the workflow created or updated
+- `tools` — any tools the workflow invoked
 
 ---
 
@@ -224,65 +224,6 @@ export default new Eval({
     {
       event: { type: 'internal:heartbeat' },
       expectSilence: true, // bot should not respond to internal events
-    },
-  ],
-})
-```
-
----
-
-## Tables
-
-Tables are structured data stores. Test that the bot reads from and writes to tables correctly.
-
-### Writing to a table
-
-```typescript
-export default new Eval({
-  name: 'table-write',
-  tags: ['tables'],
-
-  conversation: [
-    {
-      user: 'Create a support ticket for my login issue',
-      assert: {
-        tools: [{ called: 'createTicket' }],
-        response: [{ contains: 'ticket' }],
-      },
-    },
-  ],
-
-  outcome: {
-    tables: [
-      { table: 'ticketsTable', row_exists: {
-          category: { equals: 'login' },
-          status: { equals: 'open' },
-      }},
-      { table: 'ticketsTable', row_count: { gte: 1 } },
-    ],
-  },
-})
-```
-
-### Reading from a table (seeded data)
-
-```typescript
-export default new Eval({
-  name: 'table-read',
-  tags: ['tables'],
-  setup: {
-    // Tables cannot be seeded via setup.state — seed data must already exist in the dev bot's table,
-    // or be written by a prior eval turn before the assertions run.
-  },
-  conversation: [
-    {
-      user: 'List my open tickets',
-      assert: {
-        tools: [{ called: 'listTickets', params: {
-            status: { equals: 'open' },
-        }}],
-        response: [{ llm_judge: 'Response lists the open tickets' }],
-      },
     },
   ],
 })
@@ -359,9 +300,8 @@ outcome: {
 |-----------|-------------------|---------------------|
 | Actions | `tools.called` + params | `response`, `state` |
 | Tools | `tools.called/not_called/call_order` | `response` |
-| Workflows | `workflow.entered/completed` | `state`, `tables`, `outcome` |
+| Workflows | `workflow.entered/completed` | `state`, `outcome` |
 | Conversations | `response` (multi-turn) | `tools`, `state` |
-| Tables | `tables.row_exists/row_count` in `outcome` | `tools.called` |
 | State | `state.equals/changed` | `outcome.state` |
 
 ---
