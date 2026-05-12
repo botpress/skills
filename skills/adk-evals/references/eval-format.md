@@ -23,7 +23,7 @@ my-agent/
 ## Full Structure
 
 ```typescript
-import { Eval } from '@botpress/adk'
+import { Eval } from '@botpress/evals'
 
 export default new Eval({
   name: 'my-eval',              // unique identifier (required)
@@ -121,7 +121,6 @@ assert: {
     { contains: 'ticket' },                    // substring present
     { not_contains: 'error' },                 // substring absent
     { matches: 'TKT-\\d{3}' },               // regex match
-    { similar_to: 'Your ticket has been created' }, // semantic similarity
     { llm_judge: 'Response confirms the ticket was created' }, // AI judge, scores 1–5
   ],
 }
@@ -159,24 +158,6 @@ assert: {
 }
 ```
 
-### Tables
-
-Botpress table contents.
-
-```typescript
-assert: {
-  tables: [
-    { table: 'ticketsTable', row_exists: {               // row exists matching conditions
-        status: { equals: 'open' },
-        createdBy: { contains: 'Bob' },
-    }},
-    { table: 'ticketsTable', row_count: { gte: 1 },     // row count condition
-      where: { department: { equals: 'IT' } },
-    },
-  ],
-}
-```
-
 ### Workflow
 
 Workflow execution (verified via trace spans).
@@ -207,7 +188,7 @@ assert: {
 
 ## Match Operators
 
-Used in tool params, table conditions, and state values:
+Used in tool params, state values, and workflow params:
 
 | Operator | Example | Description |
 |----------|---------|-------------|
@@ -280,16 +261,10 @@ setup: {
 
 ## Outcome Assertions
 
-Run once after all conversation turns complete. Supports `state`, `tables`, and `workflow` (not `response` or `tools` — those are per-turn only).
+Run once after all conversation turns complete. Supports `state` and `workflow` (not `response` or `tools` — those are per-turn only).
 
 ```typescript
 outcome: {
-  tables: [
-    { table: 'ticketsTable', row_exists: {
-        assignedTo: { contains: 'Frank' },
-        status: { equals: 'in-progress' },
-    }},
-  ],
   state: [
     { path: 'conversation.resolved', equals: true },
   ],
@@ -307,7 +282,7 @@ Override defaults for a specific eval. Cascades: **eval options → agent config
 
 ```typescript
 options: {
-  idleTimeout: 30000,       // ms to wait for bot response (default: 15000)
+  idleTimeout: 60000,       // ms to wait for bot response (default: 30000)
   judgePassThreshold: 4,    // llm_judge score required to pass, 1–5 (default: 3)
 }
 ```
