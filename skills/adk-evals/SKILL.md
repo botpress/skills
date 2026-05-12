@@ -88,7 +88,7 @@ export default new Eval({
   },
 
   options: {
-    idleTimeout: 20000,
+    idleTimeout: 60000,
     judgePassThreshold: 4,
   },
 })

@@ -188,7 +188,7 @@ assert: {
 
 ## Match Operators
 
-Used in tool params, table conditions, and state values:
+Used in tool params, state values, and workflow params:
 
 | Operator | Example | Description |
 |----------|---------|-------------|
