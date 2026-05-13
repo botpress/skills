@@ -44,8 +44,8 @@ Activate this skill when users:
 |---------|-------------|-----------|
 | `adk search <query>` | Search integrations by keyword | `--format json`, `--limit <number>` (default: 20) |
 | `adk list --available` | Browse all Hub integrations | `--format json`, `--limit <number>` (default: 50) |
-| `adk list` | Show installed integrations | `--format json`, `--limit <number>` (default: 50) |
-| `adk info <name>` | Full integration details | `--actions`, `--channels`, `--events`, `--full`, `--format json` |
+| `adk list` | Show installed dependencies | `--format json`, `--limit <number>` (default: 50) |
+| `adk info <name>` | Full integration details (integrations only, not plugins) | `--actions`, `--channels`, `--events`, `--full`, `--format json` |
 | `adk add <name>@<version>` | Add integration to project | `--alias <name>`, `--format json` |
 | `adk add plugin:<name>@<version>` | Add plugin to project | `--alias <name>`, `--format json` |
 | `adk remove <name>` | Remove integration, plugin, or interface | `--format json` |

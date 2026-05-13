@@ -139,7 +139,7 @@ adk upgrade plugin:hitl
 adk upgrade
 ```
 
-After upgrading, check for breaking changes in the new version's actions/events, then re-deploy with `adk deploy`.
+After upgrading, check for breaking changes in the new version's actions/events, then re-deploy with `adk deploy`. To upgrade to a specific version instead of the latest, use `adk add <name>@<target-version>` — this updates the existing dependency entry.
 
 ## Complete Example
 
