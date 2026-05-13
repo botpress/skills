@@ -122,7 +122,7 @@ adk remove slack
 
 # Explicit prefix to disambiguate
 adk remove integration:slack
-adk remove plugin:hitl
+adk remove plugin:desk-hitl
 adk remove interface:translator
 ```
 
@@ -133,7 +133,7 @@ adk remove interface:translator
 adk upgrade slack
 
 # Explicit prefix to disambiguate
-adk upgrade plugin:hitl
+adk upgrade plugin:desk-hitl
 
 # Interactive — check all dependencies for updates
 adk upgrade

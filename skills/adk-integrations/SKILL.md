@@ -60,7 +60,7 @@ Use `--format json` for CLI inspection.
 ```bash
 # CORRECT - Use adk add
 adk add slack@3.0.0
-adk add plugin:hitl@1.0.0
+adk add plugin:desk-hitl@1.0.0
 adk add interface:translator@1.0.0
 
 # WRONG - Never manually edit agent.config.ts dependencies

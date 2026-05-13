@@ -424,7 +424,7 @@ adk add slack@2.5.5 --alias my-slack
 adk add integration:slack@3.0.0
 
 # Plugin
-adk add plugin:hitl@1.0.0
+adk add plugin:desk-hitl@1.0.0
 
 # Interface
 adk add interface:translator@1.0.0
@@ -454,7 +454,7 @@ adk remove slack
 
 # Explicit prefix to disambiguate
 adk remove integration:slack
-adk remove plugin:hitl
+adk remove plugin:desk-hitl
 adk remove interface:translator
 
 # JSON output for scripting
@@ -482,7 +482,7 @@ adk upgrade [resource]
 adk upgrade slack
 
 # Explicit prefix to disambiguate
-adk upgrade plugin:hitl
+adk upgrade plugin:desk-hitl
 adk upgrade interface:translator
 
 # JSON output for scripting
