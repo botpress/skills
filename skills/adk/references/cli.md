@@ -395,15 +395,16 @@ adk evals runs --latest -v
 
 ### adk add
 
-Add integration to agent.
+Add an integration, plugin, or interface to agent.
 
 ```bash
-adk add <integration> [options]
+adk add <resource> [options]
 ```
 
 **Options:**
 
 - `--alias <name>` - Custom alias
+- `--format <format>` - Output format (`json`)
 
 **Aliases:** `adk i`, `adk install`
 
@@ -419,6 +420,12 @@ adk add slack@2.5.5
 # With alias
 adk add slack@2.5.5 --alias my-slack
 
+# Explicit integration prefix
+adk add integration:slack@3.0.0
+
+# Plugin
+adk add plugin:hitl@1.0.0
+
 # Interface
 adk add interface:translator@1.0.0
 ```
@@ -427,35 +434,59 @@ Updates `agent.config.ts` dependencies, run `adk dev` to configure in UI.
 
 ### adk remove
 
-Remove integration.
+Remove an integration, plugin, or interface.
 
 ```bash
-adk remove [integration]
+adk remove [resource]
 ```
+
+**Options:**
+
+- `--format <format>` - Output format (`json`)
 
 **Alias:** `adk rm`
 
-**Example:**
+**Examples:**
 
 ```bash
+# Remove by alias (auto-resolves type)
 adk remove slack
+
+# Explicit prefix to disambiguate
+adk remove integration:slack
+adk remove plugin:hitl
+adk remove interface:translator
+
+# JSON output for scripting
+adk remove slack --format json
 ```
 
 ### adk upgrade
 
-Upgrade integration(s).
+Upgrade integration(s), plugin(s), or interface(s).
 
 ```bash
-adk upgrade [integration]
+adk upgrade [resource]
 ```
+
+**Options:**
+
+- `--format <format>` - Output format (`json`)
 
 **Alias:** `adk up`
 
-**Example:**
+**Examples:**
 
 ```bash
-# Upgrade specific
+# Upgrade specific resource
 adk upgrade slack
+
+# Explicit prefix to disambiguate
+adk upgrade plugin:hitl
+adk upgrade interface:translator
+
+# JSON output for scripting
+adk upgrade slack --format json
 
 # Interactive (all)
 adk upgrade
@@ -1004,14 +1035,14 @@ adk chat                 # Test interactively
 adk deploy               # Deploy to production
 adk run <script>         # Run script with ADK runtime
 
-# Integrations
+# Dependencies (integrations, plugins, interfaces)
 adk search <query>       # Search for integrations
-adk list                 # List installed integrations
+adk list                 # List installed dependencies
 adk list --available     # List all available integrations
 adk info <integration>   # Show integration details
-adk add <integration>    # Add integration
-adk remove <name>        # Remove integration
-adk upgrade [name]       # Upgrade integration(s)
+adk add <resource>       # Add integration, plugin:, or interface:
+adk remove <resource>    # Remove integration, plugin:, or interface:
+adk upgrade [resource]   # Upgrade dependency (or all interactively)
 
 # MCP (AI Assistant Integration)
 adk mcp                  # Start MCP server
