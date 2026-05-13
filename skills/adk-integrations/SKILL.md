@@ -44,9 +44,12 @@ Activate this skill when users:
 |---------|-------------|-----------|
 | `adk search <query>` | Search integrations by keyword | `--format json`, `--limit <number>` (default: 20) |
 | `adk list --available` | Browse all Hub integrations | `--format json`, `--limit <number>` (default: 50) |
-| `adk list` | Show installed integrations | `--format json`, `--limit <number>` (default: 50) |
-| `adk info <name>` | Full integration details | `--actions`, `--channels`, `--events`, `--full`, `--format json` |
-| `adk add <name>@<version>` | Add integration to project | `--alias <name>` |
+| `adk list` | Show installed dependencies | `--format json`, `--limit <number>` (default: 50) |
+| `adk info <name>` | Full integration details (integrations only, not plugins) | `--actions`, `--channels`, `--events`, `--full`, `--format json` |
+| `adk add <name>@<version>` | Add integration to project | `--alias <name>`, `--format json` |
+| `adk add plugin:<name>@<version>` | Add plugin to project | `--alias <name>`, `--format json` |
+| `adk remove <name>` | Remove integration, plugin, or interface | `--format json` |
+| `adk upgrade [name]` | Upgrade dependency (or all interactively) | `--format json` |
 
 Use `--format json` for CLI inspection.
 
@@ -57,9 +60,11 @@ Use `--format json` for CLI inspection.
 ```bash
 # CORRECT - Use adk add
 adk add slack@3.0.0
+adk add plugin:desk-hitl@1.0.0
+adk add interface:translator@1.0.0
 
 # WRONG - Never manually edit agent.config.ts dependencies
-# Don't hand-write entries in the dependencies.integrations block
+# Don't hand-write entries in the dependencies block
 ```
 
 ### Version Pinning

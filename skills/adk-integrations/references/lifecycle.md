@@ -116,15 +116,30 @@ Integration actions are fully typed — your editor will show available actions,
 
 ### Removing
 
-To remove an integration, delete its entry from `dependencies.integrations` in `agent.config.ts` and run `adk dev` or `adk deploy` to apply the change.
+```bash
+# Remove by alias (auto-resolves type)
+adk remove slack
+
+# Explicit prefix to disambiguate
+adk remove integration:slack
+adk remove plugin:desk-hitl
+adk remove interface:translator
+```
 
 ### Upgrading
 
-To upgrade an integration version:
+```bash
+# Upgrade a specific dependency
+adk upgrade slack
 
-1. Run `adk add <name>@<new-version>` — this updates the existing entry
-2. Check for breaking changes in the new version's actions/events
-3. Re-deploy with `adk deploy`
+# Explicit prefix to disambiguate
+adk upgrade plugin:desk-hitl
+
+# Interactive — check all dependencies for updates
+adk upgrade
+```
+
+After upgrading, check for breaking changes in the new version's actions/events, then re-deploy with `adk deploy`. To upgrade to a specific version instead of the latest, use `adk add <name>@<target-version>` — this updates the existing dependency entry.
 
 ## Complete Example
 

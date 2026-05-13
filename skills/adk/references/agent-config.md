@@ -264,10 +264,10 @@ dependencies: {
 
 ### Managing Dependencies
 
-Use the ADK CLI to manage integrations. See **[CLI Reference](./cli.md)** for commands:
-- `adk add` - Add an integration
-- `adk upgrade` - Upgrade integration(s)
-- `adk remove` - Remove an integration
+Use the ADK CLI to manage integrations, plugins, and interfaces. See **[CLI Reference](./cli.md)** for commands:
+- `adk add` - Add an integration, `plugin:`, or `interface:`
+- `adk upgrade` - Upgrade dependency (or all interactively)
+- `adk remove` - Remove an integration, `plugin:`, or `interface:`
 - `adk search` - Search for integrations
 - `adk list` - List installed/available integrations
 
