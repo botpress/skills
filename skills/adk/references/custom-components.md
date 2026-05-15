@@ -2,6 +2,8 @@
 
 Custom components are React UI elements that render in webchat. The LLM can yield them during autonomous execution, or you can send them explicitly from conversation handlers.
 
+The dev console has a **Component Registry** page (`/components`) where you can browse installed components with live previews, inspect their props, and discover new components from the registry. See the `component-registry` reference in the adk-dev-console skill for details on the UI.
+
 ## Creating a Component
 
 ### 1. Create a `.bp.tsx` file
