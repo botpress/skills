@@ -802,67 +802,42 @@ export const Chat = new Conversation({
 
 #### Custom UI Components
 
-Register custom components for rich UI interactions:
+Custom components are React `.bp.tsx` files that render rich UI in webchat. Register them in `src/components/index.ts` with `CustomComponent`, then list them in a conversation's `components` array:
 
 ```typescript
-import { Autonomous, context, Conversation, z } from "@botpress/runtime";
+import { Conversation } from "@botpress/runtime";
+import { TicketCardComponent } from "../components";
 
-export const Copilot = new Conversation({
+export const Chat = new Conversation({
   channel: "webchat.channel",
 
-  async handler({ message, execute, conversation }) {
-    const chat = context.get("chat");
+  components: [TicketCardComponent],
 
-    // Register custom component
-    chat.registerComponent({
-      component: new Autonomous.Component({
-        type: "leaf",
-        name: "Answer",
-        aliases: ["answer"],
-        description: "Provide an answer with citations and markdown formatting",
-        examples: [{
-          name: "Answer",
-          description: "Provide a concise answer to the user's question",
-          code: `
-            yield <Answer question="What is the capital of France?">
-              The capital of France is **Paris**.
-            </Answer>
-          `
-        }],
-        leaf: {
-          props: z.object({
-            question: z.string().describe("The question to answer"),
-            children: z.any().describe("The answer content (markdown supported)")
-          }) as any
-        }
-      }),
-      handler: async (props) => {
-        // Extract text from children
-        const text = props.children
-          .filter((x) => typeof x === "string" || typeof x === "number" || typeof x === "boolean")
-          .join("");
-
-        // Send custom message
-        await conversation.send({
-          type: "custom",
-          payload: {
-            name: "copilot.answer",
-            url: "builtin://components/copilot/answer",
-            data: { text, question: props.props.question }
-          }
-        });
-      }
-    });
-
-    // Now the AI can use the <Answer> component
+  async handler({ execute, conversation }) {
+    // The LLM can yield TicketCard autonomously
     await execute({
-      instructions: `You are a helpful assistant.
-      When answering questions, use the <Answer> component with markdown formatting.`,
-      tools: [searchTool]
+      instructions: "Always use the TicketCard component to display ticket details.",
+      tools: [lookupTicket]
     });
   }
 });
 ```
+
+You can also send a component explicitly:
+
+```typescript
+import { WelcomeBannerComponent } from "../components";
+
+await conversation.send({
+  type: "customComponent",
+  payload: {
+    component: WelcomeBannerComponent,
+    props: {},
+  }
+});
+```
+
+See the component registry reference for the full component creation flow (`.bp.tsx` files, metadata, and registration).
 
 **Component Use Cases:**
 - **Rich Answers**: Formatted responses with citations and styling

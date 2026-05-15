@@ -39,7 +39,7 @@ Browse the component registry and inspect components installed in the agent.
 **Registry** — Available components from the external component registry:
 - Same masonry layout
 - Click a card to open overlay with installation instructions and metadata
-- Empty state: "Registry is empty" (requires CI to publish a manifest first)
+- Empty state: "Registry is empty"
 
 **Features:**
 - Live reload on component source changes
