@@ -360,39 +360,27 @@ await conversation.send({
 **Allowed item types in bloc**:
 - `text`, `markdown`, `image`, `audio`, `video`, `file`, `location`
 
-### Custom (Integration-Specific)
+### Custom Component (Webchat)
 
-Custom message support varies by channel. In webchat conversations, use the plain `custom` message type.
-
-For webchat custom components:
+Send a custom React component in webchat conversations using the `customComponent` message type:
 
 ```typescript
+import { WelcomeBannerComponent } from '../components'
+
 await conversation.send({
-  type: "custom",
+  type: "customComponent",
   payload: {
-    url: "https://example.com/my-component.js", // Component URL
-    name: "myCustomCard", // Component identifier
-    data: { // Optional data for component
-      title: "Custom Card",
-      items: ["item1", "item2"],
-      metadata: { foo: "bar" }
-    }
+    component: WelcomeBannerComponent,
+    props: {},
   }
 });
 ```
 
-**Note**: Do not assume custom message types always use the `{integration}:{messageType}` pattern. Check the generated channel typings for the integration you are actually using.
+Components are `.bp.tsx` files registered in `src/components/index.ts` with `new CustomComponent()`. See the component registry reference for the full creation flow.
 
-**Frontend handling** (in your webpage):
+When components are listed in a `Conversation`'s `components` array, the LLM can also yield them autonomously during `execute()` — no explicit `send()` needed.
 
-```javascript
-window.botpressWebChat.onMessage((message) => {
-  if (message.type === 'custom' && message.payload.name === 'myCustomCard') {
-    // Render your custom component
-    renderCustomCard(message.payload.data);
-  }
-});
-```
+**Note**: Custom components only work in webchat channels. For other channels, use agnostic message types like `card` or `carousel`.
 
 ## Accessing Messages on the Frontend
 
@@ -576,7 +564,7 @@ Not all message types work in all channels:
 | choice | ✅ | ✅ | ✅ | ✅ | ✅ |
 | dropdown | ✅ | ✅ | ❌ | ✅ | ❌ |
 | bloc | ✅ | ✅ | ❌ | ❌ | ❌ |
-| {integration}:custom | Varies | ✅ (`custom` in webchat conversations) | Varies | Varies | Varies |
+| customComponent | ❌ | ✅ (webchat only) | ❌ | ❌ | ❌ |
 
 **Tip**: Use `text` and `image` for maximum compatibility across channels.
 
@@ -695,19 +683,25 @@ await conversation.send({
 When supporting multiple channels:
 
 ```typescript
+import { TicketCardComponent } from "../components";
+
 export const Chat = new Conversation({
   async handler({ conversation }) {
     if (conversation.channel === "webchat.channel") {
-      // Webchat supports the plain `custom` message type
+      // Webchat supports custom components
       await conversation.send({
-        type: "custom",
-        payload: { /* ... */ }
+        type: "customComponent",
+        payload: { component: TicketCardComponent, props: { ticketId: "TKT-001", title: "VPN issue", priority: "high", status: "open" } }
       });
     } else {
       // Fall back to card for other channels
       await conversation.send({
         type: "card",
-        payload: { /* ... */ }
+        payload: {
+          title: "TKT-001: VPN issue",
+          subtitle: "Priority: high · Status: open",
+          actions: []
+        }
       });
     }
   }
@@ -770,6 +764,6 @@ await conversation.send({
 1. ✅ Use `conversation.send()` in conversations, `client.createMessage()` in workflows
 2. ✅ Always pass `conversationId` to workflows that send messages
 3. ✅ Use messages for persistent content, events for ephemeral notifications
-4. ✅ In webchat conversations, use the plain `custom` message type for custom components
+4. ✅ In webchat conversations, use `customComponent` message type with a `CustomComponent` reference
 5. ❌ Never use `client.createMessage()` in conversations
 6. ❌ Check channel compatibility for message types (see table above)

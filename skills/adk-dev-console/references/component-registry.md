@@ -17,48 +17,121 @@ Shows components currently present in the agent's `src/components/` directory.
 
 ### Registry Tab
 
-Shows available components from the external component registry (published via CI).
+Shows available components from the external component registry.
 
 - Same masonry layout as the Installed tab
 - Click a card to expand an overlay with installation instructions and metadata
-- Empty state: "Registry is empty" — the registry requires a CI pipeline to publish a component manifest
+- Empty state: "Registry is empty"
+
+## Creating Custom Components
+
+Custom components are React function components in `.bp.tsx` files inside `src/components/`.
+
+### 1. Create the component file
+
+```tsx
+// src/components/TicketCard.bp.tsx
+import React from 'react'
+
+type Props = {
+  ticketId: string
+  title: string
+  priority: 'low' | 'medium' | 'high' | 'urgent'
+  status: string
+}
+
+const TicketCard: React.FC<Props> = ({ ticketId, title, priority, status }) => (
+  <div style={{ padding: 16, borderRadius: 8, background: '#f8fafc', fontFamily: 'sans-serif' }}>
+    <strong>{title}</strong>
+    <p style={{ margin: '4px 0', fontSize: 13, color: '#64748b' }}>
+      {ticketId} · {priority} · {status}
+    </p>
+  </div>
+)
+
+export default TicketCard
+```
+
+### 2. Register in `src/components/index.ts`
+
+```typescript
+import { CustomComponent, z } from '@botpress/runtime'
+import TicketCard from './TicketCard.bp.tsx'
+
+export const TicketCardComponent = new CustomComponent(TicketCard, {
+  description: 'Display a ticket summary card. Use after creating or looking up a ticket.',
+  props: z.object({
+    ticketId: z.string().describe('The ticket ID'),
+    title: z.string().describe('Short summary of the issue'),
+    priority: z.enum(['low', 'medium', 'high', 'urgent']).describe('Priority level'),
+    status: z.string().describe('Current ticket status'),
+  }),
+  exampleValues: [
+    { ticketId: 'TKT-001', title: 'VPN not working', priority: 'high', status: 'open' },
+    { ticketId: 'TKT-042', title: "Can't access email", priority: 'low', status: 'in-progress' },
+  ],
+})
+```
+
+The metadata fields:
+- **description** — shown in the dev console and tells the LLM when to use this component
+- **props** — Zod schema for the component's props; drives dev console forms and LLM prop validation
+- **exampleValues** — seed values for dev console previews and LLM usage examples
+
+Components without metadata can still be sent directly but cannot be listed in `Conversation.components` (the LLM won't know about them).
+
+### 3. Add to a conversation
+
+```typescript
+import { Conversation } from '@botpress/runtime'
+import { TicketCardComponent } from '../components'
+
+export const Chat = new Conversation({
+  channel: 'webchat.channel',
+  components: [TicketCardComponent],
+
+  async handler({ execute }) {
+    await execute({
+      instructions: 'Always use the TicketCard component to display ticket details.',
+    })
+  },
+})
+```
+
+Components listed in `components` are auto-registered so the LLM can yield them during autonomous execution.
+
+### 4. Send a component directly
+
+Outside of autonomous execution, you can send a component message explicitly:
+
+```typescript
+import { WelcomeBannerComponent } from '../components'
+
+await conversation.send({
+  type: 'customComponent',
+  payload: {
+    component: WelcomeBannerComponent,
+    props: {},
+  },
+})
+```
 
 ## Component Lifecycle
 
-1. **Registry publish** — CI publishes component manifests to the registry
-2. **Browse** — Developer views available components in the Registry tab
-3. **Install** — Developer adds the component to `src/components/` (following overlay instructions)
-4. **Registration** — At runtime, when a conversation starts on webchat, custom components are auto-registered in the Chat class's internal component registry (`componentRegistry: Map<string, ComponentRegistration>`)
-5. **LLM usage** — The autonomous agent can yield registered components during execution; the component handler renders them in the webchat
+1. **Create** — Add a `.bp.tsx` file in `src/components/` and register it in `index.ts`
+2. **Preview** — The Installed tab shows live previews; edit your `.bp.tsx` and see changes instantly
+3. **Register** — List the component in a `Conversation`'s `components` array so the LLM can use it
+4. **Deploy** — `adk deploy` bundles and uploads components; URLs are resolved automatically
+5. **Render** — The webchat renders the component when the LLM yields it or you send it explicitly
 
-## Runtime Component Registry (Chat class)
+## File Naming Conventions
 
-The runtime component registry is a `Map<string, ComponentRegistration>` inside the `Chat` class. It manages which components the LLM can yield and how they're rendered.
-
-### Registration types
-
-**Built-in components** — registered automatically in the Chat constructor based on integration type:
-- Webchat: Text, Audio, Image, Video, Location, Choice, Dropdown, Carousel
-- Other integrations: Text only
-
-**Custom components** — auto-registered when a conversation starts on webchat. Each custom component from the Components page becomes an `Autonomous.Component` in the registry with a handler that sends it as a `customComponent` message type.
-
-### ComponentRegistration structure
-
-Each registration contains:
-- **component** — an `Autonomous.Component` instance with name, aliases, description, usage examples, and a Zod props schema
-- **handler** (optional) — async function that processes the rendered component. If not provided, the default handler sends the message via the Botpress API.
-
-### Lookup behavior
-
-When the LLM yields a component:
-1. Exact name match (lowercased) in the registry
-2. Fallback: search by component aliases
-3. Dispatch to the registered handler or the default API handler
+- `.bp.tsx` — React component source
+- `.bp.css` — Optional component styles (scoped via shadow DOM)
 
 ## UI Features
 
 - **Shadow DOM previews** — component previews render in isolated shadow DOM to prevent style leaking
-- **Loading skeletons** — 6 placeholders (installed) or 9 placeholders (registry) while fetching
+- **Loading skeletons** — placeholder cards while fetching components
 - **Error states** — red alerts if components fail to load or registry fetch fails
 - **Live reload** — listens for component change events and refreshes the gallery
