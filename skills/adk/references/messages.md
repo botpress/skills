@@ -10,7 +10,7 @@ Understanding how to send messages and events is critical for building conversat
 - [Message Metadata](#message-metadata-chat-integration) - Adding custom data to messages
 - [All Message Types](#all-message-types) - Complete reference (text, image, file, card, etc.)
   - [File Messages & Metadata](#file-message-metadata) - File-specific metadata usage
-  - [Custom Messages (Webchat)](#custom-webchat-only) - Webchat-only custom UI components
+  - [Custom Component (Webchat)](#custom-component-webchat) - Webchat-only custom UI components
 - [Accessing Messages on Frontend](#accessing-messages-on-the-frontend) - Webchat SDK integration
 - [Sending from Workflows](#sending-messages-from-workflows) - Using `client.createMessage()`
 - [Sending Events (Ephemeral)](#sending-events-ephemeral) - Non-persistent notifications
@@ -41,7 +41,7 @@ Understanding how to send messages and events is critical for building conversat
 - `card`, `carousel`, `choice`, `dropdown`, `bloc`, `markdown`
 
 **Channel-Specific Messages** only work in specific integrations:
-- `custom` (webchat only)
+- `customComponent` (webchat only)
 - Platform-specific fields (e.g., Slack threads)
 
 ## Sending Messages in Conversations
@@ -634,27 +634,27 @@ export const MyWorkflow = new Workflow({
 });
 ```
 
-### 4. Using Integration-Specific Messages in Wrong Channels
+### 4. Using Custom Components in Non-Webchat Channels
 
 ```typescript
-// ❌ WRONG - custom messages only work in webchat conversations
+// ❌ WRONG - customComponent only works in webchat
 export const SlackChat = new Conversation({
   channel: "slack.dm",
   async handler({ conversation }) {
     await conversation.send({
-      type: "custom", // Will fail in Slack!
-      payload: { /* ... */ }
+      type: "customComponent", // Will fail in Slack!
+      payload: { component: TicketCardComponent, props: { /* ... */ } }
     });
   }
 });
 
-// ✅ CORRECT - Use agnostic message types
+// ✅ CORRECT - Use agnostic message types for non-webchat channels
 export const SlackChat = new Conversation({
   channel: "slack.dm",
   async handler({ conversation }) {
     await conversation.send({
       type: "card", // Works in Slack
-      payload: { /* ... */ }
+      payload: { title: "Ticket", subtitle: "Details here", actions: [] }
     });
   }
 });
