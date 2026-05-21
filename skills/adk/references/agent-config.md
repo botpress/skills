@@ -2,8 +2,6 @@
 
 Configure your bot's behavior, integrations, dependencies, and global state through the unified `agent.config.ts` file.
 
-> **Note:** As of ADK 1.9+, `dependencies.json` was removed. Integration dependencies have since moved from `agent.config.ts` to per-environment lock files (`dependencies.{dev,prod}.lock.json`). See the Dependencies section below.
-
 ## agent.config.ts
 
 The main configuration file defines your bot's core settings, AI models, dependencies, and state schemas.
