@@ -6,7 +6,7 @@ license: MIT
 
 # Botpress ADK Guidelines
 
-Use this skill when you've got questions about the Botpress Agent Development Kit (ADK) - like when you're building a feature that involves tables, actions, tools, workflows, conversations, files, knowledge bases, triggers, assets, evals, or Zai.
+Use this skill when you've got questions about the Botpress Agent Development Kit (ADK) - like when you're building a feature that involves tables, actions, tools, workflows, conversations, files, knowledge bases, triggers, assets, integrations, plugins, evals, or Zai.
 
 ## What is the ADK?
 
@@ -22,6 +22,8 @@ The ADK provides primitives for:
 - Knowledge Bases (RAG implementation)
 - Triggers (event-driven automation)
 - Assets (static files with permanent URLs)
+- Integrations (external service connections managed via CLI and lock files)
+- Plugins (reusable agent extensions with interface dependencies)
 - **Zai** (production-ready LLM utility library for common AI operations)
 
 ### Project Structure (Convention-Based)
@@ -43,7 +45,7 @@ Most primitives must be placed in `src/` directory (assets use the `assets/` dir
 └── agent.config.ts    # Bot configuration (includes integrations)
 ```
 
-> **Note:** Integration dependencies are managed via lock files (`dependencies.{dev,prod}.lock.json`) and the `adk integrations` CLI. See `integrations.md`.
+> **Note:** Integrations and plugins are managed via lock files (`dependencies.{dev,prod}.lock.json`) and the `adk integrations` / `adk plugins` CLI. See `integrations.md` and `plugins.md`.
 
 > **Critical:** Files outside `src/` are not discovered. Location = behavior.
 
