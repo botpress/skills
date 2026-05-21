@@ -271,6 +271,7 @@ Documentation should be located in `./references/` directory relative to this sk
 - **mcp-server.md** - MCP server for AI assistants
 - **desk.md** - Desk integration for ticket/support workflows
 - **integrations.md** - Integration management: CLI commands, lifecycle, configuration, common integrations
+- **plugins.md** - Plugin management: CLI commands, interface dependencies, lifecycle
 
 ### Patterns & Best Practices
 

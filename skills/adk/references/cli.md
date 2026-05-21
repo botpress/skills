@@ -482,6 +482,33 @@ adk integrations diff                    # Show lock vs cloud differences
 - `--dry-run` - Preview without applying
 - `--yes` - Skip confirmation
 
+### adk plugins
+
+Manage plugins (reusable agent extensions). Mirrors the `adk integrations` subcommand structure. All subcommands support `--target <env>` and `--format <format>`.
+
+```bash
+adk plugins search <query>               # Search by keyword
+adk plugins list                         # Show installed plugins
+adk plugins info <name>                  # Full plugin details
+adk plugins add <name>@<version>         # Install plugin
+adk plugins remove <alias>               # Uninstall plugin
+adk plugins upgrade <alias>              # Upgrade version
+adk plugins enable <alias>               # Enable a disabled plugin
+adk plugins disable <alias>              # Disable without removing
+adk plugins configure <alias>            # Set config and interface mappings
+adk plugins sync                         # Pull cloud state into lock file
+adk plugins apply                        # Push lock file to cloud
+adk plugins copy                         # Copy state between environments
+adk plugins diff                         # Show lock vs cloud differences
+```
+
+**Plugin-specific flags:**
+- `adk plugins add --dep iface=alias` - Wire interface dependency (repeatable)
+- `adk plugins configure --map iface=alias` - Remap interface dependency
+- `adk plugins upgrade --to <version>` - Target specific version
+
+Plugins require interfaces implemented by installed integrations. The CLI auto-resolves dependencies when unambiguous. See **[Plugins](./plugins.md)** for details.
+
 ### adk self-upgrade
 
 Upgrade the ADK CLI itself to the latest version.
@@ -940,6 +967,13 @@ adk integrations disable <alias>   # Disable integration
 adk integrations configure <alias> # Set/unset config values
 adk integrations sync              # Pull cloud state to lock file
 adk integrations apply             # Push lock file to cloud
+
+# Plugins
+adk plugins search <query>        # Search for plugins
+adk plugins list                   # List installed plugins
+adk plugins add <name>@<version>   # Add plugin
+adk plugins remove <alias>         # Remove plugin
+adk plugins configure <alias>      # Set config / remap interfaces
 
 # MCP (AI Assistant Integration)
 adk mcp                  # Start MCP server
