@@ -465,9 +465,8 @@ adk integrations configure slack --set apiSecret='${env:SLACK_SECRET}'
 # Enable
 adk integrations enable slack
 
-# Remove (explicit type prefix to disambiguate)
-adk integrations remove integration:slack
-adk integrations remove plugin:desk-hitl
+# Remove
+adk integrations remove slack
 ```
 
 #### State Management

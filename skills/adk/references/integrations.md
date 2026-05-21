@@ -142,10 +142,6 @@ The alias determines the accessor: `actions.<alias>.<actionName>()`. See **[Inte
 ```bash
 adk integrations remove slack
 adk integrations upgrade slack
-
-# Explicit type prefix to disambiguate from plugins
-adk integrations remove integration:slack
-adk integrations remove plugin:desk-hitl
 ```
 
 After upgrading, check for breaking changes in the new version, then re-deploy with `adk deploy`.
