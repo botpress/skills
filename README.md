@@ -23,7 +23,7 @@ Comprehensive documentation and guidelines for building AI agents with the Botpr
 - Working with Actions, Tools, or Workflows
 - Implementing data storage (Tables, Files, Knowledge Bases)
 - Using Zai for AI operations (extract, check, label, summarize)
-- Configuring integrations or bot settings
+- Configuring integrations, plugins, or bot settings
 - Setting up event-driven triggers
 - Need CLI commands or MCP server setup
 
@@ -32,7 +32,7 @@ Comprehensive documentation and guidelines for building AI agents with the Botpr
 - **Core Concepts** - Actions (strongly-typed functions), Tools (AI-callable), Workflows (long-running processes), Conversations (message handlers), Triggers (event-driven automation)
 - **Data & Content** - Tables (structured storage with semantic search), Files (file storage and management), Knowledge Bases (RAG implementation)
 - **AI Features** - Zai (production-ready LLM utility library for common AI operations)
-- **Configuration** - Agent config, integration actions, context API, environment variables
+- **Configuration** - Agent config, integrations, plugins, context API, environment variables
 - **Development Tools** - CLI reference, MCP server integration, project structure best practices
 
 ### botpress-adk-frontend
