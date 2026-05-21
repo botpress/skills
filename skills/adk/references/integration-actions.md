@@ -36,16 +36,16 @@ Before using integration actions, add the integration to your project:
 
 ```bash
 # Add integration
-adk add slack@2.5.5
+adk integrations add slack@2.5.5
 
 # Or with custom alias
-adk add linear@2.0.0 --alias my-linear
+adk integrations add linear@2.0.0 --alias my-linear
 
 # Start dev to configure
 adk dev
 ```
 
-Then configure the integration in the UI at `localhost:3001` or in `agent.config.ts`.
+Then configure the integration in the Dev Console at `localhost:3001` or via `adk integrations configure`.
 
 ## Basic Usage
 
@@ -549,9 +549,9 @@ The actions proxy automatically determines whether you're calling a bot action (
 ```
 
 **Solutions:**
-1. Add integration: `adk add slack@2.5.5`
-2. Enable in agent.config.ts: `enabled: true`
-3. Configure credentials in UI (localhost:3001) or in agent.config.ts
+1. Add integration: `adk integrations add slack@2.5.5`
+2. Enable: `adk integrations enable slack`
+3. Configure credentials in Dev Console (localhost:3001) or via `adk integrations configure`
 4. Restart dev server: `adk dev`
 
 ### Action Not Found
@@ -583,8 +583,8 @@ The actions proxy automatically determines whether you're calling a bot action (
 ```
 
 **Solutions:**
-1. Configure credentials in UI (localhost:3001 during dev)
-2. Set credentials in agent.config.ts dependencies config
+1. Configure credentials in Dev Console (localhost:3001 during dev)
+2. Set credentials via `adk integrations configure <alias> --set key=value`
 3. Check environment variables are set
 4. Verify API keys/tokens are valid
 

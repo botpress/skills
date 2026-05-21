@@ -81,25 +81,6 @@ Complete reference for writing, running, and iterating on evals (automated conve
 - **Testing Workflow** - Running evals, interpreting output, using traces, the write-test-iterate loop
 - **Test Patterns** - Per-primitive testing patterns for actions, tools, workflows, conversations, tables, and state
 
-### botpress-adk-integrations
-
-Discovering, adding, configuring, and using Botpress integrations in ADK projects. Covers the full integration lifecycle from search to production use.
-
-**Use when:**
-
-- Searching for available integrations
-- Adding an integration to an ADK project
-- Configuring integration credentials and settings
-- Using integration actions, events, and channels in code
-- Troubleshooting integration issues
-
-**Categories covered:**
-
-- **Discovery** - `adk search`, `adk list --available`, `adk info` for exploring the integration hub
-- **Lifecycle** - End-to-end workflow from search to production use
-- **Configuration** - Config types (no-config, OAuth, API key), agent.config.ts setup
-- **Common Integrations** - Quick reference for Slack, WhatsApp, Linear, and more
-
 ### botpress-adk-docs
 
 Guidelines and commands for creating, reviewing, updating, and maintaining documentation for your ADK bot. Helps you document your own workflows, actions, and features with accurate, searchable guides.
@@ -220,9 +201,6 @@ skills/                       # Heavy knowledge (skills)
 ├── adk-evals/                # Testing & evals (3 reference docs)
 │   ├── SKILL.md
 │   └── references/
-├── adk-integrations/         # Integration lifecycle (4 reference docs)
-│   ├── SKILL.md
-│   └── references/
 ├── adk-debugger/             # Debugging & observability (4 reference docs)
 │   ├── SKILL.md
 │   └── references/
@@ -235,7 +213,7 @@ commands/                     # Thin slash commands (load skills)
 ├── adk-debug.md              # /adk-debug - loads adk-debugger skill
 ├── adk-eval.md               # /adk-eval - loads adk-evals skill
 ├── adk-frontend.md           # /adk-frontend - loads adk-frontend skill
-├── adk-integration.md        # /adk-integration - loads adk-integrations skill
+├── adk-integration.md        # /adk-integration - loads adk skill for integration management
 ├── adk-doc-create.md         # /adk-doc-create - loads adk-docs skill
 ├── adk-doc-review.md         # /adk-doc-review - loads adk-docs skill
 ├── adk-doc-update.md         # /adk-doc-update - loads adk-docs skill

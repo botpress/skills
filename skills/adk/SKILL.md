@@ -43,7 +43,7 @@ Most primitives must be placed in `src/` directory (assets use the `assets/` dir
 └── agent.config.ts    # Bot configuration (includes integrations)
 ```
 
-> **Note:** `dependencies.json` was removed in ADK 1.9+. All configuration including integrations now lives in `agent.config.ts`.
+> **Note:** Integration dependencies are managed via lock files (`dependencies.{dev,prod}.lock.json`) and the `adk integrations` CLI. See `integrations.md`.
 
 > **Critical:** Files outside `src/` are not discovered. Location = behavior.
 
@@ -111,16 +111,16 @@ For integration discovery and CLI queries, use the Bash tool to run commands dir
 
 ```bash
 # Search for integrations
-adk search <query>
+adk integrations search <query>
 
 # List all available integrations
-adk list --available
+adk integrations list --available
 
 # Get detailed integration info (actions, channels, events)
-adk info <integration-name>
+adk integrations info <integration-name>
 
 # Check installed integrations (must be in ADK project)
-adk list
+adk integrations list
 ```
 
 **Project Info:**
@@ -177,7 +177,7 @@ Use these defaults when relevant:
 
 1. Use Bash tool to run the appropriate `adk` command
 2. Parse and present the output to the user
-3. Optionally suggest next steps (e.g., "Run `adk add slack@3.0.0` to install")
+3. Optionally suggest next steps (e.g., "Run `adk integrations add slack@3.0.0` to install")
 
 ### Option 2: Documentation Questions (For Conceptual Questions)
 
@@ -270,16 +270,12 @@ Documentation should be located in `./references/` directory relative to this sk
 - **cli.md** - Complete CLI command reference
 - **mcp-server.md** - MCP server for AI assistants
 - **desk.md** - Desk integration for ticket/support workflows
-- **integrations.md** - Integration management overview (points to adk-integrations skill)
+- **integrations.md** - Integration management: CLI commands, lifecycle, configuration, common integrations
 
 ### Patterns & Best Practices
 
 - **advanced-patterns.md** - Guardrails, admin auth, logging/observability, extension composition
 - **patterns-mistakes.md** - Common mistakes, correct patterns, and context access reference
-
-### Integration Management
-
-> **Note:** Full integration lifecycle docs (discovery, adding, configuring, and using integrations) are in the separate **adk-integrations** skill. Install it with `npx skills add botpress/skills --skill adk-integrations`. The `adk-integrations` skill covers `adk search`, `adk add`, `adk info`, configuration types, and common integrations. You need it if you are touching integrations.
 
 ### Frontend Integration
 
