@@ -9,25 +9,7 @@ Pages marked **(experimental)** are behind a feature flag and may change.
 
 ## Multi-Agent Navigation
 
-The Dev Console is a shared singleton — one UI server with multiple agents registering dynamically. Navigation includes:
-
-### Agent Selector (Sidebar Header)
-
-The sidebar header shows the selected agent with a status ring, name, and mode pill. Clicking opens the agent selector dropdown:
-
-- **Active agents** — running local agents with status dot (green = ready, yellow = starting, red = error), agent name, truncated project path, and close button
-- **Cloud Dev Console** — switch to inspecting a deployed Botpress Cloud bot via workspace and bot picker
-- **Recent projects** — previously opened projects not currently running
-- **Footer** — Create new project, Open existing project, Switch environment (dev↔prod), About
-
-The topbar also has a compact **Agent Picker** pill (status dot + agent name + mode pill) that opens the same dropdown content.
-
-### Environment Toggle
-
-Switches the selected agent between **Dev** and **Prod** targets:
-- **Dev** (default during `adk dev`): all pages and features available, uses local dev bot
-- **Prod**: hides dev-only pages, uses the deployed prod bot data
-- **Cloud mode**: always Prod — no dev target available for remote bots
+The Dev Console is a shared singleton — multiple `adk dev` agents register with one UI server. The sidebar agent selector switches between running agents, and the environment toggle switches between dev and prod targets. See [multi-agent-dashboard.md](./multi-agent-dashboard.md) for details.
 
 ---
 

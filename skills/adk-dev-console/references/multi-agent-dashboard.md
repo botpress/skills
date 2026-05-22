@@ -56,15 +56,15 @@ Compact pill in the top navigation center: status dot + agent name + mode pill +
 
 ## CLI Commands
 
-The following commands manage the multi-agent Dev Console from the terminal. For full options, flags, and examples, see the [CLI Reference](../../adk/references/cli.md).
+See the [CLI Reference](../../adk/references/cli.md) for full options and examples.
 
 | Command | What it does |
 |---------|-------------|
-| `adk agents` | List all agents registered with the Dev Console |
-| `adk ps` | List running processes with PIDs, ports, uptime (`--watch` for live refresh) |
-| `adk dashboard` | Open the Dev Console standalone — no agent project required |
-| `adk kill` | Stop agents or the entire Dev Console (`--all`, `--current`, `--pid`, or by name) |
-| `adk status` | Show project health and status info |
+| `adk agents` | List registered agents |
+| `adk ps` | List running processes |
+| `adk dashboard` | Open Dev Console without an agent |
+| `adk kill` | Stop agents or the Dev Console |
+| `adk status` | Show project health info |
 
 ## Data Isolation
 
