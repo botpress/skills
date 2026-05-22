@@ -245,6 +245,7 @@ Documentation should be located in `./references/` directory relative to this sk
 
 - **actions.md** - Actions with strong typing and validation
 - **tools.md** - AI-callable tools and Autonomous namespace
+- **autonomous-execution.md** - Advanced execute() API: Objects, Exits, hooks, configuration
 - **workflows.md** - Workflows and step-based execution
 - **conversations.md** - Conversation handlers and message routing
 - **triggers.md** - Event-driven automation
