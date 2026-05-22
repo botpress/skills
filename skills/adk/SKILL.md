@@ -42,10 +42,12 @@ Most primitives must be placed in `src/` directory (assets use the `assets/` dir
 │   ├── triggers/      # Event handlers → subscribe to events
 │   ├── knowledge/     # Knowledge bases → RAG with semantic search
 │   └── utils/         # Shared helpers (not auto-registered)
-└── agent.config.ts    # Bot configuration (includes integrations)
+├── dependencies.dev.lock.json   # Integration/plugin state (dev)
+├── dependencies.prod.lock.json  # Integration/plugin state (prod)
+└── agent.config.ts    # Bot configuration
 ```
 
-> **Note:** Integrations and plugins are managed via lock files (`dependencies.{dev,prod}.lock.json`) and the `adk integrations` / `adk plugins` CLI. See `integrations.md` and `plugins.md`.
+> **Note:** Integrations and plugins are managed via lock files and the `adk integrations` / `adk plugins` CLI. See `integrations.md` and `plugins.md`.
 
 > **Critical:** Files outside `src/` are not discovered. Location = behavior.
 

@@ -25,7 +25,7 @@ Use `--format json` for programmatic inspection of config schemas, action shapes
 |---------|-------------|-----------|
 | `adk integrations add <name>@<version>` | Install an integration | `--alias <name>`, `--target <env>`, `--config key=value` |
 | `adk integrations remove <alias>` | Uninstall an integration | `--target <env>` |
-| `adk integrations upgrade <alias>` | Upgrade to latest (or specific) version | `--target <env>` |
+| `adk integrations upgrade <alias>` | Upgrade to latest (or specific) version | `--to <version>`, `--target <env>` |
 | `adk integrations enable <alias>` | Enable a disabled integration | `--target <env>` |
 | `adk integrations disable <alias>` | Disable without removing | `--target <env>` |
 | `adk integrations configure <alias>` | Set or unset config values | `--set key=value`, `--unset key`, `--target <env>` |
@@ -34,9 +34,9 @@ Use `--format json` for programmatic inspection of config schemas, action shapes
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `adk integrations sync` | Pull cloud state into lock file | `--target <env>` |
+| `adk integrations sync` | Pull cloud state into lock file | `--target <env>`, `--dry-run` |
 | `adk integrations apply` | Push lock file to cloud | `--target <env>`, `--dry-run`, `--yes` |
-| `adk integrations copy` | Copy integration state between environments | |
+| `adk integrations copy` | Copy integration state between environments | `--from <env>`, `--to <env>` |
 | `adk integrations diff` | Show differences between lock file and cloud | `--target <env>` |
 
 ## Lock File System
