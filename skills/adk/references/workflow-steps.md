@@ -761,27 +761,6 @@ handler: async ({ input, step }) => {
 }
 ```
 
-### Delayed Retry with Sleep
-
-When an external dependency is unavailable, return a sentinel value, sleep, and abort so the workflow re-executes from the top:
-
-```typescript
-handler: async ({ step }) => {
-  const data = await step('poll-api', async () => {
-    const result = await api.checkStatus(id)
-    return result.ready ? result.data : null
-  })
-
-  if (!data) {
-    await step.sleep('wait-for-ready', 30_000)
-    // workflow re-executes from the top on next tick
-    step.abort()
-  }
-
-  // Continue with data...
-}
-```
-
 ---
 
 ## Pitfalls
