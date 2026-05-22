@@ -72,6 +72,7 @@ handler: async ({ type, conversation, state, execute }) => {
     //   2. Tags the conversation with sessionExpired = "true"
     //   3. Resets conversation state to defaults
     //   4. Clears the transcript
+    //   5. Sets lifecycle status to "expired"
     return;
   }
 
@@ -94,7 +95,7 @@ When `type === "expire"`:
 - `event` is typed as `LifecycleExpireEventType` with payload `{ conversationId, sessionId, scheduledAt }`
 - `message` is `undefined`
 
-All other handler props (`conversation`, `state`, `execute`, `client`, `chat`) are available as normal.
+All other handler props (`conversation`, `state`, `execute`, `client`, `chat`) are available as normal. The `chat` prop provides access to transcript and message operations within the conversation (e.g., `chat.fetchTranscript()`, `chat.clearTranscript()`, `chat.saveTranscript()`).
 
 ## Session Object
 
@@ -189,26 +190,11 @@ Message tags are applied automatically to both incoming user messages and outgoi
 
 ## Internal State Namespace
 
-Lifecycle state is stored in a separate `__lifecycle` (`lifecycleState`) state namespace, not in the user-facing conversation state. This means:
+Lifecycle state is managed by the runtime in a separate internal state namespace, not in the user-facing conversation state. This means:
 
 - Lifecycle state survives conversation state resets (which happen on expiration)
 - You cannot accidentally overwrite lifecycle fields by mutating `state`
-- The `session` property on the conversation instance is a read-only view of this internal state
-
-The `__lifecycle` state schema:
-
-```typescript
-{
-  sessionId: string;            // ULID for the current session
-  sessionNumber: number;        // Monotonically increasing counter
-  status: "active" | "expired"; // Session status
-  startedAt: string;            // ISO timestamp
-  lastActivityAt: string;       // ISO timestamp
-  nudgeCount: number;           // Nudges fired this session
-  scheduledNudgeEventId?: string;   // Internal: pending nudge event ID
-  scheduledExpireEventId?: string;  // Internal: pending expire event ID
-}
-```
+- The `conversation.session` property is the intended read-only interface for accessing lifecycle data -- use it instead of attempting to access internal state directly
 
 ## Common Patterns
 
