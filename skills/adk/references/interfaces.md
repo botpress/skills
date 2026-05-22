@@ -140,3 +140,10 @@ Interfaces and integrations are complementary. See **[integrations.md](./integra
 - Interface resolution is **per-integration** at the conversation level. The runtime determines which integration a conversation belongs to and resolves interface actions accordingly.
 - If no installed integration implements an interface, the generated mapping for that interface will be empty (no actions).
 - The `llm` and `listable` interfaces may have empty mappings if no installed integration declares support for them.
+- Plugins can depend on interfaces for runtime resolution. See [plugins.md](./plugins.md) for how plugin interface dependencies are wired.
+
+## See Also
+
+- [Integrations](./integrations.md) — Integration management overview
+- [Integration Actions](./integration-actions.md) — Calling integration actions from code
+- [Plugins](./plugins.md) — Plugins that depend on interfaces for runtime resolution
