@@ -64,7 +64,7 @@ The sidebar header shows the currently selected agent with a status indicator an
 - **Active agents** — all running local agents with status dot, name, project path, and a close button
 - **Cloud Dev Console** — switch to a deployed Botpress Cloud bot (workspace + bot picker)
 - **Recent projects** — previously opened projects not currently running
-- **Footer actions** — Create new project, Open existing, Switch environment (dev↔prod), About, About
+- **Footer actions** — Create new project, Open existing, Switch environment (dev↔prod), About
 
 ### Agent Steps (Chat Page)
 
