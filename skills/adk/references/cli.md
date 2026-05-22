@@ -151,7 +151,7 @@ adk dev [options]
 3. Syncs tables
 4. Checks integrations
 5. Registers the agent with the shared Dev Console (starts the singleton if needed)
-6. Starts UI server at http://localhost:3001
+6. Dev Console available at http://localhost:3001
 7. Watches files and hot-reloads
 
 Running `adk dev` in multiple project directories registers each agent with the same Dev Console. Switch between agents in the sidebar. See the [Dev Console multi-agent dashboard](../../adk-dev-console/references/multi-agent-dashboard.md) for details.
