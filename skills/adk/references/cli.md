@@ -480,6 +480,9 @@ adk integrations diff                    # Show lock vs cloud differences
 
 `adk pull-lock` and `adk push-lock` (no subcommand) run pull/push for both integrations and plugins at once.
 
+**`adk integrations pull-lock` options:**
+- `--dry-run` - Preview without writing the lock file
+
 **`adk integrations push-lock` options:**
 - `--dry-run` - Preview without applying
 - `--yes` - Skip confirmation
@@ -507,7 +510,9 @@ adk plugins diff                         # Show lock vs cloud differences
 **Plugin-specific flags:**
 - `adk plugins add --dep iface=alias` - Wire interface dependency (repeatable)
 - `adk plugins configure --map iface=alias` - Remap interface dependency
-- `adk plugins upgrade --to <version>` - Target specific version
+
+**Shared with `adk integrations upgrade`:**
+- `--to <version>` - Target specific version
 
 Plugins require interfaces implemented by installed integrations. The CLI auto-resolves dependencies when unambiguous. See **[Plugins](./plugins.md)** for details.
 
