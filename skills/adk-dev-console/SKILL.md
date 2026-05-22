@@ -32,7 +32,7 @@ Activate when users ask about:
 | `references/agent-steps.md` | Agent Steps visualization — turns, iterations, tools, messages, state mutations, cost tracking, status indicators |
 | `references/pages.md` | Every page/tab in the Dev Console — what it shows, key features, layout |
 | `references/component-registry.md` | Component Registry — installed vs registry tabs, component lifecycle, runtime registry internals, UI features |
-| `references/multi-agent-dashboard.md` | Multi-agent architecture, agent selector, console modes (local/cloud), dev/prod targets, CLI commands (`adk agents`, `adk ps`, `adk kill`, `adk dashboard`) |
+| `references/multi-agent-dashboard.md` | Multi-agent architecture, agent selector, console modes (local/cloud), dev/prod targets, CLI commands (`adk ps`, `adk kill`, `adk dashboard`, `adk status`) |
 
 ## How to Answer
 
@@ -64,7 +64,7 @@ The sidebar header shows the currently selected agent with a status indicator an
 - **Active agents** — all running local agents with status dot, name, project path, and a close button
 - **Cloud Dev Console** — switch to a deployed Botpress Cloud bot (workspace + bot picker)
 - **Recent projects** — previously opened projects not currently running
-- **Footer actions** — Create new project, Open existing, Switch environment (dev↔prod)
+- **Footer actions** — Create new project, Open existing, Switch environment (dev↔prod), About
 
 ### Agent Steps (Chat Page)
 
