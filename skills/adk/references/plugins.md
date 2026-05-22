@@ -115,7 +115,7 @@ adk plugins copy --from dev --to prod --dry-run
 
 ## Interface Dependencies
 
-Plugins often depend on _interfaces_ -- abstract contracts that integrations implement. When you add a plugin, the CLI resolves these dependencies:
+Plugins often depend on [interfaces](./interfaces.md) -- abstract contracts that integrations implement. When you add a plugin, the CLI resolves these dependencies:
 
 1. **Auto-resolved** -- If exactly one installed integration implements the required interface, it is wired automatically.
 2. **Ambiguous** -- If multiple installed integrations implement the same interface, the CLI errors and asks you to disambiguate with `--dep`.
@@ -259,6 +259,7 @@ adk plugins diff           # verify lock matches cloud
 
 ## See Also
 
+- [Interfaces](./interfaces.md) -- Built-in interface abstraction layer over integrations
 - [Integrations](./integrations.md) -- Integration management overview
 - [Integration Actions](./integration-actions.md) -- Calling integration actions from code
 - [CLI](./cli.md) -- Complete CLI command reference
