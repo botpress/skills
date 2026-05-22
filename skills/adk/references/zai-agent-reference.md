@@ -327,7 +327,11 @@ if (result.type === "answer") {
 A support queue has 50 tickets and the agent needs to work the most urgent ones first:
 
 ```typescript
-const rated = await zai.rate(tickets, "customer impact and time sensitivity");
+// Score tickets, then sort by those scores
+const scored = await zai.rate(tickets, "customer impact and time sensitivity");
+// scored: [4, 2, 5, 1, 3] — one score per ticket
+
+// Or sort directly when you only need ordering
 const sorted = await zai.sort(tickets, "most urgent and highest impact first");
 ```
 
@@ -434,11 +438,11 @@ if (input.trim().length > 0) {
 When processing batches, stagger requests to avoid hitting API limits:
 
 ```typescript
-import pLimit from "p-limit";
-const limit = pLimit(5); // Max 5 concurrent requests
-const results = await Promise.all(
-  items.map(item => limit(() => zai.extract(item, schema)))
-);
+const results = [];
+for (const [i, item] of items.entries()) {
+  if (i > 0) await new Promise((r) => setTimeout(r, 200));
+  results.push(await zai.extract(item, schema));
+}
 ```
 
 ## Notes
