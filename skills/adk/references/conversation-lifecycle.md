@@ -296,7 +296,7 @@ lifecycle: {
 
 ### Nudges Do Not Fire During Active Workflows
 
-If a workflow is running on the conversation (status `pending`, `in_progress`, `listening`, or `paused`), nudges are silently suppressed and rescheduled. This prevents the bot from sending "Are you still there?" while a workflow is actively processing. The check is fail-closed: if the workflow status query fails, the nudge is suppressed.
+If a workflow is running on the conversation (status `pending`, `in_progress`, `listening`, or `paused`), nudges are silently suppressed and rescheduled. This prevents the bot from sending "Are you still there?" while a workflow is actively processing. The check is fail-closed: if the workflow status query fails, the nudge is suppressed. See [workflow-steps.md](./workflow-steps.md) for the step methods that put workflows into these statuses.
 
 ### Expire Handler Errors Do Not Block Cleanup
 
@@ -317,3 +317,9 @@ If the runtime fails to schedule a nudge or expire event (e.g., API error), it l
 ### Race Guards Prevent Stale Events
 
 Both nudge and expire events carry a `scheduledAt` timestamp. If a user message arrived after the event was scheduled (i.e., `lastActivityAt > scheduledAt`), the event is silently dropped. This prevents stale timers from firing after the user has already re-engaged.
+
+## See Also
+
+- [Conversations](./conversations.md) — Conversation setup, channel routing, and handler parameters
+- [Workflows](./workflows.md) — Workflow basics and how workflows interact with conversations
+- [Workflow Steps](./workflow-steps.md) — Step methods whose statuses affect nudge suppression
