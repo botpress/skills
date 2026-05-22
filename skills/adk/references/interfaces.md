@@ -4,7 +4,7 @@ Interfaces are an abstraction layer over integrations. They define a standard co
 
 ## Key Concepts
 
-- **Interfaces are built-in.** The ADK automatically includes a fixed set of interfaces in every project. Users do not add or remove interfaces manually.
+- **Interfaces are built-in.** The ADK automatically includes a fixed set of interfaces in every project. Interfaces are provided by the ADK — they are resolved automatically based on installed integrations.
 - **Interfaces map to integration actions.** At build time, the ADK discovers which installed integrations implement each interface and generates a mapping from interface actions to concrete integration actions.
 - **The runtime resolves calls automatically.** When code calls an interface action (e.g., `startTypingIndicator`), the runtime looks up the correct integration action for the current conversation's integration.
 
@@ -20,65 +20,13 @@ Every ADK project includes these interfaces (defined in `@botpress/adk` constant
 
 These are hard-coded in the ADK and synced automatically during `adk dev` and `adk build`. Users cannot modify this list.
 
-## How Interface Mapping Works
+> **Naming:** Interface package names use kebab-case (`typing-indicator`), but the runtime uses camelCase (`typingIndicator`). The ADK handles this translation automatically.
 
-### Build Time
+## What Interfaces Enable
 
-1. The ADK fetches interface definitions from the Botpress API.
-2. For each interface, it checks which installed integrations implement it (by matching interface name and major version).
-3. It generates typed action mappings in `.adk/interfaces/` that map `"integrationAlias:interfaceAction"` to `"integrationAlias:integrationAction"`.
+### Typing Indicators in Conversation Handlers
 
-Example generated mapping (from the typing-indicator interface with webchat installed):
-
-```typescript
-// Auto-generated in .adk/interfaces/typing_indicator/actions.ts
-export const Interface_Actions_TypingIndicator = {
-  "webchat:startTypingIndicator": "webchat:startTypingIndicator",
-  "webchat:stopTypingIndicator": "webchat:stopTypingIndicator",
-};
-```
-
-When the interface action name and the integration action name are the same, the mapping is a direct pass-through. When they differ, the mapping translates one to the other.
-
-### Runtime
-
-At startup, the generated `Interfaces` object is passed to the agent registry as `interfacesMapping`. The runtime's `InterfaceMappings` singleton provides a lookup:
-
-```typescript
-interfaceMappings.getIntegrationAction(interfaceName, actionName, integrationName)
-```
-
-This returns the concrete integration action string (e.g., `"webchat:startTypingIndicator"`) or `undefined` if the integration does not implement the interface.
-
-### Concrete Example: Typing Indicators
-
-The `conversation.startTyping()` and `conversation.stopTyping()` methods use the `typingIndicator` interface internally:
-
-```typescript
-// Inside the runtime's ConversationInstance:
-async startTyping() {
-  const mapping = interfaceMappings.getIntegrationAction(
-    'typingIndicator',         // interface name
-    'startTypingIndicator',    // interface action
-    this.integration           // current integration alias (e.g., "webchat")
-  );
-
-  if (mapping) {
-    await this.client.callAction({
-      type: mapping,           // resolves to "webchat:startTypingIndicator"
-      input: { conversationId: this.id, messageId: message?.id || '' },
-    });
-  }
-}
-```
-
-This means `conversation.startTyping()` works for any integration that implements the `typing-indicator` interface (webchat, Slack, etc.) without any integration-specific code in the conversation handler.
-
-## What Users See
-
-### In Conversation Handlers
-
-Users call `conversation.startTyping()` and `conversation.stopTyping()` without thinking about interfaces. The interface resolution is invisible:
+The `typing-indicator` interface powers `conversation.startTyping()` and `conversation.stopTyping()`. These work automatically for any integration that implements the interface (webchat, Slack, etc.) with no integration-specific code needed:
 
 ```typescript
 import { Conversation } from "@botpress/runtime";
