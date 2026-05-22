@@ -101,7 +101,7 @@ step.request(
 |-----------|------|---------|-------------|
 | `request` | `string` | required | Name of a request type defined in the workflow's `requests` schema. |
 | `message` | `string` | required | Prompt message sent to the conversation as context. |
-| `stepName` | `string` | defaults to `request` | Custom step name. Required when the same request type is used multiple times. |
+| `stepName` | `string` | defaults to the value of `request` | Custom step name. Required when the same request type is used multiple times. |
 
 ### Behavior
 
@@ -131,7 +131,7 @@ async handler({ type, request, conversation }) {
 
 ### Examples
 
-From the Lack agent's `softwareRequest` workflow — collecting multiple inputs using the same request type with custom step names:
+An IT request workflow — collecting multiple inputs using the same request type with custom step names:
 
 ```typescript
 export const SoftwareRequestWorkflow = new Workflow({
@@ -219,7 +219,7 @@ step.notify(
 |-----------|------|---------|-------------|
 | `notification` | `string` | required | Name of a notification defined in the workflow's `notifications` schema. |
 | `payload` | `object` | required | Payload validated against the notification's Zod schema. |
-| `stepName` | `string` | defaults to `notification` | Custom step name. Required when emitting the same notification multiple times. |
+| `stepName` | `string` | defaults to the value of `notification` | Custom step name. Required when emitting the same notification multiple times. |
 
 ### Behavior
 
@@ -231,7 +231,7 @@ step.notify(
 
 ### Examples
 
-From the Lack agent's `ticketReview` workflow — streaming progress updates during iteration:
+A support workflow — streaming progress updates during iteration:
 
 ```typescript
 export const TicketReviewWorkflow = new Workflow({
@@ -421,7 +421,7 @@ Use `step.forEach()` for side-effect-only operations (sending notifications, upd
 
 ### Examples
 
-From the Lack agent's `ticketReview` workflow:
+A support workflow — reviewing tickets with side effects:
 
 ```typescript
 await step.forEach(
@@ -763,23 +763,22 @@ handler: async ({ input, step }) => {
 
 ### Delayed Retry with Sleep
 
-When an external dependency is unavailable, sleep and retry:
+When an external dependency is unavailable, return a sentinel value, sleep, and abort so the workflow re-executes from the top:
 
 ```typescript
 handler: async ({ step }) => {
-  const data = await step('check-availability', async ({ attempt }) => {
-    const result = await externalApi.check()
-    if (!result.ready) {
-      throw new Error('Not ready yet')
-    }
-    return result
-  }, { maxAttempts: 1 })
+  const data = await step('poll-api', async () => {
+    const result = await api.checkStatus(id)
+    return result.ready ? result.data : null
+  })
 
-  // If not available, sleep and the workflow will be re-triggered
   if (!data) {
-    await step.sleep('wait-for-availability', 60_000) // 1 minute
-    // Workflow resumes here; use another step to retry
+    await step.sleep('wait-for-ready', 30_000)
+    // workflow re-executes from the top on next tick
+    step.abort()
   }
+
+  // Continue with data...
 }
 ```
 
