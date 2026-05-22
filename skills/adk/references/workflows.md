@@ -459,8 +459,8 @@ await step.listen("wait-for-event");
 // Fail workflow with message
 await step.fail("Workflow failed due to X");
 
-// Abort workflow
-await step.abort("User cancelled");
+// Abort workflow (no args, synchronous, does not mark as failed)
+step.abort();
 ```
 
 ### Step Rules
