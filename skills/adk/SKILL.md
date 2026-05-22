@@ -272,6 +272,7 @@ Documentation should be located in `./references/` directory relative to this sk
 - **mcp-server.md** - MCP server for AI assistants
 - **desk.md** - Desk integration for ticket/support workflows
 - **integrations.md** - Integration management overview (points to adk-integrations skill)
+- **interfaces.md** - Built-in interface abstraction layer over integrations (typing indicators, LLM, listable)
 
 ### Patterns & Best Practices
 
