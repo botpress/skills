@@ -330,7 +330,8 @@ adk ps [options]
 
 **Options:**
 
-- `--watch [seconds]` - Continuous refresh (default interval: 2s)
+- `--watch [seconds]` - Continuous refresh (default interval: 2s, not supported with `--format json`)
+- `--cloud` - Include Cloud Dev Console prod selections in the listing
 - `--format <format>` - `text` (default) or `json`
 
 Shows PID, status, uptime, and ports for each process.
