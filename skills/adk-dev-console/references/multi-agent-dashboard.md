@@ -2,23 +2,11 @@
 
 The Dev Console is a **singleton shared dashboard** that coordinates multiple running agents. Each `adk dev` process registers its agent with the shared DevConsole, and the UI lets developers switch between them instantly.
 
-## Architecture
+## How It Works
 
-```
-Browser → DevConsole UI Server (singleton, :3001+) → proxies to selected agent's backend
-                    ↑
-    adk dev (agent A) ──socket──┤
-    adk dev (agent B) ──socket──┤
-    adk dev (agent C) ──socket──┘
-```
+Running `adk dev` in multiple project directories registers each agent with a single shared DevConsole. The UI automatically updates to show all running agents, and developers can switch between them from the sidebar.
 
-- **DevConsole UI Server** — detached singleton per user. Serves the React dashboard, owns the agent registry, proxies requests to agent backends.
-- **`adk dev` process** — one per agent project. Runs the bot runtime, agent API backend, span ingest, file watcher. Connects to the singleton via Unix socket (`~/.adk/console.sock`).
-- **Browser never talks directly to an agent backend** — all requests go through the singleton, which routes by selected agent.
-
-## Agent Lifecycle
-
-Each agent reports its status via heartbeats:
+Each agent shows a status indicator:
 
 | Status | Meaning |
 |--------|---------|
@@ -26,7 +14,7 @@ Each agent reports its status via heartbeats:
 | `ready` | Agent is running and accepting requests |
 | `error` | Agent encountered a fatal error |
 
-Agents that miss heartbeats are evicted from the registry. On clean shutdown (`Ctrl+C`), the agent sends a deregister message. If all agents disconnect and the singleton was started in managed mode (spawned by `adk dev`), it exits after a grace period. Standalone mode (`adk dashboard`) keeps the singleton alive with an empty registry.
+If all agents are stopped, the DevConsole exits automatically (unless started in standalone mode via `adk dashboard`).
 
 ## Console Modes
 
@@ -66,18 +54,6 @@ Full-width dropdown trigger showing: ADK logo, status ring (color matches agent 
 
 Compact pill in the top navigation center: status dot + agent name + mode pill + chevron. Opens the same dropdown content. Falls back to a non-interactive label if no agents are connected.
 
-## Routing
-
-All browser requests to the selected agent go through `buildApiUrl(path)`, which appends `?agent=<selectedAgentPath>`.
-
-The singleton resolves the target agent with this precedence:
-1. `?agent=<absolute-agent-path>` query parameter
-2. `X-Agent-Path` header
-3. If exactly one agent is registered, use it implicitly
-4. If multiple agents and no selector → `400 Ambiguous agent`
-
-The refusal to guess when ambiguous is intentional — it prevents accidentally mutating the wrong bot.
-
 ## CLI Commands
 
 ### `adk agents`
@@ -109,23 +85,6 @@ Supports `--force` for SIGKILL escalation and `--dry-run` to preview without act
 
 Displays project health and status information. Returns JSON when `--format json` is passed.
 
-## Per-User and Per-Project Files
+## Data Isolation
 
-**Per-user** (`~/.adk/`):
-
-| File | Purpose |
-|------|---------|
-| `console.sock` | Unix socket for agent registration |
-| `console.port` | Persisted HTTP port for CLI/browser discovery |
-| `console.lock` | Spawn lock preventing duplicate singletons |
-
-**Per-project** (`.adk/`):
-
-| File | Purpose |
-|------|---------|
-| `traces.db` | SQLite trace store for that agent |
-| `dev-ids.json` | Dev bot ID preservation |
-| `logs/` | Session logs |
-| `evals/runs/` | Eval run results |
-
-Agent-local data stays agent-local. Traces, logs, eval results, and dev bot IDs live under the project's `.adk/` directory, not in the singleton.
+Each agent's data is isolated to its own project directory (`.adk/`). Traces, logs, eval results, and dev bot IDs stay per-project — switching agents in the UI switches the data you see.
