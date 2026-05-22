@@ -667,6 +667,8 @@ export const Chat = new Conversation({
 })
 ```
 
+For lifecycle event handling (nudge/expire) in conversations, see [conversation-lifecycle.md](./conversation-lifecycle.md).
+
 ## Common Patterns
 
 ### Classify-and-exit (single-shot)
@@ -741,3 +743,5 @@ await execute({
 - [Workflows](./workflows.md) — Long-running processes, step-based execution
 - [Context API](./context-api.md) — Accessing runtime services and state
 - [Model Configuration](./model-configuration.md) — Model selection and defaults
+- [Workflow Steps](./workflow-steps.md) — Step API reference for using execute() within workflow handlers
+- [Conversation Lifecycle](./conversation-lifecycle.md) — Lifecycle events (nudge/expire) that also receive execute as a handler prop
