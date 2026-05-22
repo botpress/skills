@@ -320,27 +320,6 @@ adk status [options]
 
 - `--format <format>` - Output format: `text` or `json`
 
-### adk agents
-
-List all agents currently registered with the Dev Console.
-
-```bash
-adk agents [options]
-```
-
-**Options:**
-
-- `--format <format>` - Output format: `text` (default) or `json`
-
-Shows agent name, status, runtime version, ports, and project path for every running agent.
-
-**Example:**
-
-```bash
-adk agents
-adk agents --format json
-```
-
 ### adk ps
 
 List running ADK dev processes (Dev Console + agents).
@@ -1119,8 +1098,7 @@ adk deploy               # Deploy to production
 adk run <script>         # Run script with ADK runtime
 
 # Multi-Agent / Dev Console
-adk agents               # List registered agents
-adk ps                   # List running processes (PIDs, ports, uptime)
+adk ps                   # List running agents and processes
 adk dashboard            # Open Dev Console standalone (no agent needed)
 adk kill --all           # Stop all agents + Dev Console
 

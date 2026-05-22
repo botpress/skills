@@ -105,8 +105,7 @@ The right panel of the Chat page shows **Agent Steps** — a real-time visualiza
 
 | Command | Purpose |
 |---------|---------|
-| `adk agents` | List all agents registered with the DevConsole |
-| `adk ps` | List running ADK dev processes with PIDs, ports, uptime (supports `--watch`) |
+| `adk ps` | List running agents and processes with PIDs, ports, uptime (supports `--watch`) |
 | `adk dashboard` | Open the DevConsole in standalone mode (no agent required) |
 | `adk kill` | Stop agents or the entire DevConsole (`--all`, `--current`, `--pid`, or by name) |
 | `adk status` | Show project health and status info |

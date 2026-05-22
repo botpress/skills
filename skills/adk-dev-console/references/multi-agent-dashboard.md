@@ -60,8 +60,7 @@ See the [CLI Reference](../../adk/references/cli.md) for full options and exampl
 
 | Command | What it does |
 |---------|-------------|
-| `adk agents` | List registered agents |
-| `adk ps` | List running processes |
+| `adk ps` | List running agents and processes |
 | `adk dashboard` | Open Dev Console without an agent |
 | `adk kill` | Stop agents or the Dev Console |
 | `adk status` | Show project health info |
