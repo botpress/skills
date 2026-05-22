@@ -52,6 +52,7 @@ adk plugins add <name> --target prod
 
 # Remove a plugin by alias
 adk plugins remove <alias>
+adk plugins remove <alias> --target prod
 ```
 
 ### Listing and Inspection
@@ -78,6 +79,9 @@ adk plugins configure <alias> --unset key1 key2
 
 # Rewire interface dependencies
 adk plugins configure <alias> --map <interface-alias>=<integration-alias>
+
+# Target a specific environment (default: dev)
+adk plugins configure <alias> --set key=value --target prod
 ```
 
 ### Lifecycle
@@ -87,9 +91,14 @@ adk plugins configure <alias> --map <interface-alias>=<integration-alias>
 adk plugins enable <alias>
 adk plugins disable <alias>
 
+# Target a specific environment (default: dev)
+adk plugins enable <alias> --target prod
+adk plugins disable <alias> --target prod
+
 # Upgrade to latest or a specific version
 adk plugins upgrade <alias>
 adk plugins upgrade <alias> --to <version>
+adk plugins upgrade <alias> --target prod
 ```
 
 ### Lock File Management
@@ -99,18 +108,23 @@ Plugin state is tracked in `dependencies.<env>.lock.json` alongside integrations
 ```bash
 # Pull cloud state into the local lock file
 adk plugins sync
+adk plugins sync --target prod
+adk plugins sync --dry-run          # preview without writing
 
 # Push lock file state to cloud
 adk plugins apply
-adk plugins apply --dry-run   # preview without writing
-adk plugins apply --yes       # allow destructive changes
+adk plugins apply --target prod
+adk plugins apply --dry-run         # preview without writing
+adk plugins apply --yes             # allow destructive changes without confirmation
 
 # Show differences between lock and cloud
 adk plugins diff
+adk plugins diff --target prod
 
 # Copy plugin state between environments
 adk plugins copy --from dev --to prod
 adk plugins copy --from dev --to prod --dry-run
+adk plugins copy --from dev --to prod --yes   # allow destructive changes without confirmation
 ```
 
 ## Interface Dependencies
