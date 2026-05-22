@@ -291,6 +291,8 @@ step.listen(name: string): Promise<void>
 
 Use `step.listen()` when you need a generic pause point that is not tied to a request or sleep timer. For typed data collection, use `step.request()` instead.
 
+Note: When a workflow is in `listening` status, nudge events on the linked conversation are suppressed. See [conversation-lifecycle.md](./conversation-lifecycle.md) for details.
+
 ---
 
 ## step.sleep() / step.sleepUntil()
@@ -860,3 +862,12 @@ const processed = await step('compute', async () => {
 ### step.sleep() threshold: 10 seconds
 
 Sleeps under 10 seconds use in-memory `setTimeout` (workflow stays active). Sleeps of 10 seconds or more enter `listening` mode (workflow pauses and resumes via scheduled event). Plan accordingly — a 9-second sleep ties up the execution context, while a 10-second sleep frees it.
+
+---
+
+## See Also
+
+- [Workflows](./workflows.md) — Workflow basics, input/output schemas, request/notification definitions
+- [Conversations](./conversations.md) — Conversation-side handling of workflow requests and notifications
+- [Autonomous Execution](./autonomous-execution.md) — Using execute() inside workflow handlers (worker mode)
+- [Conversation Lifecycle](./conversation-lifecycle.md) — Nudge suppression during active workflow steps
