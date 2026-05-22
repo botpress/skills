@@ -150,8 +150,11 @@ adk dev [options]
 2. Creates/restores development bot
 3. Syncs tables
 4. Checks integrations
-5. Starts UI server at http://localhost:3001
-6. Watches files and hot-reloads
+5. Registers the agent with the shared Dev Console (starts the singleton if needed)
+6. Starts UI server at http://localhost:3001
+7. Watches files and hot-reloads
+
+Running `adk dev` in multiple project directories registers each agent with the same Dev Console. Switch between agents in the sidebar. See the [Dev Console multi-agent dashboard](../../adk-dev-console/references/multi-agent-dashboard.md) for details.
 
 **Example:**
 
@@ -316,6 +319,86 @@ adk status [options]
 **Options:**
 
 - `--format <format>` - Output format: `text` or `json`
+
+### adk agents
+
+List all agents currently registered with the Dev Console.
+
+```bash
+adk agents [options]
+```
+
+**Options:**
+
+- `--format <format>` - Output format: `text` (default) or `json`
+
+Shows agent name, status, runtime version, ports, and project path for every running agent.
+
+**Example:**
+
+```bash
+adk agents
+adk agents --format json
+```
+
+### adk ps
+
+List running ADK dev processes (Dev Console + agents).
+
+```bash
+adk ps [options]
+```
+
+**Options:**
+
+- `--watch [seconds]` - Continuous refresh (default interval: 2s)
+- `--format <format>` - `text` (default) or `json`
+
+Shows PID, status, uptime, and ports for each process.
+
+**Example:**
+
+```bash
+adk ps
+adk ps --watch
+adk ps --format json
+```
+
+### adk dashboard
+
+Open the Dev Console in standalone mode — no agent project required.
+
+```bash
+adk dashboard
+```
+
+Starts the Dev Console UI server and opens the browser. Useful for connecting to Cloud bots or waiting for agents to register. The standalone Dev Console stays alive even with an empty agent registry.
+
+### adk kill
+
+Gracefully stop agents or the entire Dev Console.
+
+```bash
+adk kill [agents...] [options]
+```
+
+**Options:**
+
+- `--all` - Stop all agents and the Dev Console singleton
+- `--current` - Stop the agent in the current working directory
+- `--pid <pid>` - Stop a specific process by PID
+- `--force` - Escalate to SIGKILL if graceful shutdown fails
+- `--dry-run` - Preview what would be stopped without acting
+
+**Examples:**
+
+```bash
+adk kill --all              # stop everything
+adk kill --current          # stop agent in cwd
+adk kill my-agent           # stop by name
+adk kill --pid 12345        # stop by PID
+adk kill --all --dry-run    # preview
+```
 
 ### adk logs
 
@@ -1034,6 +1117,12 @@ adk dev                  # Start development
 adk chat                 # Test interactively
 adk deploy               # Deploy to production
 adk run <script>         # Run script with ADK runtime
+
+# Multi-Agent / Dev Console
+adk agents               # List registered agents
+adk ps                   # List running processes (PIDs, ports, uptime)
+adk dashboard            # Open Dev Console standalone (no agent needed)
+adk kill --all           # Stop all agents + Dev Console
 
 # Dependencies (integrations, plugins, interfaces)
 adk search <query>       # Search for integrations

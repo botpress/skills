@@ -56,34 +56,15 @@ Compact pill in the top navigation center: status dot + agent name + mode pill +
 
 ## CLI Commands
 
-### `adk agents`
+The following commands manage the multi-agent Dev Console from the terminal. For full options, flags, and examples, see the [CLI Reference](../../adk/references/cli.md).
 
-Lists all agents currently registered with the DevConsole. Shows agent name, status, runtime version, ports, and project path.
-
-### `adk ps`
-
-Lists running ADK dev processes (console + agents). Shows PID, status, uptime, and ports. Supports `--watch [seconds]` for continuous refresh and `--format json` for structured output.
-
-### `adk dashboard`
-
-Opens the DevConsole UI server in standalone mode — no agent project required. Useful for browsing the dashboard, connecting to Cloud bots, or waiting for agents to register. Automatically opens the browser.
-
-### `adk kill`
-
-Gracefully stops agents or the entire DevConsole.
-
-| Flag | What it stops |
-|------|---------------|
-| `--all` | All agents + the DevConsole singleton |
-| `--current` | The agent in the current working directory |
-| `--pid <pid>` | A specific process by PID |
-| (positional) | Agents by name or path |
-
-Supports `--force` for SIGKILL escalation and `--dry-run` to preview without acting. Cleans up stale state files (`console.sock`, `console.port`, `console.lock`) on console shutdown.
-
-### `adk status`
-
-Displays project health and status information. Returns JSON when `--format json` is passed.
+| Command | What it does |
+|---------|-------------|
+| `adk agents` | List all agents registered with the Dev Console |
+| `adk ps` | List running processes with PIDs, ports, uptime (`--watch` for live refresh) |
+| `adk dashboard` | Open the Dev Console standalone — no agent project required |
+| `adk kill` | Stop agents or the entire Dev Console (`--all`, `--current`, `--pid`, or by name) |
+| `adk status` | Show project health and status info |
 
 ## Data Isolation
 
