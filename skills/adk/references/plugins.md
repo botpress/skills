@@ -40,8 +40,8 @@ All plugin management uses the `adk plugins` subcommand family. Every command su
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `adk plugins sync` | Pull cloud state into lock file | `--dry-run` |
-| `adk plugins apply` | Push lock file to cloud | `--dry-run`, `--yes` |
+| `adk plugins pull-lock` | Pull cloud state into lock file | `--dry-run` |
+| `adk plugins push-lock` | Push lock file to cloud | `--dry-run`, `--yes` |
 | `adk plugins copy` | Copy plugin state between environments | `--from <env>`, `--to <env>` |
 | `adk plugins diff` | Show differences between lock file and cloud | |
 

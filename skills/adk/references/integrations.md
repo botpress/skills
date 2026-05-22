@@ -34,8 +34,8 @@ Use `--format json` for programmatic inspection of config schemas, action shapes
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `adk integrations sync` | Pull cloud state into lock file | `--target <env>`, `--dry-run` |
-| `adk integrations apply` | Push lock file to cloud | `--target <env>`, `--dry-run`, `--yes` |
+| `adk integrations pull-lock` | Pull cloud state into lock file | `--target <env>`, `--dry-run` |
+| `adk integrations push-lock` | Push lock file to cloud | `--target <env>`, `--dry-run`, `--yes` |
 | `adk integrations copy` | Copy integration state between environments | `--from <env>`, `--to <env>` |
 | `adk integrations diff` | Show differences between lock file and cloud | `--target <env>` |
 

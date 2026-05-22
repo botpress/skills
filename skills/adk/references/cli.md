@@ -472,13 +472,15 @@ adk integrations remove slack
 #### State Management
 
 ```bash
-adk integrations sync                    # Pull cloud state into lock file
-adk integrations apply                   # Push lock file to cloud
+adk integrations pull-lock               # Pull cloud state into lock file
+adk integrations push-lock               # Push lock file to cloud
 adk integrations copy                    # Copy state between environments
 adk integrations diff                    # Show lock vs cloud differences
 ```
 
-**`adk integrations apply` options:**
+`adk pull-lock` and `adk push-lock` (no subcommand) run pull/push for both integrations and plugins at once.
+
+**`adk integrations push-lock` options:**
 - `--dry-run` - Preview without applying
 - `--yes` - Skip confirmation
 
@@ -496,8 +498,8 @@ adk plugins upgrade <alias>              # Upgrade version
 adk plugins enable <alias>               # Enable a disabled plugin
 adk plugins disable <alias>              # Disable without removing
 adk plugins configure <alias>            # Set config and interface mappings
-adk plugins sync                         # Pull cloud state into lock file
-adk plugins apply                        # Push lock file to cloud
+adk plugins pull-lock                    # Pull cloud state into lock file
+adk plugins push-lock                    # Push lock file to cloud
 adk plugins copy                         # Copy state between environments
 adk plugins diff                         # Show lock vs cloud differences
 ```
@@ -965,8 +967,8 @@ adk integrations upgrade [alias]   # Upgrade dependency
 adk integrations enable <alias>    # Enable integration
 adk integrations disable <alias>   # Disable integration
 adk integrations configure <alias> # Set/unset config values
-adk integrations sync              # Pull cloud state to lock file
-adk integrations apply             # Push lock file to cloud
+adk integrations pull-lock         # Pull cloud state to lock file
+adk integrations push-lock         # Push lock file to cloud
 
 # Plugins
 adk plugins search <query>        # Search for plugins
@@ -974,6 +976,12 @@ adk plugins list                   # List installed plugins
 adk plugins add <name>@<version>   # Add plugin
 adk plugins remove <alias>         # Remove plugin
 adk plugins configure <alias>      # Set config / remap interfaces
+adk plugins pull-lock              # Pull cloud state to lock file
+adk plugins push-lock              # Push lock file to cloud
+
+# Lock file (both integrations + plugins at once)
+adk pull-lock                      # Pull cloud state for both
+adk push-lock                      # Push lock files to cloud for both
 
 # MCP (AI Assistant Integration)
 adk mcp                  # Start MCP server
