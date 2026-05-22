@@ -440,7 +440,7 @@ console.log(result); // { name: "John Smith", age: 35, city: "New York" }
 - `summarize()` - Handle documents of any size
 - `filter()` - Query arrays with natural language
 
-**See Also:** `/docs/zai.md` for complete Zai documentation.
+**See Also:** The ADK skill's [zai-agent-reference.md](../../adk/references/zai-agent-reference.md) for all Zai operations and edge cases, and [zai-complete-guide.md](../../adk/references/zai-complete-guide.md) for the full developer guide.
 
 ---
 

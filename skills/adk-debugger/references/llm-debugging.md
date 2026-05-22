@@ -128,6 +128,7 @@ Check `think` spans for safety-related reasoning. The model may cite content pol
 - **Provide examples:** Show the model what good output looks like
 - **Try a different model:** Some models handle extraction better; check model configuration
 - **Pre-process input:** Clean up or normalize the text before extraction
+- See the **Edge Cases & Gotchas** section in [zai-agent-reference.md](../../adk/references/zai-agent-reference.md) for common pitfalls like hallucinated fields and chunk-window issues
 
 ---
 

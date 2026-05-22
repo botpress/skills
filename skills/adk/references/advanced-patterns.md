@@ -50,7 +50,7 @@ export const makeGuardrails = (message: any) => {
 };
 ```
 
-> **Note:** `adk.zai.check()` is the recommended approach for AI-powered validation. An advanced pattern `adk.zai.learn().check()` exists for cached/reusable checks, but `adk.zai.check()` is simpler and covers most cases.
+> **Note:** `adk.zai.check()` is the recommended approach for AI-powered validation. An advanced pattern `adk.zai.learn().check()` exists for cached/reusable checks, but `adk.zai.check()` is simpler and covers most cases. See [zai-agent-reference.md](./zai-agent-reference.md) for all Zai operations and edge cases.
 
 ### Usage in Conversation
 

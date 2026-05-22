@@ -251,14 +251,17 @@ Documentation should be located in `./references/` directory relative to this sk
 - **messages.md** - Sending messages and events
 - **custom-components.md** - Custom webchat components (`.bp.tsx` files, metadata, usage in conversations)
 
+### Zai (AI Operations)
+
+- **zai-agent-reference.md** - Quick reference: all operations, everyday problems Zai solves, edge cases & gotchas
+- **zai-complete-guide.md** - Full developer guide: architecture, active learning, chunking, performance tuning
+
 ### Data & Content
 
 - **tables.md** - Data storage with semantic search
 - **files.md** - File storage and management
 - **knowledge-bases.md** - RAG implementation
 - **assets.md** - Static files with permanent URLs and sync lifecycle
-- **zai-complete-guide.md** - Complete ZAI developer guide
-- **zai-agent-reference.md** - Quick ZAI reference
 
 ### Configuration & Integration
 
