@@ -3,6 +3,31 @@
 Every page accessible from the ADK Dev Console at `http://localhost:3001`.
 
 Pages marked **(dev only)** are hidden when the environment toggle is set to Production.
+Pages marked **(experimental)** are behind a feature flag and may change.
+
+---
+
+## Multi-Agent Navigation
+
+The Dev Console is a shared singleton — one UI server with multiple agents registering dynamically. Navigation includes:
+
+### Agent Selector (Sidebar Header)
+
+The sidebar header shows the selected agent with a status ring, name, and mode pill. Clicking opens the agent selector dropdown:
+
+- **Active agents** — running local agents with status dot (green = ready, yellow = starting, red = error), agent name, truncated project path, and close button
+- **Cloud Dev Console** — switch to inspecting a deployed Botpress Cloud bot via workspace and bot picker
+- **Recent projects** — previously opened projects not currently running
+- **Footer** — Create new project, Open existing project, Switch environment (dev↔prod), About
+
+The topbar also has a compact **Agent Picker** pill (status dot + agent name + mode pill) that opens the same dropdown content.
+
+### Environment Toggle
+
+Switches the selected agent between **Dev** and **Prod** targets:
+- **Dev** (default during `adk dev`): all pages and features available, uses local dev bot
+- **Prod**: hides dev-only pages, uses the deployed prod bot data
+- **Cloud mode**: always Prod — no dev target available for remote bots
 
 ---
 
@@ -18,6 +43,24 @@ Real-time conversation interface for testing the agent.
 - Conversation picker dropdown (filters to webchat conversations)
 - "Open conversation traces" link to jump to full Traces view
 - Download transcript button
+
+---
+
+## Agent Map (`/agent-map`) — dev only, experimental
+
+Interactive bird's-eye visualization of the agent's architecture as a graph. Feature-flagged behind `enable_agent_forge`.
+
+**Layout:** Full-screen React Flow canvas with auto-layout (elkjs) + detail panel
+
+**Features:**
+- Graph nodes for agent primitives: triggers, actions, workflows, autonomous handlers, knowledge bases, tables
+- Edges showing relationships between primitives
+- Auto-layout with elkjs; user can drag nodes (positions persist to localStorage per agent)
+- Detail panel: click a node to inspect metadata (description, knowledge counts, table schemas)
+- Hover cards with node summary
+- Change pulse animation when the agent snapshot updates (e.g., after file save)
+- Data from `/api/agent-map/snapshot` (one-shot) and `/api/agent-map/stream` (SSE for live updates)
+- "Experimental feature" badge — the map is compiled by parsing code and may be incomplete or inaccurate
 
 ---
 
