@@ -400,8 +400,8 @@ type Hooks = {
 | Category | Hooks | Behavior |
 |----------|-------|----------|
 | **Non-blocking** | `onTrace` | Fire-and-forget. Cannot delay execution. |
-| **Blocking, non-mutation** | `onIterationStart`, `onIterationEnd`, `onExit` | Block until resolved. Cannot change tool I/O or code. |
-| **Blocking, mutation** | `onBeforeTool`, `onAfterTool`, `onBeforeExecution` | Block until resolved. Can return modified values. |
+| **Blocking, mutation** | `onIterationStart`, `onBeforeTool`, `onAfterTool`, `onBeforeExecution` | Block until resolved. Can return modified values. |
+| **Blocking, non-mutation** | `onIterationEnd`, `onExit` | Block until resolved. Cannot change tool I/O or code. |
 
 ### Common Hook Patterns
 
