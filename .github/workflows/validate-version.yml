@@ -1,0 +1,61 @@
+name: Validate version
+
+on:
+  pull_request:
+    paths:
+      - "skills.json"
+      - "skills/**"
+      - "commands/**"
+      - ".claude-plugin/**"
+      - "scripts/sync-versions.sh"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate skills.json
+        run: |
+          if [[ ! -f skills.json ]]; then
+            echo "::error::skills.json not found"
+            exit 1
+          fi
+
+          VERSION=$(jq -r '."adk-version"' skills.json)
+          if [[ -z "$VERSION" || "$VERSION" == "null" ]]; then
+            echo "::error::adk-version field missing in skills.json"
+            exit 1
+          fi
+
+          if ! npx --yes semver "$VERSION" > /dev/null 2>&1; then
+            echo "::error::adk-version '$VERSION' is not valid semver"
+            exit 1
+          fi
+
+          echo "skills.json adk-version: $VERSION"
+
+      - name: Verify versions are in sync
+        run: |
+          SKILLS_VERSION=$(jq -r '."adk-version"' skills.json)
+          PLUGIN_VERSION=$(jq -r '.version' .claude-plugin/plugin.json)
+          MARKETPLACE_VERSION=$(jq -r '.plugins[0].version' .claude-plugin/marketplace.json)
+
+          ERRORS=0
+
+          if [[ "$SKILLS_VERSION" != "$PLUGIN_VERSION" ]]; then
+            echo "::error::plugin.json version ($PLUGIN_VERSION) != skills.json adk-version ($SKILLS_VERSION)"
+            ERRORS=1
+          fi
+
+          if [[ "$SKILLS_VERSION" != "$MARKETPLACE_VERSION" ]]; then
+            echo "::error::marketplace.json version ($MARKETPLACE_VERSION) != skills.json adk-version ($SKILLS_VERSION)"
+            ERRORS=1
+          fi
+
+          if [[ "$ERRORS" -ne 0 ]]; then
+            echo "Run ./scripts/sync-versions.sh to fix version drift"
+            exit 1
+          fi
+
+          echo "All versions in sync: $SKILLS_VERSION"
