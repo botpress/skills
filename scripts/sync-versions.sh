@@ -10,7 +10,10 @@ if [[ -z "$VERSION" || "$VERSION" == "null" ]]; then
   exit 1
 fi
 
-jq --arg v "$VERSION" '.version = $v' .claude-plugin/plugin.json > tmp.json && mv tmp.json .claude-plugin/plugin.json
-jq --arg v "$VERSION" '.plugins[0].version = $v' .claude-plugin/marketplace.json > tmp.json && mv tmp.json .claude-plugin/marketplace.json
+TMPFILE=$(mktemp)
+trap 'rm -f "$TMPFILE"' EXIT
+
+jq --arg v "$VERSION" '.version = $v' .claude-plugin/plugin.json > "$TMPFILE" && mv "$TMPFILE" .claude-plugin/plugin.json
+jq --arg v "$VERSION" '.plugins[0].version = $v' .claude-plugin/marketplace.json > "$TMPFILE" && mv "$TMPFILE" .claude-plugin/marketplace.json
 
 echo "Synced version $VERSION to plugin.json and marketplace.json"

@@ -8,6 +8,13 @@ on:
       - "commands/**"
       - ".claude-plugin/**"
       - "scripts/sync-versions.sh"
+  push:
+    branches:
+      - master
+      - dev
+    paths:
+      - "skills.json"
+      - ".claude-plugin/**"
 
 jobs:
   validate:
@@ -28,7 +35,7 @@ jobs:
             exit 1
           fi
 
-          if ! npx --yes semver "$VERSION" > /dev/null 2>&1; then
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?(\+[a-zA-Z0-9.]+)?$ ]]; then
             echo "::error::adk-version '$VERSION' is not valid semver"
             exit 1
           fi
