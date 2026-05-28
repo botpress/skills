@@ -4,7 +4,7 @@ Traces and logs are the primary debugging interface for ADK agents. Every conver
 
 ## CLI Debugging Tools
 
-All commands support `--format json` for structured output. **Always use `--format json`** when consuming output programmatically.
+Most commands support `--format json` for structured output — **always use it** when consuming output programmatically. The exception is `adk dev`, which has no `--format` flag: use `adk dev --non-interactive` to get a structured NDJSON event stream instead.
 
 | Command | Purpose | Additional Flags |
 |---------|---------|-----------------|
@@ -12,7 +12,7 @@ All commands support `--format json` for structured output. **Always use `--form
 | `adk logs --format json` | Browse or stream log entries | `--follow`, `--summary`, level filters (`error`, `warning`) |
 | `adk traces --format json` | Query conversation traces with span details | `--conversation-id` |
 | `adk chat --single "msg" --format json` | Send a test message and get structured response | `--conversation-id` |
-| `adk dev --non-interactive --format json` | Start dev server with structured NDJSON event stream (no TUI) | — |
+| `adk dev --non-interactive` | Start dev server with structured NDJSON event stream (no TUI) | — |
 
 ## Querying Logs
 

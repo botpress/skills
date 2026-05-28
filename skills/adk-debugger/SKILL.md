@@ -87,7 +87,7 @@ adk logs --follow --format json                  # stream live
 adk traces --format json                         # recent traces
 adk traces --conversation-id <id> --format json  # specific conversation
 adk chat --single "msg" --format json            # test message
-adk dev --non-interactive --format json          # structured dev output
+adk dev --non-interactive                        # structured NDJSON dev output (no TUI)
 adk conversations --format json                  # list recent conversations
 adk conversations show <id> --format json        # conversation timeline
 adk conversations show <id> --include-llm --format json  # timeline with LLM reasoning
@@ -109,7 +109,7 @@ adk conversations show <id> --include-llm --format json  # timeline with LLM rea
 Before debugging, verify:
 
 - [ ] **Project valid?** Run `adk check --format json` — fix any reported issues first
-- [ ] **Dev server running?** `adk dev` (or `adk dev --non-interactive --format json` for structured output)
+- [ ] **Dev server running?** `adk dev` (or `adk dev --non-interactive` for structured NDJSON output)
 - [ ] **Bot linked?** `agent.json` exists with `botId` and `workspaceId` (created by `adk link`)
 - [ ] **Dev bot created?** `agent.local.json` has `devId` (set automatically by the first `adk dev` run)
 - [ ] **Integration configured?** Check Dev Console at localhost:3001 for unconfigured integrations
