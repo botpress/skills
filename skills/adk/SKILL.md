@@ -249,10 +249,14 @@ Documentation should be located in `./references/` directory relative to this sk
 
 - **actions.md** - Actions with strong typing and validation
 - **tools.md** - AI-callable tools and Autonomous namespace
+- **autonomous-execution.md** - Advanced execute() API: Objects, Exits, hooks, configuration
 - **workflows.md** - Workflows and step-based execution
+- **workflow-steps.md** - Complete Workflow Step API reference (step.request, step.map, step.notify, etc.)
 - **conversations.md** - Conversation handlers and message routing
+- **conversation-lifecycle.md** - Nudge/expiration lifecycle management for conversations
 - **triggers.md** - Event-driven automation
 - **messages.md** - Sending messages and events
+- **custom-components.md** - Custom webchat components (`.bp.tsx` files, metadata, usage in conversations)
 
 ### Data & Content
 
@@ -274,8 +278,9 @@ Documentation should be located in `./references/` directory relative to this sk
 - **cli.md** - Complete CLI command reference
 - **mcp-server.md** - MCP server for AI assistants
 - **desk.md** - Desk integration for ticket/support workflows
-- **integrations.md** - Integration management: CLI commands, lifecycle, configuration, common integrations
-- **plugins.md** - Plugin management: CLI commands, interface dependencies, lifecycle
+- **integrations.md** - Integration management overview (points to adk-integrations skill)
+- **interfaces.md** - Built-in interface abstraction layer over integrations (typing indicators, LLM, listable)
+- **plugins.md** - Plugin consumption: discovery, installation, configuration, and usage
 
 ### Patterns & Best Practices
 

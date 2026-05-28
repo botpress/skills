@@ -577,5 +577,5 @@ export default new Autonomous.Tool({
 
 - [Actions](./actions.md) - Strongly-typed internal functions
 - [Conversations](./conversations.md) - Using tools in conversation handlers
-- [Autonomous Execution](./autonomous.md) - Deep dive into `execute()` function
+- [Autonomous Execution](./autonomous-execution.md) - Objects, Exits, hooks, and full `execute()` API
 - [Context API](./context-api.md) - Access runtime context and services

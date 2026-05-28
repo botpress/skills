@@ -1,72 +1,179 @@
-# Plugin Management
+# Plugins
 
-Plugins are reusable agent extensions that bundle custom business logic as actions. Unlike integrations (which connect to external services), plugins provide composable agent capabilities that depend on integrations through interface contracts.
+Plugins are pre-built, reusable capabilities published on the Botpress Hub that you install into your agent. Unlike integrations (which connect to external platforms), plugins add self-contained behavior -- tools, actions, data sources, or components -- that run inside your bot.
 
-## Plugins vs Integrations
+Users consume plugins. They do not author them.
 
-| | Integrations | Plugins |
-|--|-------------|---------|
-| **Purpose** | Connect to external services (Slack, Zendesk, etc.) | Add reusable agent logic (HITL, summarization, etc.) |
-| **Expose** | Channels, events, actions | Actions only |
-| **Interfaces** | Implement interfaces | Require interfaces |
-| **Dependencies** | None | Map required interfaces to installed integrations |
+## Plugin vs Integration
 
-**Example:** The `desk-hitl` plugin requires the `hitl` interface. If `slack` implements `hitl`, the CLI auto-wires the dependency. If both `slack` and `intercom` implement it, you disambiguate with `--dep hitl=slack`.
+| | Plugin | Integration |
+|--|--------|-------------|
+| **Purpose** | Adds behavior/logic to your bot | Connects to an external platform |
+| **Installed via** | `adk plugins add <name>` | `adk add <name>` or `adk integrations add <name>` |
+| **May depend on** | Integrations (via interface wiring) | Nothing |
+| **Lock file key** | `plugins` | `integrations` |
+| **Action call format** | `plugins.<alias>.actions.<action>(input)` | `actions.<alias>.<action>(input)` |
 
 ## CLI Commands
 
-All plugin management uses the `adk plugins` subcommand family. Every command supports `--target <env>` (dev or prod, default: dev) and `--format <format>` (text or json).
+All plugin management goes through the `adk plugins` subcommand group. Every command supports `--format json` for scripted output.
 
 ### Discovery
 
-| Command | Description | Key Flags |
-|---------|-------------|-----------|
-| `adk plugins search <query>` | Search by keyword | `--format json` |
-| `adk plugins list` | Show installed plugins | `--format json` |
-| `adk plugins info <name>` | Full plugin details | `--format json` |
+```bash
+# Search the Hub for plugins
+adk plugins search <query>
 
-### Mutations
+# Inspect a plugin before installing (shows config, actions, dependencies)
+adk plugins info <name>
+adk plugins info <name>@<version>
+```
 
-| Command | Description | Key Flags |
-|---------|-------------|-----------|
-| `adk plugins add <name>@<version>` | Install a plugin | `--alias <name>`, `--dep iface=alias`, `--config key=value` |
-| `adk plugins remove <alias>` | Uninstall a plugin | |
-| `adk plugins upgrade <alias>` | Upgrade version | `--to <version>` |
-| `adk plugins enable <alias>` | Enable a disabled plugin | |
-| `adk plugins disable <alias>` | Disable without removing | |
-| `adk plugins configure <alias>` | Set config and interface mappings | `--set key=value`, `--unset key`, `--map iface=alias` |
+### Adding and Removing
 
-### State Management
+```bash
+# Add a plugin (latest version, alias defaults to plugin name)
+adk plugins add <name>
 
-| Command | Description | Key Flags |
-|---------|-------------|-----------|
-| `adk plugins pull-lock` | Pull cloud state into lock file | `--dry-run` |
-| `adk plugins push-lock` | Push lock file to cloud | `--dry-run`, `--yes` |
-| `adk plugins copy` | Copy plugin state between environments | `--from <env>`, `--to <env>` |
-| `adk plugins diff` | Show differences between lock file and cloud | |
+# Add a specific version
+adk plugins add <name>@<version>
+
+# Add with a custom alias
+adk plugins add <name> --alias <alias>
+
+# Add with configuration values
+adk plugins add <name> --config key1=value1 --config key2=value2
+
+# Wire interface dependencies explicitly
+adk plugins add <name> --dep <interface-alias>=<integration-alias>
+
+# Target a specific environment (default: dev)
+adk plugins add <name> --target prod
+
+# Remove a plugin by alias
+adk plugins remove <alias>
+adk plugins remove <alias> --target prod
+```
+
+### Listing and Inspection
+
+```bash
+# List installed plugins
+adk plugins list
+
+# Show config and dependency details
+adk plugins list --verbose
+
+# Target a specific environment
+adk plugins list --target prod
+```
+
+### Configuration
+
+```bash
+# Set config values on an installed plugin
+adk plugins configure <alias> --set key=value
+
+# Remove config keys
+adk plugins configure <alias> --unset key1 key2
+
+# Rewire interface dependencies
+adk plugins configure <alias> --map <interface-alias>=<integration-alias>
+
+# Target a specific environment (default: dev)
+adk plugins configure <alias> --set key=value --target prod
+```
+
+### Lifecycle
+
+```bash
+# Enable / disable a plugin without removing it
+adk plugins enable <alias>
+adk plugins disable <alias>
+
+# Target a specific environment (default: dev)
+adk plugins enable <alias> --target prod
+adk plugins disable <alias> --target prod
+
+# Upgrade to latest or a specific version
+adk plugins upgrade <alias>
+adk plugins upgrade <alias> --to <version>
+adk plugins upgrade <alias> --target prod
+```
+
+### Lock File Management
+
+Plugin state is tracked in `dependencies.<env>.lock.json` alongside integrations. These commands manage the lock file:
+
+```bash
+# Pull cloud state into the local lock file
+adk plugins sync
+adk plugins sync --target prod
+adk plugins sync --dry-run          # preview without writing
+
+# Push lock file state to cloud
+adk plugins apply
+adk plugins apply --target prod
+adk plugins apply --dry-run         # preview without writing
+adk plugins apply --yes             # allow destructive changes without confirmation
+
+# Show differences between lock and cloud
+adk plugins diff
+adk plugins diff --target prod
+
+# Copy plugin state between environments
+adk plugins copy --from dev --to prod
+adk plugins copy --from dev --to prod --dry-run
+adk plugins copy --from dev --to prod --yes   # allow destructive changes without confirmation
+```
 
 ## Interface Dependencies
 
-Plugins declare which interfaces they require. When adding a plugin, the CLI resolves these against installed integrations:
+Plugins often depend on [interfaces](./interfaces.md) -- abstract contracts that integrations implement. When you add a plugin, the CLI resolves these dependencies:
 
-- **Auto-resolve:** Exactly one integration implements the interface — wired automatically.
-- **Ambiguous:** Multiple integrations match — CLI asks you to specify with `--dep iface=alias`.
-- **Missing:** No integration implements the interface — CLI suggests which Hub integrations to install.
+1. **Auto-resolved** -- If exactly one installed integration implements the required interface, it is wired automatically.
+2. **Ambiguous** -- If multiple installed integrations implement the same interface, the CLI errors and asks you to disambiguate with `--dep`.
+3. **Missing** -- If no installed integration implements the interface, the CLI errors and suggests Hub integrations you can install first.
+
+**Example: adding a plugin that requires the `hitl` interface**
 
 ```bash
-# Auto-resolves if only one integration implements 'hitl'
-adk plugins add desk-hitl@1.0.0
+# If you already have exactly one integration implementing hitl:
+adk plugins add desk-hitl
+# CLI auto-resolves the interface dependency
 
-# Explicit wiring when multiple integrations match
-adk plugins add desk-hitl@1.0.0 --dep hitl=slack
+# If multiple integrations implement hitl, disambiguate:
+adk plugins add desk-hitl --dep hitlService=zendesk
 
-# Remap interface dependencies after install
-adk plugins configure desk-hitl --map hitl=intercom
+# If no integration implements hitl, install one first:
+adk integrations add zendesk
+adk plugins add desk-hitl
 ```
+
+After installation, you can re-wire dependencies any time:
+
+```bash
+adk plugins configure desk-hitl --map hitlService=freshdesk
+```
+
+## Using Plugin Actions in Code
+
+Installed plugins expose typed actions via the `plugins` proxy from `@botpress/runtime`. The ADK generates types automatically so you get full autocompletion.
+
+```typescript
+import { plugins } from "@botpress/runtime";
+
+// Call a plugin action: plugins.<alias>.actions.<actionName>(input)
+const result = await plugins.myPlugin.actions.doSomething({ key: "value" });
+```
+
+The call format is `plugins.<alias>.actions.<action>()`. This differs from integration actions, which use `actions.<alias>.<action>()`. See [Integration Actions](./integration-actions.md) for comparison.
+
+Plugin actions are routed through the Botpress client internally -- the runtime proxy calls `client.callAction()` with the format `<alias>#<actionName>`, so you never need to construct this yourself.
 
 ## Lock File Structure
 
-Plugins share the `dependencies.{dev,prod}.lock.json` lock files with integrations:
+Plugins live in `dependencies.dev.lock.json` (or `dependencies.prod.lock.json`) under the `plugins` key:
 
 ```json
 {
@@ -78,56 +185,96 @@ Plugins share the `dependencies.{dev,prod}.lock.json` lock files with integratio
       "name": "desk-hitl",
       "version": "1.0.0",
       "enabled": true,
-      "config": { "queue": "support" },
+      "config": {
+        "apiKey": "${env:HITL_API_KEY}"
+      },
       "dependencies": {
-        "hitl": { "integrationAlias": "slack" }
+        "hitlService": {
+          "integrationAlias": "zendesk"
+        }
       }
     }
   }
 }
 ```
 
-The `dependencies` field maps each required interface to the integration alias that provides it.
+Each plugin entry has:
 
-## Lifecycle
+| Field | Description |
+|-------|-------------|
+| `name` | Plugin name on the Hub |
+| `version` | Installed version |
+| `enabled` | Whether the plugin is active |
+| `config` | Configuration key-value pairs |
+| `dependencies` | Map of interface alias to integration alias |
 
-### 1. Discover
+## Environment Variable References
+
+Plugin config values support `${env:VAR_NAME}` syntax. The CLI substitutes these from the process environment at apply time while preserving the reference in the lock file. This keeps secrets out of version control.
 
 ```bash
-adk plugins search hitl
-adk plugins info desk-hitl --format json
+# Set a config value that references an env var
+adk plugins configure my-plugin --set apiKey='${env:MY_API_KEY}'
 ```
 
-### 2. Add
+## Common Patterns
+
+### Add a Plugin with All Dependencies
 
 ```bash
+# 1. Install the required integration first
+adk integrations add zendesk@2.0.0
+
+# 2. Add the plugin (interface dependency auto-resolves)
 adk plugins add desk-hitl@1.0.0
-adk plugins add desk-hitl@1.0.0 --dep hitl=slack --config queue=support
+
+# 3. Verify
+adk plugins list --verbose
 ```
 
-Always pin to a specific version.
-
-### 3. Configure
+### Promote Plugins from Dev to Prod
 
 ```bash
-adk plugins configure desk-hitl --set queue=priority
-adk plugins configure desk-hitl --map hitl=intercom
+# Copy all plugin (and integration) state from dev to prod
+adk plugins copy --from dev --to prod --dry-run   # preview first
+adk plugins copy --from dev --to prod --yes        # apply
 ```
 
-### 4. Enable
+### Temporarily Disable a Plugin
 
 ```bash
-adk plugins enable desk-hitl
+adk plugins disable my-plugin
+# Later:
+adk plugins enable my-plugin
 ```
 
-### 5. Use in Code
+### Sync After Manual Cloud Changes
 
-Plugins expose actions callable from agent code. Check `adk plugins info <name> --format json` for available actions and their input/output schemas.
-
-### 6. Remove / Upgrade
+If someone changed plugin state through the Botpress dashboard:
 
 ```bash
-adk plugins remove desk-hitl
-adk plugins upgrade desk-hitl
-adk plugins upgrade desk-hitl --to 2.0.0
+adk plugins sync           # pull cloud state into lock file
+adk plugins diff           # verify lock matches cloud
 ```
+
+## Pitfalls
+
+1. **Interface dependency errors on add** -- The most common failure. Always ensure the required integration is installed _before_ adding the plugin. Run `adk plugins info <name>` to see what interfaces a plugin needs.
+
+2. **Ambiguous dependencies** -- If you have multiple integrations implementing the same interface (e.g., two different HITL providers), you must pass `--dep` to disambiguate. The CLI will not guess.
+
+3. **Plugin actions vs integration actions** -- Plugin actions use `plugins.<alias>.actions.<name>()`, not `actions.<alias>.<name>()`. Mixing these up gives runtime errors.
+
+4. **Lock file drift** -- If someone adds or removes plugins via the Botpress dashboard, your local lock file becomes stale. Run `adk plugins sync` to reconcile.
+
+5. **Prod requires confirmation** -- `adk plugins apply --target prod` and destructive operations (uninstalls) require `--yes` to proceed. This is intentional.
+
+6. **Old `adk add plugin:` syntax** -- The legacy `adk add plugin:<name>` command still works but routes through the older dependency path. Prefer `adk plugins add <name>` for the full feature set (config, deps, enable/disable).
+
+## See Also
+
+- [Interfaces](./interfaces.md) -- Built-in interface abstraction layer over integrations
+- [Integrations](./integrations.md) -- Integration management overview
+- [Integration Actions](./integration-actions.md) -- Calling integration actions from code
+- [CLI](./cli.md) -- Complete CLI command reference
+- [Agent Config](./agent-config.md) -- Bot configuration and state management
