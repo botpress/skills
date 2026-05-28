@@ -58,45 +58,18 @@ await execute({
 
 ---
 
-## 3. Zai Instance Configuration
+## 3. Zai Model Override
 
-### At Initialization
-
-```typescript
-import { Zai, adk } from "@botpress/runtime";
-
-// Option 1: instantiate Zai directly
-const zai = new Zai({
-  client,
-  modelId: "openai:gpt-4o"
-});
-
-// Option 2: start from the runtime-provided helper
-const preciseZai = adk.zai.with({
-  modelId: "openai:gpt-4o"
-});
-```
-
-### Via .with() Chaining
+Override the default Zai model per-instance using `.with()`:
 
 ```typescript
-const preciseZai = zai.with({
-  modelId: "openai:gpt-4o-turbo"
-});
+import { adk } from "@botpress/runtime";
 
+const preciseZai = adk.zai.with({ modelId: "openai:gpt-4o" });
 await preciseZai.extract(text, schema);
 ```
 
-### Combining Configuration
-
-```typescript
-const customZai = zai
-  .with({ modelId: "anthropic:claude-3-5-sonnet" })
-  .with({ temperature: 0.2 })
-  .learn("invoice-extraction");
-
-const result = await customZai.extract(document, schema);
-```
+> For full Zai configuration (initialization, chaining, learning, operations), see [zai-agent-reference.md](./zai-agent-reference.md) and [zai-complete-guide.md](./zai-complete-guide.md).
 
 ---
 

@@ -896,49 +896,26 @@ export const DirectLLMWorkflow = new Workflow({
 
 ### 3. Using Zai (Structured Operations)
 
-The ADK provides `adk.zai` for structured AI operations directly in workflows:
+Use `adk.zai` for structured AI operations (extract, check, summarize, etc.) inside workflows. Always wrap Zai calls in `step()` for persistence.
 
 ```typescript
 import { Workflow, z, adk } from "@botpress/runtime";
 
 export const ZaiWorkflow = new Workflow({
   name: "zaiWorkflow",
-
   handler: async ({ input, state, step }) => {
-    // Extract structured data using adk.zai
     const insights = await step("extract insights", async () =>
-      adk.zai.extract(
-        input.text,
-        z.array(z.object({
-          type: z.enum(["bug", "feature_request", "question"]),
-          description: z.string(),
-          priority: z.enum(["low", "medium", "high"])
-        })),
-        {
-          instructions: "Extract customer insights from the conversation"
-        }
-      )
+      adk.zai.extract(input.text, z.array(z.object({
+        type: z.enum(["bug", "feature_request", "question"]),
+        description: z.string(),
+        priority: z.enum(["low", "medium", "high"]),
+      })))
     );
-
-    // Check conditions
     const hasBugs = await step("check for bugs", async () =>
-      adk.zai.check(
-        insights,
-        "Are there any bug reports?",
-        { returnBoolean: true }
-      )
+      adk.zai.check(insights, "Are there any bug reports?")
     );
-
-    // Summarize content
-    const summary = await step("summarize", async () =>
-      adk.zai.summarize(input.text, {
-        maxLength: 100,
-        style: "bullet_points"
-      })
-    );
-
-    return { insights, hasBugs, summary };
-  }
+    return { insights, hasBugs };
+  },
 });
 ```
 
@@ -957,6 +934,8 @@ export const ZaiWorkflow = new Workflow({
 2. **Model format**: Use `"provider:model"` (e.g., `"openai:gpt-4o"`)
 3. **Cost awareness**: AI calls consume tokens
 4. **Error handling**: AI calls can fail, use retries
+
+> For the full list of Zai operations, everyday use cases, and edge cases, see [zai-agent-reference.md](./zai-agent-reference.md).
 
 ## Exposing Workflows as Tools (Non-Blocking Pattern)
 
