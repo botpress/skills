@@ -2,7 +2,7 @@
 
 Each pattern follows: **Symptom → How to Check → Root Cause → Fix**.
 
-Always use `--format json` on CLI commands for structured, parseable output.
+Use `--format json` on diagnostic CLI commands that support it for structured, parseable output.
 
 ---
 

@@ -208,7 +208,10 @@ adk deploy [options]
 **Options:**
 
 - `-e, --env <environment>` - Target environment (default: "production")
-- `-y, --yes` - Auto-approve preflight changes without prompting
+- `-y, --yes` - Auto-approve non-destructive deploy-plan changes without prompting
+- `--confirm-storage-changes` - Explicitly confirm destructive table/KB/asset deletions
+- `--dry-run` - Compute the deploy plan without applying changes
+- `--format <format>` - Output format (`json`; requires `--yes` or `--dry-run`)
 
 **What it does:**
 
@@ -218,6 +221,7 @@ adk deploy [options]
 4. Deploys bot to Botpress Cloud
 5. Syncs knowledge bases
 6. Syncs tables
+7. Syncs assets
 
 **Requires:**
 
@@ -229,13 +233,19 @@ adk deploy [options]
 ```bash
 adk deploy
 
-# Auto-approve preflight changes
+# Auto-approve non-destructive deploy-plan changes
 adk deploy --yes
+
+# Preview deploy plan without applying it
+adk deploy --dry-run
+adk deploy --dry-run --format json
 ```
 
 **Automation notes:**
 
-- `--yes` only auto-approves preflight changes.
+- `--yes` auto-approves non-destructive deploy-plan changes.
+- Destructive table, KB, or asset deletions still require `--confirm-storage-changes`.
+- JSON output requires either `--yes` or `--dry-run`.
 - Deploy still validates configuration and may require interaction if config values are missing.
 - Do not assume `adk deploy --yes` is fully non-interactive.
 
@@ -370,7 +380,7 @@ adk ps [options]
 - `--wide` - Show all columns (runtime, both PIDs, path)
 - `--format <format>` - `text` (default) or `json`
 
-Shows PID, status, uptime, and ports for each process. Reads `~/.adk/console.port` to find the running Dev Console, and exits non-zero if none is running.
+Shows PID, status, uptime, and ports for each process. Reads `~/.adk/console.port` to find the running Dev Console. If none is running, it prints a friendly empty result instead of starting one.
 
 **Example:**
 
@@ -457,19 +467,24 @@ adk logs warning since=1h          # last hour of warnings
 Read execution traces — tool calls, action invocations, LLM steps, error context — for understanding *what happened* during a turn, beyond what `adk logs` reports.
 
 ```bash
-adk traces [options]
+adk traces [tokens...] [options]
 ```
 
-**Options:**
+**Options and tokens:**
 
 - `--format <format>` - `text` or `json`
-- `--conversation-id <id>` - Filter to a specific conversation
+- `--follow` - Stream new traces as they complete
+- `--include-llm` - Include LLM instructions, code, and tool details in drill-in mode
+- `conversation=<id>` - Filter to a specific conversation
+- `trace=<id>` - Drill into a specific trace
+- `error`, `workflow=<name>`, `action=<name>`, `since=<duration>`, `limit=<n>` - Common filters
 
 **Examples:**
 
 ```bash
 adk traces --format json
-adk traces --conversation-id <id> --format json
+adk traces conversation=<id> --format json
+adk traces trace=<id> --include-llm --format json
 ```
 
 ### adk conversations
@@ -715,7 +730,7 @@ adk kb sync [options]
 - `-y, --yes` - Skip confirmation prompts
 - `--confirm-storage-changes` - Confirm destructive storage changes (KB deletions)
 - `--force` - Force re-sync all knowledge bases
-- `--format <format>` - Output format (`json`)
+- `--format <format>` - Output format (`json`; requires `--yes`)
 
 **What it does:**
 
@@ -735,6 +750,7 @@ adk kb sync --prod
 
 # Auto-confirm sync
 adk kb sync --dev -y
+adk kb sync --dev -y --format json
 
 # Preview changes without applying
 adk kb sync --dev --dry-run
@@ -765,6 +781,7 @@ adk assets sync [options]
 - `-y, --yes` - Skip confirmation
 - `--bail-on-failure` - Stop on first error
 - `--force` - Force re-upload all files
+- `--format <format>` - Output format (`json`; requires `--yes`)
 
 **Example:**
 
@@ -774,6 +791,7 @@ adk assets sync
 
 # Auto-confirm
 adk assets sync -y
+adk assets sync -y --format json
 ```
 
 **Other asset commands:**
@@ -796,13 +814,14 @@ adk assets list [options]
 
 - `--local` - Show only local assets
 - `--remote` - Show only remote assets
+- `--format <format>` - Output format (`json`)
 
 ### adk assets status
 
 Show asset synchronization status.
 
 ```bash
-adk assets status
+adk assets status [--format json]
 ```
 
 ### adk assets pull
@@ -1033,6 +1052,31 @@ adk run scripts/process.ts arg1 arg2
 - Must have linked bot (`adk link`)
 - Script must be a TypeScript file
 
+### adk workflows
+
+List, inspect, run, and inspect runs for workflows from the local dev server.
+
+```bash
+adk workflows [list] [--format json]
+adk workflows inspect <name> [--format json]
+adk workflows run <name> [payload] [--wait] [--timeout <duration>] [--format json]
+adk workflows runs [workflowIdOrTokens...] [--format json]
+```
+
+**Notes:**
+
+- Requires `adk dev` to be running.
+- `payload` must be a JSON object; it can also be piped on stdin.
+- `adk workflows run` defaults to JSON output.
+- `adk workflows runs` accepts a workflow instance id or filters like `name=<name>`, `status=failed`, `limit=5`, and `nextToken=<token>`.
+
+```bash
+adk workflows list --format json
+adk workflows inspect onboarding
+adk workflows run onboarding '{"userId":"123"}' --wait --timeout 30s
+adk workflows runs status=failed limit=5 --format json
+```
+
 ### Global Options
 
 ```bash
@@ -1147,6 +1191,12 @@ adk logs                 # Recent log entries
 adk traces               # Execution traces
 adk conversations        # List recent conversations
 adk conversations show <id>  # Inspect one conversation timeline
+
+# Workflows
+adk workflows            # List discovered workflows
+adk workflows inspect <name>  # Inspect workflow schema
+adk workflows run <name>      # Start a workflow
+adk workflows runs            # List or inspect workflow runs
 
 # Dependencies (integrations, plugins, interfaces)
 adk integrations search <query>    # Search for integrations

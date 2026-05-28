@@ -10,7 +10,7 @@ Most commands support `--format json` for structured output — **always use it*
 |---------|---------|-----------------|
 | `adk check --format json` | Offline project validation — catches config/schema issues before runtime | — |
 | `adk logs --format json` | Browse or stream log entries | `--follow`, `--summary`, level filters (`error`, `warning`) |
-| `adk traces --format json` | Query conversation traces with span details | `--conversation-id` |
+| `adk traces --format json` | Query conversation traces with span details | `conversation=<id>`, `trace=<id>`, `--include-llm` |
 | `adk chat --single "msg" --format json` | Send a test message and get structured response | `--conversation-id` |
 | `adk dev --non-interactive` | Start dev server with structured NDJSON event stream (no TUI) | — |
 
@@ -39,7 +39,7 @@ Traces provide the full picture of a conversation turn: every span in order.
 
 ```bash
 adk traces --format json                                    # recent traces
-adk traces --conversation-id <id> --format json             # traces for a specific conversation
+adk traces conversation=<id> --format json                  # traces for a specific conversation
 ```
 
 ### Trace Structure

@@ -10,7 +10,7 @@ license: MIT
 
 Every ADK agent records its behavior as traces and logs — every conversation turn, tool call, LLM reasoning step, and error. These are the source of truth for understanding what your agent did and why.
 
-The ADK CLI provides all the tools you need to debug. All commands support `--format json` for structured output, which you should always use when consuming output programmatically.
+The ADK CLI provides the tools you need to debug. Most diagnostic commands support `--format json`; use it for programmatic output. The exception is `adk dev`, which has no `--format` flag and uses `adk dev --non-interactive` for structured NDJSON output.
 
 ## When to Use This Skill
 
@@ -78,14 +78,14 @@ Use this skill when the developer asks about:
 symptom → validate (adk check) → reproduce (adk chat) → logs (adk logs) → traces (adk traces) → root cause → fix → verify
 ```
 
-### CLI Commands (always use `--format json`)
+### CLI Commands (prefer structured output)
 
 ```bash
 adk check --format json                         # offline validation
 adk logs error --format json                     # recent errors
 adk logs --follow --format json                  # stream live
 adk traces --format json                         # recent traces
-adk traces --conversation-id <id> --format json  # specific conversation
+adk traces conversation=<id> --format json       # specific conversation
 adk chat --single "msg" --format json            # test message
 adk dev --non-interactive                        # structured NDJSON dev output (no TUI)
 adk conversations --format json                  # list recent conversations

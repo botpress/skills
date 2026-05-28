@@ -2,7 +2,7 @@
 
 A step-by-step process for diagnosing and fixing issues in ADK agents. Follow these steps in order — each step narrows the problem space.
 
-All CLI commands use `--format json` for structured, parseable output. Make sure `adk dev` is running in the background, once the project is validated.
+Most diagnostic CLI commands use `--format json` for structured, parseable output. Make sure `adk dev` is running in the background, once the project is validated.
 
 ---
 
@@ -95,7 +95,7 @@ Traces show everything the agent did during a conversation turn.
 adk traces --format json
 
 # For a specific conversation
-adk traces --conversation-id <id> --format json
+adk traces conversation=<id> --format json
 ```
 
 **Read spans in order.** Look for:
@@ -225,7 +225,7 @@ adk check --format json > check-output.json
 adk logs error --format json > error-logs.json
 
 # Traces from the failing conversation
-adk traces --conversation-id <id> --format json > traces.json
+adk traces conversation=<id> --format json > traces.json
 ```
 
 Include:
