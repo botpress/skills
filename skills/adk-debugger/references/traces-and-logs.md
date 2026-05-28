@@ -11,6 +11,7 @@ All commands support `--format json` for structured output. **Always use `--form
 | `adk check --format json` | Offline project validation — catches config/schema issues before runtime | — |
 | `adk logs --format json` | Browse or stream log entries | `--follow`, `--summary`, level filters (`error`, `warning`) |
 | `adk traces --format json` | Query conversation traces with span details | `--conversation-id` |
+| `adk workflows runs --format json` | List or inspect durable workflow runs by id, name, or status | `name=`, `status=`, `limit=`, `nextToken=`, `<wrkflow_id>` |
 | `adk chat --single "msg" --format json` | Send a test message and get structured response | `--conversation-id` |
 | `adk dev --non-interactive --format json` | Start dev server with structured NDJSON event stream (no TUI) | — |
 

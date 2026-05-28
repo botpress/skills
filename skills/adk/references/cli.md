@@ -361,6 +361,36 @@ adk traces --format json
 adk traces --conversation-id <id> --format json
 ```
 
+### adk workflows runs
+
+Inspect workflow runs on the linked dev bot — list recent runs with filters, or pull the full status, state, and steps for a single run by id. Use this to diagnose stuck or failed durable workflows beyond what `adk logs` and `adk traces` reveal.
+
+```bash
+adk workflows runs [tokens...|<wrkflow_id>] [--format json]
+```
+
+**List filters** (passed as `key=value` tokens):
+
+- `name=<workflowName>` — filter by workflow definition name
+- `status=<s1[,s2,...]>` — `pending`, `in_progress`, `failed`, `completed`, `listening`, `paused`, `timedout`, `cancelled`
+- `limit=<n>` — cap returned rows
+- `nextToken=<token>` — fetch the next page
+
+**Show mode:** pass a workflow instance id (starts with `wrkflow_`) to print one run's metadata plus its `workflowState` and `workflowSteps` payloads.
+
+**Examples:**
+
+```bash
+adk workflows runs                              # recent runs
+adk workflows runs name=onboarding              # filter by definition name
+adk workflows runs status=failed limit=5        # latest 5 failed runs
+adk workflows runs nextToken=<token>            # next page
+adk workflows runs wrkflow_01KSF...             # one run (status + state + steps)
+adk workflows runs status=failed --format json  # machine-readable
+```
+
+**Requires:** dev server linked (same credentials path as `adk dev`).
+
 ### adk evals
 
 Run automated conversation tests defined under `evals/`.
@@ -1060,6 +1090,10 @@ adk profiles set         # Switch profile
 adk config               # Configure agent settings
 adk config:get <key>     # Get config value
 adk config:set <key> <value>  # Set config value
+
+# Workflows
+adk workflows runs                # List recent workflow runs
+adk workflows runs <wrkflow_id>   # Inspect one run (status + state + steps)
 
 # Knowledge Bases
 adk kb sync --dev        # Sync KB to development bot
