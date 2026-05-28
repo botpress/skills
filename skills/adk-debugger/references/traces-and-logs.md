@@ -10,7 +10,7 @@ All commands support `--format json` for structured output. **Always use `--form
 |---------|---------|-----------------|
 | `adk check --format json` | Offline project validation — catches config/schema issues before runtime | — |
 | `adk logs --format json` | Browse or stream log entries | `--follow`, `--summary`, level filters (`error`, `warning`) |
-| `adk traces --format json` | Query conversation traces with span details | `--conversation-id` |
+| `adk traces --format json` | Query traces with span details — filter by workflow, action, trigger, conversation, error, time | `workflow=`, `action=`, `trigger=`, `conversation=`, `trace=`, `error`, `since=`, `until=`, `limit=`, `--follow`, `--include-llm` |
 | `adk workflows runs --format json` | List or inspect durable workflow runs by id, name, or status | `name=`, `status=`, `limit=`, `nextToken=`, `<wrkflow_id>` |
 | `adk chat --single "msg" --format json` | Send a test message and get structured response | `--conversation-id` |
 | `adk dev --non-interactive --format json` | Start dev server with structured NDJSON event stream (no TUI) | — |
@@ -36,12 +36,19 @@ adk logs --summary --format json                # single snapshot summary
 
 ## Querying Traces
 
-Traces provide the full picture of a conversation turn: every span in order.
+Traces provide the full picture of a conversation turn: every span in order. The command takes positional filter tokens (not flags) for slicing the trace store.
 
 ```bash
-adk traces --format json                                    # recent traces
-adk traces --conversation-id <id> --format json             # traces for a specific conversation
+adk traces --format json                                    # recent traces (default limit 20)
+adk traces error --format json                              # error traces only
+adk traces workflow=<name> --format json                    # traces for a workflow
+adk traces conversation=<id> --format json                  # traces for a conversation
+adk traces trace=<id> --include-llm --format json           # drill into one trace with LLM content
+adk traces since=1h limit=50 --format json                  # last hour, up to 50
+adk traces --follow error --format json                     # stream errors live (NDJSON)
 ```
+
+Combine tokens freely (`adk traces error workflow=onboarding since=1h`). `--format` only accepts `json`; omit it for the default text output.
 
 ### Trace Structure
 
