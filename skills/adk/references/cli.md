@@ -375,7 +375,7 @@ adk traces workflow=onboarding            # traces for a workflow
 adk traces conversation=<id> --format json
 adk traces trace=<id> --include-llm       # drill into one trace with LLM content
 adk traces since=1h limit=50 --format json
-adk traces --follow error                 # stream errors live
+adk traces error --follow                 # stream errors live
 ```
 
 ### adk workflows

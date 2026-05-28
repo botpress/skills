@@ -45,7 +45,7 @@ adk traces workflow=<name> --format json                    # traces for a workf
 adk traces conversation=<id> --format json                  # traces for a conversation
 adk traces trace=<id> --include-llm --format json           # drill into one trace with LLM content
 adk traces since=1h limit=50 --format json                  # last hour, up to 50
-adk traces --follow error --format json                     # stream errors live (NDJSON)
+adk traces error --follow --format json                     # stream errors live (NDJSON)
 ```
 
 Combine tokens freely (`adk traces error workflow=onboarding since=1h`). `--format` only accepts `json`; omit it for the default text output.
