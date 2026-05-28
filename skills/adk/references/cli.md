@@ -380,7 +380,7 @@ adk ps [options]
 - `--wide` - Show all columns (runtime, both PIDs, path)
 - `--format <format>` - `text` (default) or `json`
 
-Shows PID, status, uptime, and ports for each process. Reads `~/.adk/console.port` to find the running Dev Console. If none is running, it prints a friendly empty result instead of starting one.
+Shows PID, status, uptime, and ports for each process. If none is running, it prints a friendly empty result instead of starting one.
 
 **Example:**
 
