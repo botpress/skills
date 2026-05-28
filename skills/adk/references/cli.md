@@ -415,7 +415,7 @@ adk workflows run <name> [payload] [--wait] [--timeout <duration>] [--format jso
 - `[payload]` — JSON string, or pipe via stdin (`echo '{...}' | adk workflows run …`)
 - `--wait` — block until the run reaches a terminal state
 - `--timeout <duration>` — `500ms`, `30s`, `1m`, `5m`; implies `--wait`
-- `--format <format>` — always emits JSON regardless of value
+- `--format <format>` — only `json` is accepted; any other value is rejected (defaults to `json` if omitted, unlike sibling commands which default to text)
 
 **Examples:**
 
