@@ -6,7 +6,7 @@ Traces and logs are the primary debugging interface for ADK agents. Every conver
 
 Most commands support `--format json` for structured output — **always use it** when consuming output programmatically. The exception is `adk dev`, which has no `--format` flag: use `adk dev --non-interactive` to get a structured NDJSON event stream instead.
 
-| Command | Purpose | Additional Flags |
+| Command | Purpose | Options / tokens |
 |---------|---------|-----------------|
 | `adk check --format json` | Offline project validation — catches config/schema issues before runtime | — |
 | `adk logs --format json` | Browse or stream log entries | `--follow`, `--summary`, level filters (`error`, `warning`) |
