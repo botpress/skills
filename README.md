@@ -23,7 +23,7 @@ Comprehensive documentation and guidelines for building AI agents with the Botpr
 - Working with Actions, Tools, or Workflows
 - Implementing data storage (Tables, Files, Knowledge Bases)
 - Using Zai for AI operations (extract, check, label, summarize)
-- Configuring integrations or bot settings
+- Configuring integrations, plugins, or bot settings
 - Setting up event-driven triggers
 - Need CLI commands or MCP server setup
 
@@ -32,7 +32,7 @@ Comprehensive documentation and guidelines for building AI agents with the Botpr
 - **Core Concepts** - Actions (strongly-typed functions), Tools (AI-callable), Workflows (long-running processes), Conversations (message handlers), Triggers (event-driven automation)
 - **Data & Content** - Tables (structured storage with semantic search), Files (file storage and management), Knowledge Bases (RAG implementation)
 - **AI Features** - Zai (production-ready LLM utility library for common AI operations)
-- **Configuration** - Agent config, integration actions, context API, environment variables
+- **Configuration** - Agent config, integrations, plugins, context API, environment variables
 - **Development Tools** - CLI reference, MCP server integration, project structure best practices
 
 ### botpress-adk-frontend
@@ -80,25 +80,6 @@ Complete reference for writing, running, and iterating on evals (automated conve
 - **Eval Format** - File structure, turn types, all assertion categories (response, tools, state, tables, workflow, timing)
 - **Testing Workflow** - Running evals, interpreting output, using traces, the write-test-iterate loop
 - **Test Patterns** - Per-primitive testing patterns for actions, tools, workflows, conversations, tables, and state
-
-### botpress-adk-integrations
-
-Discovering, adding, configuring, and using Botpress integrations in ADK projects. Covers the full integration lifecycle from search to production use.
-
-**Use when:**
-
-- Searching for available integrations
-- Adding an integration to an ADK project
-- Configuring integration credentials and settings
-- Using integration actions, events, and channels in code
-- Troubleshooting integration issues
-
-**Categories covered:**
-
-- **Discovery** - `adk search`, `adk list --available`, `adk info` for exploring the integration hub
-- **Lifecycle** - End-to-end workflow from search to production use
-- **Configuration** - Config types (no-config, OAuth, API key), agent.config.ts setup
-- **Common Integrations** - Quick reference for Slack, WhatsApp, Linear, and more
 
 ### botpress-adk-docs
 
@@ -220,9 +201,6 @@ skills/                       # Heavy knowledge (skills)
 ├── adk-evals/                # Testing & evals (3 reference docs)
 │   ├── SKILL.md
 │   └── references/
-├── adk-integrations/         # Integration lifecycle (4 reference docs)
-│   ├── SKILL.md
-│   └── references/
 ├── adk-debugger/             # Debugging & observability (4 reference docs)
 │   ├── SKILL.md
 │   └── references/
@@ -235,7 +213,7 @@ commands/                     # Thin slash commands (load skills)
 ├── adk-debug.md              # /adk-debug - loads adk-debugger skill
 ├── adk-eval.md               # /adk-eval - loads adk-evals skill
 ├── adk-frontend.md           # /adk-frontend - loads adk-frontend skill
-├── adk-integration.md        # /adk-integration - loads adk-integrations skill
+├── adk-integration.md        # /adk-integration - loads adk skill for integration management
 ├── adk-doc-create.md         # /adk-doc-create - loads adk-docs skill
 ├── adk-doc-review.md         # /adk-doc-review - loads adk-docs skill
 ├── adk-doc-update.md         # /adk-doc-update - loads adk-docs skill

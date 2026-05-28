@@ -6,7 +6,7 @@ license: MIT
 
 # Botpress ADK Guidelines
 
-Use this skill when you've got questions about the Botpress Agent Development Kit (ADK) - like when you're building a feature that involves tables, actions, tools, workflows, conversations, files, knowledge bases, triggers, assets, evals, or Zai.
+Use this skill when you've got questions about the Botpress Agent Development Kit (ADK) - like when you're building a feature that involves tables, actions, tools, workflows, conversations, files, knowledge bases, triggers, assets, integrations, plugins, evals, or Zai.
 
 ## What is the ADK?
 
@@ -22,6 +22,8 @@ The ADK provides primitives for:
 - Knowledge Bases (RAG implementation)
 - Triggers (event-driven automation)
 - Assets (static files with permanent URLs)
+- Integrations (external service connections managed via CLI and lock files)
+- Plugins (reusable agent extensions with interface dependencies)
 - **Zai** (production-ready LLM utility library for common AI operations)
 
 ### Project Structure (Convention-Based)
@@ -40,10 +42,12 @@ Most primitives must be placed in `src/` directory (assets use the `assets/` dir
 │   ├── triggers/      # Event handlers → subscribe to events
 │   ├── knowledge/     # Knowledge bases → RAG with semantic search
 │   └── utils/         # Shared helpers (not auto-registered)
-└── agent.config.ts    # Bot configuration (includes integrations)
+├── dependencies.dev.lock.json   # Integration/plugin state (dev)
+├── dependencies.prod.lock.json  # Integration/plugin state (prod)
+└── agent.config.ts    # Bot configuration
 ```
 
-> **Note:** `dependencies.json` was removed in ADK 1.9+. All configuration including integrations now lives in `agent.config.ts`.
+> **Note:** Integrations and plugins are managed via lock files and the `adk integrations` / `adk plugins` CLI. See `integrations.md` and `plugins.md`.
 
 > **Critical:** Files outside `src/` are not discovered. Location = behavior.
 
@@ -111,16 +115,16 @@ For integration discovery and CLI queries, use the Bash tool to run commands dir
 
 ```bash
 # Search for integrations
-adk search <query>
+adk integrations search <query>
 
 # List all available integrations
-adk list --available
+adk integrations list --available
 
 # Get detailed integration info (actions, channels, events)
-adk info <integration-name>
+adk integrations info <integration-name>
 
 # Check installed integrations (must be in ADK project)
-adk list
+adk integrations list
 ```
 
 **Project Info:**
@@ -177,7 +181,7 @@ Use these defaults when relevant:
 
 1. Use Bash tool to run the appropriate `adk` command
 2. Parse and present the output to the user
-3. Optionally suggest next steps (e.g., "Run `adk add slack@3.0.0` to install")
+3. Optionally suggest next steps (e.g., "Run `adk integrations add slack@3.0.0` to install")
 
 ### Option 2: Documentation Questions (For Conceptual Questions)
 
@@ -282,10 +286,6 @@ Documentation should be located in `./references/` directory relative to this sk
 
 - **advanced-patterns.md** - Guardrails, admin auth, logging/observability, extension composition
 - **patterns-mistakes.md** - Common mistakes, correct patterns, and context access reference
-
-### Integration Management
-
-> **Note:** Full integration lifecycle docs (discovery, adding, configuring, and using integrations) are in the separate **adk-integrations** skill. Install it with `npx skills add botpress/skills --skill adk-integrations`. The `adk-integrations` skill covers `adk search`, `adk add`, `adk info`, configuration types, and common integrations. You need it if you are touching integrations.
 
 ### Frontend Integration
 

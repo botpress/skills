@@ -2,8 +2,6 @@
 
 Configure your bot's behavior, integrations, dependencies, and global state through the unified `agent.config.ts` file.
 
-> **Note:** As of ADK 1.9+, `dependencies.json` has been removed. All configuration including integrations now lives in `agent.config.ts`.
-
 ## agent.config.ts
 
 The main configuration file defines your bot's core settings, AI models, dependencies, and state schemas.
@@ -54,20 +52,8 @@ export default defineConfig({
     }),
   },
 
-  // Dependencies (integrations) - replaces dependencies.json as of ADK 1.9+
-  dependencies: {
-    integrations: {
-      chat: { version: "chat@0.7.3", enabled: true },
-      webchat: { version: "webchat@0.3.0", enabled: true },
-      slack: {
-        version: "slack@2.5.5",
-        enabled: true,
-        config: {
-          botToken: process.env.SLACK_BOT_TOKEN,
-        },
-      },
-    },
-  },
+  // Integrations are managed via lock files (dependencies.dev.lock.json / dependencies.prod.lock.json)
+  // Use `adk integrations add/remove/configure` to manage them — see integrations.md
 });
 ```
 
@@ -176,100 +162,30 @@ user.state.lastActiveDate = new Date();
 user.state.metadata.lastQuery = "product pricing";
 ```
 
-## Dependencies Configuration
+## Dependencies (Integrations, Plugins, Interfaces)
 
-> **Note:** As of ADK 1.9+, dependencies are configured directly in `agent.config.ts`. The separate `dependencies.json` file has been removed.
+Integration state lives in per-environment lock files at the project root, not in `agent.config.ts`:
 
-### Dependencies Example
+- `dependencies.dev.lock.json` — development environment
+- `dependencies.prod.lock.json` — production environment
 
-```typescript
-import { defineConfig, z } from "@botpress/runtime";
+Cloud is the source of truth. Lock files are local reflections refreshed after every mutation. Never edit lock files by hand.
 
-export default defineConfig({
-  name: "customer-support-bot",
-
-  defaultModels: {
-    autonomous: "openai:gpt-4.1-mini-2025-04-14",
-    zai: "openai:gpt-4.1-mini-2025-04-14",
-  },
-
-  dependencies: {
-    integrations: {
-      // Chat channels
-      chat: { version: "chat@0.7.3", enabled: true },
-      webchat: { version: "webchat@0.3.0", enabled: true },
-
-      // Slack Integration
-      slack: {
-        version: "slack@2.5.5",
-        enabled: true,
-        config: {
-          botToken: process.env.SLACK_BOT_TOKEN,
-          signingSecret: process.env.SLACK_SIGNING_SECRET,
-        },
-      },
-
-      // Linear Integration
-      linear: {
-        version: "agi/linear@2.0.0",
-        enabled: true,
-        configurationType: "apiKey",
-        config: {
-          apiKey: process.env.LINEAR_API_KEY,
-        },
-      },
-
-      // Browser Integration (for web scraping)
-      browser: {
-        version: "browser@0.8.1",
-        enabled: true,
-      },
-
-      // Organization-scoped integration
-      intercom: {
-        version: "vertical-one/intercom@1.0.1",
-        enabled: true,
-      },
-    },
-  },
-});
-```
-
-### Integration Naming Conventions
-
-**Version Patterns:**
-- **Public integrations**: `name@version` (e.g., `slack@2.5.5`)
-- **Organization integrations**: `org/name@version` (e.g., `vertical-one/intercom@1.0.1`)
-
-**Example:**
-
-```typescript
-dependencies: {
-  integrations: {
-    // Public integration
-    slack: { version: "slack@2.5.5", enabled: true },
-
-    // Organization-scoped integration
-    intercom: { version: "vertical-one/intercom@1.0.1", enabled: true },
-
-    // With configuration
-    browser: {
-      version: "browser@0.8.1",
-      enabled: true,
-      config: { /* integration-specific config */ },
-    },
-  },
-}
-```
+> **Migration:** Projects with a legacy `dependencies` block in `agent.config.ts` are auto-migrated to lock files on the first CLI command.
 
 ### Managing Dependencies
 
-Use the ADK CLI to manage integrations, plugins, and interfaces. See **[CLI Reference](./cli.md)** for commands:
-- `adk add` - Add an integration, `plugin:`, or `interface:`
-- `adk upgrade` - Upgrade dependency (or all interactively)
-- `adk remove` - Remove an integration, `plugin:`, or `interface:`
-- `adk search` - Search for integrations
-- `adk list` - List installed/available integrations
+Use the `adk integrations` CLI subcommands. See **[CLI Reference](./cli.md)** and **[Integrations](./integrations.md)** for full details:
+
+```bash
+adk integrations search <query>           # Search for integrations
+adk integrations add <name>@<version>     # Add integration
+adk integrations configure <alias> --set key=value  # Configure
+adk integrations enable <alias>           # Enable
+adk integrations remove <alias>           # Remove
+adk integrations upgrade [alias]          # Upgrade
+adk integrations list                     # List installed
+```
 
 ### Using Integration Actions
 

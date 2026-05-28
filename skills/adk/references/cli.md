@@ -71,7 +71,7 @@ adk init customer-support --template hello-world
 
 ```
 my-agent/
-├── agent.config.ts      # Agent configuration (includes dependencies)
+├── agent.config.ts      # Agent configuration
 └── src/
     ├── actions/         # Functions
     ├── conversations/   # Conversation handlers
@@ -456,206 +456,128 @@ adk evals --format json             # for CI
 adk evals runs --latest -v
 ```
 
-### adk add
+### adk integrations
 
-Add an integration, plugin, or interface to agent.
+Manage integrations, plugins, and interfaces. All subcommands support `--target <env>` (dev or prod, default: dev) and `--format <format>` (text or json).
+
+> **Deprecated aliases:** The old flat commands (`adk add`, `adk remove`, `adk search`, `adk list`, `adk info`, `adk upgrade`) still work as shims but emit deprecation warnings.
+
+#### Discovery
 
 ```bash
-adk add <resource> [options]
+adk integrations search <query>          # Search by keyword
+adk integrations list --available        # Browse all Hub integrations
+adk integrations list                    # Show installed dependencies
+adk integrations info <name>             # Full integration details
 ```
 
-**Options:**
+**`adk integrations search` options:**
+- `--format json` - Machine-readable output
+- `--limit <n>` - Max results (default: 20)
 
-- `--alias <name>` - Custom alias
-- `--format <format>` - Output format (`json`)
+**`adk integrations list` options:**
+- `--available` - Browse Hub instead of installed
+- `--format json` - Machine-readable output
+- `--verbose` - Show config details
+- `--limit <n>` - Max results (default: 50)
 
-**Aliases:** `adk i`, `adk install`
+**`adk integrations info` options:**
+- `--actions` - Show only actions
+- `--channels` - Show only channels
+- `--events` - Show only events
+- `--full` - Show all sections
+- `--format json` - Machine-readable output
+
+#### Mutations
+
+```bash
+adk integrations add <name>@<version>    # Install integration
+adk integrations remove <alias>          # Uninstall integration
+adk integrations upgrade <alias>         # Upgrade to latest version
+adk integrations enable <alias>          # Enable a disabled integration
+adk integrations disable <alias>         # Disable without removing
+adk integrations configure <alias>       # Set/unset config values
+```
+
+**`adk integrations add` options:**
+- `--alias <name>` - Custom alias for code access
+- `--target <env>` - Environment (dev/prod)
+- `--config key=value` - Set config at install time (repeatable)
+- `--format json`
+
+**`adk integrations configure` options:**
+- `--set key=value` - Set config values (repeatable)
+- `--unset key` - Remove config keys (repeatable)
+- `--target <env>` - Environment (dev/prod)
 
 **Examples:**
 
 ```bash
-# Add latest version
-adk add slack
+# Add with version pin
+adk integrations add slack@3.0.0
 
-# Specific version
-adk add slack@2.5.5
+# Add with alias
+adk integrations add openai@1.0.0 --alias ai
 
-# With alias
-adk add slack@2.5.5 --alias my-slack
+# Configure
+adk integrations configure slack --set replyBehaviour=start-conversation
 
-# Explicit integration prefix
-adk add integration:slack@3.0.0
+# Use env substitution for secrets
+adk integrations configure slack --set apiSecret='${env:SLACK_SECRET}'
 
-# Plugin
-adk add plugin:desk-hitl@1.0.0
+# Enable
+adk integrations enable slack
 
-# Interface
-adk add interface:translator@1.0.0
+# Remove
+adk integrations remove slack
 ```
 
-Updates `agent.config.ts` dependencies, run `adk dev` to configure in UI.
-
-### adk remove
-
-Remove an integration, plugin, or interface.
+#### State Management
 
 ```bash
-adk remove [resource]
+adk integrations pull-lock               # Pull cloud state into lock file
+adk integrations push-lock               # Push lock file to cloud
+adk integrations copy                    # Copy state between environments
+adk integrations diff                    # Show lock vs cloud differences
 ```
 
-**Options:**
+`adk pull-lock` and `adk push-lock` (no subcommand) run pull/push for both integrations and plugins at once.
 
-- `--format <format>` - Output format (`json`)
+**`adk integrations pull-lock` options:**
+- `--dry-run` - Preview without writing the lock file
 
-**Alias:** `adk rm`
+**`adk integrations push-lock` options:**
+- `--dry-run` - Preview without applying
+- `--yes` - Skip confirmation
 
-**Examples:**
+### adk plugins
+
+Manage plugins (reusable agent extensions). Mirrors the `adk integrations` subcommand structure. All subcommands support `--target <env>` and `--format <format>`.
 
 ```bash
-# Remove by alias (auto-resolves type)
-adk remove slack
-
-# Explicit prefix to disambiguate
-adk remove integration:slack
-adk remove plugin:desk-hitl
-adk remove interface:translator
-
-# JSON output for scripting
-adk remove slack --format json
+adk plugins search <query>               # Search by keyword
+adk plugins list                         # Show installed plugins
+adk plugins info <name>                  # Full plugin details
+adk plugins add <name>@<version>         # Install plugin
+adk plugins remove <alias>               # Uninstall plugin
+adk plugins upgrade <alias>              # Upgrade version
+adk plugins enable <alias>               # Enable a disabled plugin
+adk plugins disable <alias>              # Disable without removing
+adk plugins configure <alias>            # Set config and interface mappings
+adk plugins pull-lock                    # Pull cloud state into lock file
+adk plugins push-lock                    # Push lock file to cloud
+adk plugins copy                         # Copy state between environments
+adk plugins diff                         # Show lock vs cloud differences
 ```
 
-### adk upgrade
+**Plugin-specific flags:**
+- `adk plugins add --dep iface=alias` - Wire interface dependency (repeatable)
+- `adk plugins configure --map iface=alias` - Remap interface dependency
 
-Upgrade integration(s), plugin(s), or interface(s).
+**Shared with `adk integrations upgrade`:**
+- `--to <version>` - Target specific version
 
-```bash
-adk upgrade [resource]
-```
-
-**Options:**
-
-- `--format <format>` - Output format (`json`)
-
-**Alias:** `adk up`
-
-**Examples:**
-
-```bash
-# Upgrade specific resource
-adk upgrade slack
-
-# Explicit prefix to disambiguate
-adk upgrade plugin:desk-hitl
-adk upgrade interface:translator
-
-# JSON output for scripting
-adk upgrade slack --format json
-
-# Interactive (all)
-adk upgrade
-```
-
-### adk search
-
-Search for integrations in the Botpress hub.
-
-```bash
-adk search <query>
-```
-
-**Description:** Search available integrations by name or keyword.
-
-**Example:**
-
-```bash
-# Search for Slack integration
-adk search slack
-
-# Output:
-# Found 1 integration matching "slack"
-#
-# Name     Version  Title  Description
-# ─────────────────────────────────────
-# slack    3.0.0    Slack  Automate interactions with your team.
-#
-# Run adk info <name> to see integration details
-```
-
-### adk list
-
-List integrations (installed or available).
-
-```bash
-adk list [options]
-```
-
-**Options:**
-
-- `--available` - List all available integrations from the hub (doesn't require being in a project)
-
-**Description:**
-
-- When run in a project directory: Lists installed integrations
-- With `--available` flag: Lists all integrations available in the Botpress hub
-
-**Example:**
-
-```bash
-# List installed integrations (in project)
-adk list
-
-# List all available integrations
-adk list --available
-
-# Output:
-# Available Integrations (50+)
-#
-# Name           Version  Title
-# ───────────────────────────────────
-# slack          3.0.0    Slack
-# whatsapp       4.5.6    WhatsApp
-# linear         2.0.0    Linear
-# ...
-```
-
-### adk info
-
-Show detailed information about an integration.
-
-```bash
-adk info <integration>
-```
-
-**Description:** Display comprehensive details including actions, channels, events, and usage instructions.
-
-**Example:**
-
-```bash
-adk info slack
-
-# Output:
-# Slack v3.0.0
-#
-# Automate interactions with your team.
-#
-# • 9 actions
-# • 3 channels
-# • 6 events
-#
-# Actions
-#   addReaction - Add a reaction to a message
-#   findTarget - Find a target in Slack
-#   getUserProfile - Get user information
-#   ...
-#
-# Channels
-#   channel, dm, thread
-#
-# Events
-#   memberJoinedChannel
-#   reactionAdded
-#   ...
-```
+Plugins require interfaces implemented by installed integrations. The CLI auto-resolves dependencies when unambiguous. See **[Plugins](./plugins.md)** for details.
 
 ### adk self-upgrade
 
@@ -1049,25 +971,29 @@ adk dev
 
 ```bash
 # Search for integrations
-adk search slack
+adk integrations search slack
 
 # List all available integrations
-adk list --available
+adk integrations list --available
 
 # Get detailed info about an integration
-adk info slack
+adk integrations info slack
 
 # Add
-adk add slack@3.0.0
+adk integrations add slack@3.0.0
 
-# Configure (start dev server to access UI)
-adk dev  # Configure in UI at localhost:3001
+# Configure
+adk integrations configure slack --set replyBehaviour=start-conversation
+
+# Enable and start dev server for OAuth
+adk integrations enable slack
+adk dev  # Complete OAuth in Dev Console at localhost:3001
 
 # List installed
-adk list
+adk integrations list
 
 # Remove
-adk remove slack
+adk integrations remove slack
 ```
 
 ## Best Practices
@@ -1104,13 +1030,31 @@ adk dashboard            # Open Dev Console standalone (no agent needed)
 adk kill --all           # Stop all agents + Dev Console
 
 # Dependencies (integrations, plugins, interfaces)
-adk search <query>       # Search for integrations
-adk list                 # List installed dependencies
-adk list --available     # List all available integrations
-adk info <integration>   # Show integration details
-adk add <resource>       # Add integration, plugin:, or interface:
-adk remove <resource>    # Remove integration, plugin:, or interface:
-adk upgrade [resource]   # Upgrade dependency (or all interactively)
+adk integrations search <query>    # Search for integrations
+adk integrations list              # List installed dependencies
+adk integrations list --available  # List all available integrations
+adk integrations info <name>       # Show integration details
+adk integrations add <name>@<ver>  # Add integration
+adk integrations remove <alias>    # Remove integration
+adk integrations upgrade [alias]   # Upgrade dependency
+adk integrations enable <alias>    # Enable integration
+adk integrations disable <alias>   # Disable integration
+adk integrations configure <alias> # Set/unset config values
+adk integrations pull-lock         # Pull cloud state to lock file
+adk integrations push-lock         # Push lock file to cloud
+
+# Plugins
+adk plugins search <query>        # Search for plugins
+adk plugins list                   # List installed plugins
+adk plugins add <name>@<version>   # Add plugin
+adk plugins remove <alias>         # Remove plugin
+adk plugins configure <alias>      # Set config / remap interfaces
+adk plugins pull-lock              # Pull cloud state to lock file
+adk plugins push-lock              # Push lock file to cloud
+
+# Lock file (both integrations + plugins at once)
+adk pull-lock                      # Pull cloud state for both
+adk push-lock                      # Push lock files to cloud for both
 
 # MCP (AI Assistant Integration)
 adk mcp                  # Start MCP server

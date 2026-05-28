@@ -111,4 +111,4 @@ Glob({ pattern: "**/adk/examples/**/*.ts" })
 - **`adk` skill** — Core ADK knowledge (actions, workflows, conversations, etc.)
 - **`adk-evals` skill** — Testing and eval documentation
 - **`adk-frontend` skill** — Frontend integration documentation
-- **`adk-integrations` skill** — Integration lifecycle documentation
+- **`adk` skill `integrations.md` reference** — Integration lifecycle documentation
