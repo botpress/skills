@@ -406,22 +406,113 @@ adk logs warning since=1h          # last hour of warnings
 
 ### adk traces
 
-Read execution traces — tool calls, action invocations, LLM steps, error context — for understanding *what happened* during a turn, beyond what `adk logs` reports.
+Read execution traces — tool calls, action invocations, LLM steps, error context — for understanding *what happened* during a turn, beyond what `adk logs` reports. Reads from the local SQLite trace store under `.adk/`.
 
 ```bash
-adk traces [options]
+adk traces [tokens...] [options]
 ```
+
+**Filter tokens** (positional, space-separated):
+
+- `error` — only traces that contain errors
+- `workflow=<name>` — filter by workflow name (comma-separated for multiple)
+- `action=<name>` — filter by action/tool name
+- `trigger=<name>` — filter by trigger name
+- `conversation=<id>` — filter by conversation id
+- `trace=<id>` — drill into a specific trace (shows the full span tree)
+- `since=<duration>` / `until=<duration>` — e.g. `30s`, `5m`, `1h`, `2d`, `1w`
+- `limit=<n>` — max traces to show (default: 20)
 
 **Options:**
 
-- `--format <format>` - `text` or `json`
-- `--conversation-id <id>` - Filter to a specific conversation
+- `-f, --follow` — stream new traces as they complete
+- `--include-llm` — include LLM instructions, code, and tools in drill-in mode
+- `--format <format>` — `json` only (omit for default text output)
 
 **Examples:**
 
 ```bash
-adk traces --format json
-adk traces --conversation-id <id> --format json
+adk traces                                # recent traces
+adk traces error                          # error traces only
+adk traces workflow=onboarding            # traces for a workflow
+adk traces conversation=<id> --format json
+adk traces trace=<id> --include-llm       # drill into one trace with LLM content
+adk traces since=1h limit=50 --format json
+adk traces error --follow                 # stream errors live
+```
+
+### adk workflows
+
+Inspect workflow definitions and runs on the linked dev bot. All `adk workflows ...` commands target the dev bot (same credentials path as `adk dev`) and only accept `--format json` — any other `--format` value is rejected.
+
+**Subcommands:**
+
+- `adk workflows` / `adk workflows list` — list discovered workflow definitions
+- `adk workflows inspect <name>` — show one workflow's schema and metadata (input schema, schedule, timeout)
+- `adk workflows run <name> [payload]` — kick off a run, optionally waiting for it to finish
+- `adk workflows runs [tokens...|<wrkflow_id>]` — list runs with filters, or dump status + state + steps for one run by id
+
+#### adk workflows list
+
+```bash
+adk workflows                        # list (default)
+adk workflows list --format json
+```
+
+#### adk workflows inspect
+
+```bash
+adk workflows inspect <name> [--format json]
+```
+
+Prints the workflow's input schema, description, schedule (if any), and timeout. Use this before `adk workflows run` to see what payload shape it expects.
+
+#### adk workflows run
+
+```bash
+adk workflows run <name> [payload] [--wait] [--timeout <duration>] [--format json]
+```
+
+**Options:**
+
+- `[payload]` — JSON string, or pipe via stdin (`echo '{...}' | adk workflows run …`)
+- `--wait` — block until the run reaches a terminal state
+- `--timeout <duration>` — `500ms`, `30s`, `1m`, `5m`; implies `--wait`
+- `--format <format>` — only `json` is accepted; any other value is rejected (defaults to `json` if omitted, unlike sibling commands which default to text)
+
+**Examples:**
+
+```bash
+adk workflows run onboarding '{"userId":"123"}'
+adk workflows run onboarding '{"userId":"123"}' --wait --timeout 30s
+echo '{"userId":"123"}' | adk workflows run onboarding --wait
+```
+
+#### adk workflows runs
+
+Diagnose durable workflows beyond what `adk logs` and `adk traces` show — list recent runs with filters, or pull the full status + `workflowState` + `workflowSteps` payloads for one run by id.
+
+```bash
+adk workflows runs [tokens...|<wrkflow_id>] [--format json]
+```
+
+**List filters** (passed as `key=value` tokens):
+
+- `name=<workflowName>` — filter by workflow definition name
+- `status=<s1[,s2,...]>` — `pending`, `in_progress`, `failed`, `completed`, `listening`, `paused`, `timedout`, `cancelled`
+- `limit=<n>` — cap returned rows
+- `nextToken=<token>` — fetch the next page
+
+**Show mode:** pass a workflow instance id (starts with `wrkflow_`) to print one run's metadata plus its `workflowState` and `workflowSteps` payloads. File-swapped payloads are resolved automatically.
+
+**Examples:**
+
+```bash
+adk workflows runs                              # recent runs
+adk workflows runs name=onboarding              # filter by definition name
+adk workflows runs status=failed limit=5        # latest 5 failed runs
+adk workflows runs nextToken=<token>            # next page
+adk workflows runs wrkflow_01KSF...             # one run (status + state + steps)
 ```
 
 ### adk evals
@@ -1072,6 +1163,13 @@ adk profiles set         # Switch profile
 adk config               # Configure agent settings
 adk config:get <key>     # Get config value
 adk config:set <key> <value>  # Set config value
+
+# Workflows (dev bot only; --format json only)
+adk workflows                     # List workflow definitions
+adk workflows inspect <name>      # Show one workflow's schema + metadata
+adk workflows run <name> [json]   # Run a workflow (add --wait to block)
+adk workflows runs                # List recent workflow runs
+adk workflows runs <wrkflow_id>   # Inspect one run (status + state + steps)
 
 # Knowledge Bases
 adk kb sync --dev        # Sync KB to development bot
