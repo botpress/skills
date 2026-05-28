@@ -1,6 +1,6 @@
 ---
 name: adk-dev-console
-description: Explains the ADK Dev Console — what each tab shows, how to read Agent Steps, traces, and other UI features visible at localhost:3001 during adk dev
+description: Explains the ADK Dev Console — what each tab shows, how to read Agent Steps, traces, multi-agent dashboard, agent switching, console modes, and other UI features visible at localhost:3001 during adk dev
 license: MIT
 ---
 
@@ -8,17 +8,22 @@ license: MIT
 
 The Dev Console is a local app served at port `3001` (by default, but can be customized) during `adk dev`. It gives developers real-time visibility into their agent's behavior — conversations, execution traces, data, integrations, and configuration.
 
+The Dev Console is a **singleton shared dashboard**: one UI server per user, with multiple `adk dev` agents registering and deregistering dynamically. Developers can switch between running agents in the sidebar, toggle between dev and prod targets, and connect to deployed Cloud bots — all from the same browser tab.
+
 ## When to Use This Skill
 
 Activate when users ask about:
 
-- **UI concepts** — "What are Agent Steps?", "What does the Observe tab show?", "What is a turn?", "What is the component registry?"
+- **UI concepts** — "What are Agent Steps?", "What does the Observe tab show?", "What is a turn?", "What is the component registry?", "What is the Agent Map?"
 - **Dev Console navigation** — "What tabs are available?", "Where do I find traces?", "How do I test RAG?"
 - **Reading execution data** — "What do the steps mean?", "Why is my step red?", "What's the cost shown?"
 - **Component registry** — "Where do I find custom components?", "How do I install a component?", "What components are available?"
+- **Multi-agent dashboard** — "How do I switch between agents?", "How do I run multiple agents?", "What does the agent selector show?", "How do I see which agents are running?"
+- **Console modes and targets** — "What's the difference between dev and prod?", "How do I connect to a Cloud bot?", "What is Cloud Dev Console?"
+- **Agent management CLI** — "How do I list running agents?", "How do I stop an agent?", "What does `adk ps` show?", "How do I open the dashboard?"
 - **Specific pages** — "How do I use the evals page?", "Where do I configure integrations?", "How do I search knowledge?"
 - **Comparing UI vs CLI** — "Should I use the Dev Console or CLI for debugging?"
-- Mentions of `localhost:3001`, "dev console", "Dev Console", "component registry", or specific tab names (Chat, Build, Components, Data, Test, Observe, Config)
+- Mentions of `localhost:3001`, "dev console", "Dev Console", "component registry", "agent selector", "agent picker", "agent map", "Cloud Dev Console", or specific tab names (Chat, Build, Components, Data, Test, Observe, Config)
 
 ## Available Documentation
 
@@ -27,6 +32,7 @@ Activate when users ask about:
 | `references/agent-steps.md` | Agent Steps visualization — turns, iterations, tools, messages, state mutations, cost tracking, status indicators |
 | `references/pages.md` | Every page/tab in the Dev Console — what it shows, key features, layout |
 | `references/component-registry.md` | Component Registry — installed vs registry tabs, component lifecycle, runtime registry internals, UI features |
+| `references/multi-agent-dashboard.md` | Multi-agent architecture, agent selector, console modes (local/cloud), dev/prod targets, CLI commands (`adk ps`, `adk kill`, `adk dashboard`, `adk status`) |
 
 ## How to Answer
 
@@ -44,12 +50,21 @@ Match depth to the question:
 | Group | Pages | Purpose |
 |-------|-------|---------|
 | **Chat** | Chat | Test the agent via webchat + see Agent Steps |
-| **Build** | Story | Visual agent flow graph (feature-flagged) |
+| **Build** | Agent Map | Interactive agent architecture graph (experimental, feature-flagged behind `enable_agent_forge`) |
 | **Components** | Webchat Components, Actions, Workflows, Triggers | Browse component registry, test bot primitives |
 | **Test** | RAG Search, Evals | Test knowledge search and run automated evals |
 | **Data** | Knowledge, Tables, Files | Manage knowledge bases, tables, and files |
 | **Observe** | Conversations, Traces, Logs | View conversation history, execution traces, runtime logs |
 | **Config** | Settings, Integrations | Agent config, secrets, LLM settings, integration management |
+
+### Multi-Agent Sidebar
+
+The sidebar header shows the currently selected agent with a status indicator and mode pill (dev/prod/cloud). Clicking it opens the **Agent Selector** dropdown:
+
+- **Active agents** — all running local agents with status dot, name, project path, and a close button
+- **Cloud Dev Console** — switch to a deployed Botpress Cloud bot (workspace + bot picker)
+- **Recent projects** — previously opened projects not currently running
+- **Footer actions** — Create new project, Open existing, Switch environment (dev↔prod), About
 
 ### Agent Steps (Chat Page)
 
@@ -72,6 +87,7 @@ The right panel of the Chat page shows **Agent Steps** — a real-time visualiza
 | Path | Page |
 |------|------|
 | `/chat` | Chat + Agent Steps |
+| `/agent-map` | Agent Map — interactive architecture graph (experimental) |
 | `/components` | Component registry + installed components |
 | `/actions` | Actions browser |
 | `/workflows` | Workflows + run history |
@@ -84,3 +100,12 @@ The right panel of the Chat page shows **Agent Steps** — a real-time visualiza
 | `/logs` | Runtime logs |
 | `/settings` | Agent configuration |
 | `/integrations` | Integration management |
+
+### Multi-Agent CLI Commands
+
+| Command | Purpose |
+|---------|---------|
+| `adk ps` | List running agents and processes with PIDs, ports, uptime (supports `--watch`) |
+| `adk dashboard` | Open the DevConsole in standalone mode (no agent required) |
+| `adk kill` | Stop agents or the entire DevConsole (`--all`, `--current`, `--pid`, or by name) |
+| `adk status` | Show project health and status info |

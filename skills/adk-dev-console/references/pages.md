@@ -3,6 +3,13 @@
 Every page accessible from the ADK Dev Console at `http://localhost:3001`.
 
 Pages marked **(dev only)** are hidden when the environment toggle is set to Production.
+Pages marked **(experimental)** are behind a feature flag and may change.
+
+---
+
+## Multi-Agent Navigation
+
+The Dev Console is a shared singleton — multiple `adk dev` agents register with one UI server. The sidebar agent selector switches between running agents, and the environment toggle switches between dev and prod targets. See [multi-agent-dashboard.md](./multi-agent-dashboard.md) for details.
 
 ---
 
@@ -18,6 +25,24 @@ Real-time conversation interface for testing the agent.
 - Conversation picker dropdown (filters to webchat conversations)
 - "Open conversation traces" link to jump to full Traces view
 - Download transcript button
+
+---
+
+## Agent Map (`/agent-map`) — dev only, experimental
+
+Interactive bird's-eye visualization of the agent's architecture as a graph. Feature-flagged behind `enable_agent_forge`.
+
+**Layout:** Full-screen React Flow canvas with auto-layout (elkjs) + detail panel
+
+**Features:**
+- Graph nodes for agent primitives: triggers, actions, workflows, autonomous handlers, knowledge bases, tables
+- Edges showing relationships between primitives
+- Auto-layout with elkjs; user can drag nodes (positions persist to localStorage per agent)
+- Detail panel: click a node to inspect metadata (description, knowledge counts, table schemas)
+- Hover cards with node summary
+- Change pulse animation when the agent snapshot updates (e.g., after file save)
+- Data from `/api/agent-map/snapshot` (one-shot) and `/api/agent-map/stream` (SSE for live updates)
+- "Experimental feature" badge — the map is compiled by parsing code and may be incomplete or inaccurate
 
 ---
 
