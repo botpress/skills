@@ -4,16 +4,16 @@ Traces and logs are the primary debugging interface for ADK agents. Every conver
 
 ## CLI Debugging Tools
 
-All commands support `--format json` for structured output. **Always use `--format json`** when consuming output programmatically.
+Most commands support `--format json` for structured output — **always use it** when consuming output programmatically. The exception is `adk dev`, which has no `--format` flag: use `adk dev --non-interactive` to get a structured NDJSON event stream instead.
 
-| Command | Purpose | Additional Flags |
+| Command | Purpose | Options / tokens |
 |---------|---------|-----------------|
 | `adk check --format json` | Offline project validation — catches config/schema issues before runtime | — |
 | `adk logs --format json` | Browse or stream log entries | `--follow`, `--summary`, level filters (`error`, `warning`) |
 | `adk traces --format json` | Query traces with span details — filter by workflow, action, trigger, conversation, error, time | `workflow=`, `action=`, `trigger=`, `conversation=`, `trace=`, `error`, `since=`, `until=`, `limit=`, `--follow`, `--include-llm` |
 | `adk workflows runs --format json` | List or inspect durable workflow runs by id, name, or status | `name=`, `status=`, `limit=`, `nextToken=`, `<wrkflow_id>` |
 | `adk chat --single "msg" --format json` | Send a test message and get structured response | `--conversation-id` |
-| `adk dev --non-interactive --format json` | Start dev server with structured NDJSON event stream (no TUI) | — |
+| `adk dev --non-interactive` | Start dev server with structured NDJSON event stream (no TUI) | — |
 
 ## Querying Logs
 

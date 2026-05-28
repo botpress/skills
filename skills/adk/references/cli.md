@@ -16,8 +16,8 @@ cd my-bot
 # 3. Link explicitly when you know the IDs
 adk link --workspace ws_123 --bot bot_456
 
-# 4. Start development
-adk dev --logs --no-open
+# 4. Start development (CI/agent mode: NDJSON events, no TUI)
+adk dev --non-interactive
 
 # 5. Deploy
 adk deploy --yes
@@ -129,6 +129,24 @@ adk profiles list          # List all profiles
 adk profiles set staging   # Switch profile
 ```
 
+### adk logout
+
+Remove ADK credentials for the current or a named profile.
+
+```bash
+adk logout [options]
+```
+
+**Options:**
+
+- `--profile <profile>` - Profile to remove (defaults to the active profile)
+- `--format <format>` - Output format (`json`)
+
+```bash
+adk logout
+adk logout --profile staging
+```
+
 ### adk dev
 
 Start development mode with hot reloading.
@@ -141,8 +159,10 @@ adk dev [options]
 
 - `-p, --port <port>` - Bot port (default: 3000)
 - `--port-console <port>` - UI console port (default: 3001)
-- `-l, --logs` - Stream logs to stderr (no TUI)
-- `--no-open` - Do not auto-open the dev console in a browser
+- `--non-interactive` - Emit structured NDJSON events to stdout without the Ink/TUI (CI/agent-friendly)
+- `-v, --verbose` - Show additional details (project path, log file)
+- `--otlp` - Enable OTLP trace export to an external collector (default port 4318)
+- `--port-otlp <port>` - Port for the OTLP collector endpoint (Jaeger, otel-tui, etc.)
 
 **What it does:**
 
@@ -161,16 +181,18 @@ Running `adk dev` in multiple project directories registers each agent with the 
 ```bash
 adk dev
 
-# CI mode (no TUI)
-adk dev --logs
+# CI / agent mode — NDJSON events to stdout, no TUI
+adk dev --non-interactive
 
-# CI mode without opening a browser
-adk dev --logs --no-open
+# Custom ports in non-interactive mode
+adk dev --non-interactive --port 4000 --port-console 4001
 ```
+
+In `--non-interactive` mode the `lifecycle.ready` event includes `serverPort`, `botPort`, `agentPath`, `healthUrl`, and `botUrl`, so scripts don't need to parse log lines to find them. To discover an already-running Dev Console from a separate process, read `~/.adk/console.port` or run `adk dashboard --no-browser --format json` / `adk ps --format json`.
 
 **Automation notes:**
 
-- `--logs` is the most AI-friendly mode, but `adk dev` is not fully headless.
+- `--non-interactive` is the most AI-friendly mode, but `adk dev` is not fully headless.
 - Dev can still hit interactive flows such as preflight, knowledge-base sync, or config prompts depending on project state.
 - Treat `adk dev` as CI-friendly rather than guaranteed prompt-free.
 - Event-driven integrations are not always perfectly mirrored in local dev; if an event flow behaves strangely, verify it against a deployed bot too.
@@ -186,7 +208,10 @@ adk deploy [options]
 **Options:**
 
 - `-e, --env <environment>` - Target environment (default: "production")
-- `-y, --yes` - Auto-approve preflight changes without prompting
+- `-y, --yes` - Auto-approve non-destructive deploy-plan changes without prompting
+- `--confirm-storage-changes` - Explicitly confirm destructive table/KB/asset deletions
+- `--dry-run` - Compute the deploy plan without applying changes
+- `--format <format>` - Output format (`json`; requires `--yes` or `--dry-run`)
 
 **What it does:**
 
@@ -196,6 +221,7 @@ adk deploy [options]
 4. Deploys bot to Botpress Cloud
 5. Syncs knowledge bases
 6. Syncs tables
+7. Syncs assets
 
 **Requires:**
 
@@ -207,13 +233,19 @@ adk deploy [options]
 ```bash
 adk deploy
 
-# Auto-approve preflight changes
+# Auto-approve non-destructive deploy-plan changes
 adk deploy --yes
+
+# Preview deploy plan without applying it
+adk deploy --dry-run
+adk deploy --dry-run --format json
 ```
 
 **Automation notes:**
 
-- `--yes` only auto-approves preflight changes.
+- `--yes` auto-approves non-destructive deploy-plan changes.
+- Destructive table, KB, or asset deletions still require `--confirm-storage-changes`.
+- JSON output requires either `--yes` or `--dry-run`.
 - Deploy still validates configuration and may require interaction if config values are missing.
 - Do not assume `adk deploy --yes` is fully non-interactive.
 
@@ -270,14 +302,27 @@ Chat with your **local development bot**.
 > ⚠️ `adk chat` (and `adk chat --single`) targets the linked dev bot — the one started by `adk dev` and identified by `devId`. It does **not** hit the deployed production bot. Never use it as a post-deploy smoke test or as any kind of "did the deploy work?" verification: a `--single` round-trip can pass against the dev bot while production is broken. For deployed bots, use `adk status --format json` for metadata and direct the user to the Dev Console for live verification.
 
 ```bash
-adk chat                                # interactive
-adk chat --single "<message>"           # one-shot
+adk chat [options]
+```
+
+**Options:**
+
+- `--single <message>` - Send one message, print the response, and exit
+- `--format <format>` - Output format (`json`)
+- `--conversation-id <id>` - Continue an existing conversation (use `--format json` to capture the ID from a prior turn)
+- `--timeout <duration>` - Max wait duration: `500ms`, `30s`, `1m`, `5m` (default: `60s`)
+
+```bash
+adk chat                                          # interactive
+adk chat --single "<message>"                     # one-shot
 adk chat --single "<message>" --format json
+adk chat --single "Run the full analysis" --timeout 30s
+adk chat --single "Follow up" --conversation-id <id>
 ```
 
 **Requires:**
 
-- `adk dev` run at least once (creates devId)
+- `adk dev` running (also creates the `devId` on first run). Conversation continuation requires the dev server to be running — the user token is persisted automatically.
 
 **Example:**
 
@@ -332,14 +377,16 @@ adk ps [options]
 
 - `--watch [seconds]` - Continuous refresh (default interval: 2s, not supported with `--format json`)
 - `--cloud` - Include Cloud Dev Console prod selections in the listing
+- `--wide` - Show all columns (runtime, both PIDs, path)
 - `--format <format>` - `text` (default) or `json`
 
-Shows PID, status, uptime, and ports for each process.
+Shows PID, status, uptime, and ports for each process. If none is running, it prints a friendly empty result instead of starting one.
 
 **Example:**
 
 ```bash
 adk ps
+adk ps --wide
 adk ps --watch
 adk ps --format json
 ```
@@ -349,10 +396,21 @@ adk ps --format json
 Open the Dev Console in standalone mode — no agent project required.
 
 ```bash
-adk dashboard
+adk dashboard [options]
 ```
 
 Starts the Dev Console UI server and opens the browser. Useful for connecting to Cloud bots or waiting for agents to register. The standalone Dev Console stays alive even with an empty agent registry.
+
+**Options:**
+
+- `--port-console <port>` - Starting port for the console server (default: 3001)
+- `--no-browser` - Do not open the dashboard in a browser (ensures the singleton is running and prints the URL)
+- `--format <format>` - Output format (`json`) — emits `{ port, url, wasSpawned }`
+
+```bash
+adk dashboard                                # open in browser
+adk dashboard --no-browser --format json     # script-friendly: discover the running URL
+```
 
 ### adk kill
 
@@ -514,6 +572,37 @@ adk workflows runs status=failed limit=5        # latest 5 failed runs
 adk workflows runs nextToken=<token>            # next page
 adk workflows runs wrkflow_01KSF...             # one run (status + state + steps)
 ```
+
+### adk conversations
+
+List and inspect conversations from the local trace store. Use this to find a conversation id before drilling into it with `adk traces` or `adk conversations show`.
+
+```bash
+adk conversations [list] [tokens...] [--format json]
+adk conversations show <id> [--include-llm] [--format json]
+```
+
+**`list`** (default subcommand) — recent conversations, filtered by positional `key=value` tokens:
+
+- `limit=<n>` - max conversations to show (default: 20)
+- `since=<duration>` - only conversations newer than a duration (e.g. `30s`, `5m`, `1h`, `2d`)
+
+**`show <id>`** — full timeline and details for one conversation:
+
+- `--include-llm` - include LLM reasoning spans
+- `--format <format>` - output format (`json`)
+
+**Examples:**
+
+```bash
+adk conversations                        # recent conversations (list is default)
+adk conversations list limit=5
+adk conversations list since=1h --format json
+adk conversations show <id>              # full timeline
+adk conversations show <id> --include-llm --format json
+```
+
+**Requires:** `adk dev` run at least once (populates the local trace store).
 
 ### adk evals
 
@@ -725,7 +814,9 @@ adk kb sync [options]
 - `--prod` - Sync with production bot (required: must use --dev or --prod)
 - `--dry-run` - Preview changes without applying them
 - `-y, --yes` - Skip confirmation prompts
+- `--confirm-storage-changes` - Confirm destructive storage changes (KB deletions)
 - `--force` - Force re-sync all knowledge bases
+- `--format <format>` - Output format (`json`; requires `--yes`)
 
 **What it does:**
 
@@ -745,6 +836,7 @@ adk kb sync --prod
 
 # Auto-confirm sync
 adk kb sync --dev -y
+adk kb sync --dev -y --format json
 
 # Preview changes without applying
 adk kb sync --dev --dry-run
@@ -775,6 +867,7 @@ adk assets sync [options]
 - `-y, --yes` - Skip confirmation
 - `--bail-on-failure` - Stop on first error
 - `--force` - Force re-upload all files
+- `--format <format>` - Output format (`json`; requires `--yes`)
 
 **Example:**
 
@@ -784,6 +877,7 @@ adk assets sync
 
 # Auto-confirm
 adk assets sync -y
+adk assets sync -y --format json
 ```
 
 **Other asset commands:**
@@ -806,13 +900,14 @@ adk assets list [options]
 
 - `--local` - Show only local assets
 - `--remote` - Show only remote assets
+- `--format <format>` - Output format (`json`)
 
 ### adk assets status
 
 Show asset synchronization status.
 
 ```bash
-adk assets status
+adk assets status [--format json]
 ```
 
 ### adk assets pull
@@ -916,6 +1011,38 @@ adk config:get botId --prod
 ```
 
 **Note:** This replaces the legacy `adk agent` command.
+
+### adk secret
+
+Manage the bot's secrets in the local store. `adk secret` (no subcommand) shows the declared secrets and whether each is set.
+
+```bash
+adk secret [options]                      # show declared secrets + status
+adk secret:set <key> <value> [options]    # set a secret value
+adk secret:delete <key> [options]         # delete a secret
+```
+
+**Options (all three):**
+
+- `--prod` - Target the production bot (default: dev)
+- `--format <format>` - Output format (`json`)
+
+`<key>` is `SCREAMING_SNAKE_CASE`. `secret:set` never echoes the value back.
+
+```bash
+adk secret                                # list declared secrets and set/unset status
+adk secret --prod --format json
+adk secret:set OPENAI_API_KEY sk-...      # set on the dev bot
+adk secret:delete OPENAI_API_KEY --prod   # delete on the prod bot
+```
+
+### adk models
+
+List the Cognitive models available to the current bot, grouped by integration (including aliases like `fast` and `best`). Useful when configuring model selection or diagnosing a model-not-found error.
+
+```bash
+adk models [--format json]
+```
 
 ### adk telemetry
 
@@ -1120,6 +1247,18 @@ adk ps                   # List running agents and processes
 adk dashboard            # Open Dev Console standalone (no agent needed)
 adk kill --all           # Stop all agents + Dev Console
 
+# Diagnostics (local trace store)
+adk logs                 # Recent log entries
+adk traces               # Execution traces
+adk conversations        # List recent conversations
+adk conversations show <id>  # Inspect one conversation timeline
+
+# Workflows
+adk workflows            # List discovered workflows
+adk workflows inspect <name>  # Inspect workflow schema
+adk workflows run <name>      # Start a workflow
+adk workflows runs            # List or inspect workflow runs
+
 # Dependencies (integrations, plugins, interfaces)
 adk integrations search <query>    # Search for integrations
 adk integrations list              # List installed dependencies
@@ -1158,11 +1297,15 @@ adk telemetry            # Manage telemetry preferences
 # Authentication
 adk profiles list        # List profiles
 adk profiles set         # Switch profile
+adk logout               # Remove credentials for a profile
 
 # Configuration
 adk config               # Configure agent settings
 adk config:get <key>     # Get config value
 adk config:set <key> <value>  # Set config value
+adk secret               # Show declared secrets + status
+adk secret:set <k> <v>   # Set a secret
+adk models               # List available Cognitive models
 
 # Workflows (dev bot only; --format json only)
 adk workflows                     # List workflow definitions

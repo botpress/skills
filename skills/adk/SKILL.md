@@ -152,10 +152,10 @@ adk init my-agent --yes --skip-link
 # Link directly when IDs are known
 adk link --workspace ws_123 --bot bot_456
 
-# More automation-friendly dev mode
-adk dev --logs --no-open
+# More automation-friendly dev mode (NDJSON events, no TUI)
+adk dev --non-interactive
 
-# Auto-approve preflight changes only
+# Auto-approve non-destructive deploy-plan changes
 adk deploy --yes
 ```
 
@@ -165,8 +165,8 @@ Use these defaults when relevant:
 - Treat bare `BOTPRESS_TOKEN` as a no-TTY convenience, not a guaranteed interactive-terminal shortcut.
 - Prefer `adk init <name> --yes --skip-link` for AI-driven scaffolding, but only after login is already completed.
 - Treat `adk link --workspace ... --bot ...` as scriptable, but not guaranteed safe in every no-TTY environment.
-- Treat `adk dev --logs --no-open` as CI-friendly, not fully prompt-free.
-- Treat `adk deploy --yes` as auto-approving preflight only; config validation can still block automation.
+- Treat `adk dev --non-interactive` as CI-friendly, not fully prompt-free.
+- Treat `adk deploy --yes` as auto-approving non-destructive deploy-plan changes; config validation and destructive storage changes can still block automation.
 
 **When to use CLI commands:**
 
