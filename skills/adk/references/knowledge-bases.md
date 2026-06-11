@@ -411,12 +411,24 @@ src/knowledge/
 
 ```typescript
 // ✅ Good
-export const TechnicalDocsKB = new Knowledge({ name: "technicalDocs" });
-export const CustomerFAQKB = new Knowledge({ name: "customerFAQ" });
+export const TechnicalDocsKB = new Knowledge({
+  name: "technicalDocs",
+  sources: [DataSource.Directory.fromPath("src/knowledge/docs", { id: "technical_docs" })],
+});
+export const CustomerFAQKB = new Knowledge({
+  name: "customerFAQ",
+  sources: [DataSource.Directory.fromPath("src/knowledge/faqs", { id: "customer_faq" })],
+});
 
 // ❌ Bad
-export const KB1 = new Knowledge({ name: "kb1" });
-export const Stuff = new Knowledge({ name: "stuff" });
+export const KB1 = new Knowledge({
+  name: "kb1",
+  sources: [DataSource.Directory.fromPath("src/knowledge/kb1", { id: "kb1" })],
+});
+export const Stuff = new Knowledge({
+  name: "stuff",
+  sources: [DataSource.Directory.fromPath("src/knowledge/stuff", { id: "stuff" })],
+});
 ```
 
 ### 3. Refresh Frequently-Changing Content

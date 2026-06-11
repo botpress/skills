@@ -43,7 +43,7 @@ export const MyWorkflow = new Workflow({
   description: "Description of what this workflow does",
 
   // Optional: Set workflow timeout (default: 5 minutes)
-  timeout: "6h", // Can be: "30m", "2h", "1d", etc.
+  timeout: "6h", // Format: `${number}s` | `${number}m` | `${number}h` (e.g. "30s", "30m", "2h"); "1d" is invalid
 
   // Optional: Schedule for automatic execution
   schedule: "0 9 * * *", // Cron format (daily at 9 AM)

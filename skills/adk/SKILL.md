@@ -22,7 +22,7 @@ The ADK provides primitives for:
 - Knowledge Bases (RAG implementation)
 - Triggers (event-driven automation)
 - Assets (static files with permanent URLs)
-- Integrations (external service connections managed via CLI and lock files)
+- Integrations (external service connections managed via the CLI; state lives in Botpress Cloud)
 - Plugins (reusable agent extensions with interface dependencies)
 - **Zai** (production-ready LLM utility library for common AI operations)
 
@@ -42,12 +42,11 @@ Most primitives must be placed in `src/` directory (assets use the `assets/` dir
 │   ├── triggers/      # Event handlers → subscribe to events
 │   ├── knowledge/     # Knowledge bases → RAG with semantic search
 │   └── utils/         # Shared helpers (not auto-registered)
-├── dependencies.dev.lock.json   # Integration/plugin state (dev)
-├── dependencies.prod.lock.json  # Integration/plugin state (prod)
+├── .adk/dependencies/ # Generated integration/plugin snapshots (dev.json, prod.json) — cache, never hand-edited
 └── agent.config.ts    # Bot configuration
 ```
 
-> **Note:** Integrations and plugins are managed via lock files and the `adk integrations` / `adk plugins` CLI. See `integrations.md` and `plugins.md`.
+> **Note:** Integrations and plugins are managed via the `adk integrations` / `adk plugins` CLI; Botpress Cloud is the source of truth for their state. See `integrations.md` and `plugins.md`.
 
 > **Critical:** Files outside `src/` are not discovered. Location = behavior.
 
@@ -114,11 +113,8 @@ For integration discovery and CLI queries, use the Bash tool to run commands dir
 **Integration Discovery:**
 
 ```bash
-# Search for integrations
+# Search the Hub for integrations
 adk integrations search <query>
-
-# List all available integrations
-adk integrations list --available
 
 # Get detailed integration info (actions, channels, events)
 adk integrations info <integration-name>
@@ -381,7 +377,7 @@ yarn install      # Works fine
 pnpm install      # Works fine
 
 # ADK auto-detects based on lock files
-# - bun.lockb → uses bun
+# - bun.lock or bun.lockb → uses bun
 # - package-lock.json → uses npm
 # - yarn.lock → uses yarn
 # - pnpm-lock.yaml → uses pnpm

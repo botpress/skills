@@ -2,7 +2,7 @@
 
 Triggers allow your bot to react to events from the bot itself or integrated services. They enable event-driven automation and workflow orchestration.
 
-> **⚠️ IMPORTANT:** Always verify integration events exist before using them! Use `adk info <integration> --events` to discover real events. Integration events change between versions.
+> **⚠️ IMPORTANT:** Always verify integration events exist before using them! Use `adk integrations info <name>` to discover real events (the Events section is part of the default output). Integration events change between versions.
 >
 > **⚠️ Dev-mode limitation:** `adk dev` is not a perfect mirror of production for every integration event flow. Some private or custom integration events may not register or route locally even when the event name is valid. If an event-driven flow works in docs but not in local dev, verify the event first, then test against a deployed bot before assuming your trigger code is wrong.
 
@@ -100,7 +100,7 @@ Standard events emitted by the bot:
 
 Events from integrated services use the pattern `integrationName:eventName`.
 
-**IMPORTANT:** Always verify events exist using `adk info <integration> --events` before using them.
+**IMPORTANT:** Always verify events exist using `adk integrations info <name>` before using them.
 
 ```typescript
 // Intercom events (real events from vertical-one)
@@ -108,7 +108,7 @@ Events from integrated services use the pattern `integrationName:eventName`.
 "intercom:contactEvent"       // Contact created/updated
 "intercom:adminEvent"         // Admin changes
 
-// Slack events (verified with adk info slack --events)
+// Slack events (verified with adk integrations info slack)
 "slack:reactionAdded"
 "slack:reactionRemoved"
 "slack:memberJoinedChannel"
@@ -116,18 +116,18 @@ Events from integrated services use the pattern `integrationName:eventName`.
 "slack:memberLeftChannel"
 "slack:workflowWebhook"
 
-// Linear events (verified with adk info linear --events)
+// Linear events (verified with adk integrations info linear)
 "linear:issueCreated"
 "linear:issueUpdated"
 "linear:issueDeleted"
 
-// GitHub events (verified with adk info github --events)
+// GitHub events (verified with adk integrations info github)
 "github:issueOpened"
 "github:pullRequestOpened"
 "github:pullRequestMerged"
 "github:pullRequestReviewSubmitted"
 
-// Webchat events (verified with adk info webchat --events)
+// Webchat events (verified with adk integrations info webchat)
 "webchat:conversationStarted"
 "webchat:trigger"
 ```
@@ -135,15 +135,15 @@ Events from integrated services use the pattern `integrationName:eventName`.
 **How to discover events:**
 ```bash
 # Search for an integration
-adk search email
+adk integrations search email
 
-# Get all events for an integration
-adk info slack --events
-adk info linear --events
-adk info github --events
+# Get integration details — the Events section is part of the default output
+adk integrations info slack
+adk integrations info linear
+adk integrations info github
 ```
 
-Checking `adk info <integration> --events` confirms the event exists, but it does not guarantee that every event source behaves the same in `adk dev` as it does after deployment.
+Checking `adk integrations info <name>` confirms the event exists, but it does not guarantee that every event source behaves the same in `adk dev` as it does after deployment.
 
 ## Trigger Handlers
 
@@ -226,7 +226,7 @@ export default new Trigger({
 
   handler: async ({ event }) => {
     // Call integration action (e.g., SendGrid)
-    // First add the integration: adk add sendgrid
+    // First add the integration: adk integrations add sendgrid
     await actions.sendgrid.sendEmail({
       to: "admin@example.com",
       from: "bot@example.com",

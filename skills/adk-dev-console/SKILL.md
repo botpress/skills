@@ -50,7 +50,7 @@ Match depth to the question:
 | Group | Pages | Purpose |
 |-------|-------|---------|
 | **Chat** | Chat | Test the agent via webchat + see Agent Steps |
-| **Build** | Agent Map | Interactive agent architecture graph (experimental, feature-flagged behind `enable_agent_forge`) |
+| **Build** | Agent Map | Interactive agent architecture graph (experimental) |
 | **Components** | Webchat Components, Actions, Workflows, Triggers | Browse component registry, test bot primitives |
 | **Test** | RAG Search, Evals | Test knowledge search and run automated evals |
 | **Data** | Knowledge, Tables, Files | Manage knowledge bases, tables, and files |

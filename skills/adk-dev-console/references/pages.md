@@ -30,7 +30,7 @@ Real-time conversation interface for testing the agent.
 
 ## Agent Map (`/agent-map`) — dev only, experimental
 
-Interactive bird's-eye visualization of the agent's architecture as a graph. Feature-flagged behind `enable_agent_forge`.
+Interactive bird's-eye visualization of the agent's architecture as a graph. Always available (not feature-flagged).
 
 **Layout:** Full-screen React Flow canvas with auto-layout (elkjs) + detail panel
 

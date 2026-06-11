@@ -187,31 +187,21 @@ defaultModels: {
 
 ### Integrations
 
-The `dependencies.integrations` section defines which external services the bot connects to.
+Integrations are no longer defined in `agent.config.ts`. If you see a `dependencies` block in the file, it is **legacy**: the CLI migrates that state to Botpress Cloud on first contact and removes the block from the file — it is not used at runtime. Current dependency state comes from the CLI:
+
+```bash
+adk integrations list       # installed integrations (per environment)
+adk integrations status     # readiness — explains unconfigured/missing fields/pending auth
+```
 
 **How to explain:**
 
-For each integration, describe:
+For each installed integration, describe:
 1. **What it is** — the platform or service it connects to
 2. **What it provides** — channels (for messaging), actions (for API calls), events (for triggers)
-3. **Whether it's configured** — check the `status` field from `adk status`
+3. **Whether it's configured** — check `adk integrations status`
 
-**Example explanation:**
-
-```typescript
-dependencies: {
-  integrations: {
-    webchat: "webchat@0.3.0",
-    chat: "chat@1.0.0",
-    slack: {
-      version: "slack@2.5.5",
-      enabled: true,
-      config: { botToken: "{{secrets.SLACK_BOT_TOKEN}}" },
-    },
-    browser: "browser@0.8.7",
-  },
-}
-```
+**Example explanation** (from `adk integrations list --verbose`):
 
 > Your bot has 4 integrations:
 >
@@ -223,13 +213,14 @@ dependencies: {
 **To get details about a specific integration's capabilities:**
 
 ```bash
-adk info slack
+adk integrations info slack
 ```
 
 **Potential issues:**
-- Integration with `status: "unconfigured"` and `missing` fields — needs configuration before it works.
+- Integration with `status: "unconfigured"` or `missingFields` in `adk integrations status` — needs configuration before it works.
 - Integration using hardcoded secrets instead of the ADK secrets API — security risk.
 - Integration with `enabled: false` — installed but not active.
+- A leftover `dependencies` block in `agent.config.ts` — legacy, migrated to Cloud and ignored at runtime.
 
 ### State Schemas
 
@@ -395,7 +386,7 @@ Based on what's present vs missing, suggest concrete next steps:
 1. Run `adk status --format json` — check the `integrations` array
 2. For each integration, explain what it provides
 3. Flag any with `status: "unconfigured"`
-4. Optionally run `adk info <name>` to show available actions/channels
+4. Optionally run `adk integrations info <name>` to show available actions/channels
 
 ### "Explain my config"
 

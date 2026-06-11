@@ -52,7 +52,7 @@ export default defineConfig({
     }),
   },
 
-  // Integrations are managed via lock files (dependencies.dev.lock.json / dependencies.prod.lock.json)
+  // Integrations are NOT configured here — their state lives in Botpress Cloud.
   // Use `adk integrations add/remove/configure` to manage them — see integrations.md
 });
 ```
@@ -99,28 +99,19 @@ See **[Context API](./context-api.md)** for details on accessing other runtime v
 
 **Default Models:**
 
-If you don't specify `defaultModels`, the ADK uses these defaults:
-- `zai`: `"openai:gpt-4.1-2025-04-14"`
-- `autonomous`: `"openai:gpt-4.1-mini-2025-04-14"`
+If you don't specify `defaultModels`, both default to `"auto"`:
+- `autonomous`: `"auto"`
+- `zai`: `"auto"`
 
 **Available Models:**
 
+Any `provider:model` string is accepted — run `adk models` to list the models available to your bot. Examples:
+
 ```typescript
-// OpenAI
 "openai:gpt-4o"
 "openai:gpt-4o-mini"
-"openai:gpt-4-turbo"
-"openai:gpt-4.1-2025-04-14"
-"openai:gpt-4.1-mini-2025-04-14"
-
-// Anthropic
 "anthropic:claude-3-5-sonnet"
-"anthropic:claude-3-opus"
-"anthropic:claude-3-haiku"
-
-// Google
 "google:gemini-1.5-pro"
-"google:gemini-1.5-flash"
 ```
 
 **Model Fallback Arrays:**
@@ -164,14 +155,9 @@ user.state.metadata.lastQuery = "product pricing";
 
 ## Dependencies (Integrations, Plugins, Interfaces)
 
-Integration state lives in per-environment lock files at the project root, not in `agent.config.ts`:
+Dependency state does **not** live in `agent.config.ts`. **Botpress Cloud is the source of truth.** The CLI keeps generated per-environment snapshots under `.adk/dependencies/` (`dev.json`, `prod.json`) — a cache refreshed after every mutation, never hand-edited or committed as desired state.
 
-- `dependencies.dev.lock.json` — development environment
-- `dependencies.prod.lock.json` — production environment
-
-Cloud is the source of truth. Lock files are local reflections refreshed after every mutation. Never edit lock files by hand.
-
-> **Migration:** Projects with a legacy `dependencies` block in `agent.config.ts` are auto-migrated to lock files on the first CLI command.
+> **Migration:** Older projects kept a `dependencies` block in `agent.config.ts` and/or root lock files (`dependencies.dev.lock.json` / `dependencies.prod.lock.json`). Both are legacy: on first contact the CLI migrates that state **to Cloud** (the config block is removed from the file; the root lock files are read once and deleted). Neither is used at runtime.
 
 ### Managing Dependencies
 
@@ -183,8 +169,10 @@ adk integrations add <name>@<version>     # Add integration
 adk integrations configure <alias> --set key=value  # Configure
 adk integrations enable <alias>           # Enable
 adk integrations remove <alias>           # Remove
-adk integrations upgrade [alias]          # Upgrade
+adk integrations upgrade <alias>          # Upgrade
 adk integrations list                     # List installed
+adk integrations status                   # Explain unready dependencies
+adk integrations copy --from dev --to prod  # Move state between environments
 ```
 
 ### Using Integration Actions
@@ -208,10 +196,12 @@ ANTHROPIC_API_KEY=sk-ant-...
 SLACK_BOT_TOKEN=xoxb-...
 LINEAR_API_KEY=lin_api_...
 
-# ADK Development (CLI-specific)
-ADK_DEV_PORT=3000           # Bot port (default: 3000)
-ADK_CONSOLE_PORT=3001       # UI console port (default: 3001)
-DEBUG=adk:*                 # Enable ADK debug logs
+# ADK CLI overrides (optional — normally set by `adk login` / `adk link`)
+# ADK_TOKEN=pat_...           # Auth token override
+# ADK_BOT_ID=bot_...          # Bot ID override
+# ADK_WORKSPACE_ID=ws_...     # Workspace ID override
+# ADK_API_URL=https://api.botpress.cloud
+# Note: dev server ports are NOT env vars — use `adk dev --port 3000 --port-console 3001`
 
 # Feature Flags (optional)
 ENABLE_ADVANCED_SEARCH=true
@@ -422,6 +412,7 @@ The `agent.json` file stores bot and workspace IDs for deployment. This file is 
 - `botId` - Production bot ID (used by `adk deploy`)
 - `workspaceId` - Workspace ID
 - `devId` - Development bot ID (used by `adk dev`)
+- `apiUrl` - Optional Botpress API URL override (set by `adk link --api-url`)
 
 **Important:**
 

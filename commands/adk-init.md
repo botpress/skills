@@ -25,6 +25,6 @@ Don't just explain the project structure — ask what they want to build and gui
 - **Multi-channel bot** → suggest adding channel integrations (Slack, WhatsApp, Webchat) and a conversation handler
 - **Automation** → suggest creating workflows and triggers
 
-Then offer the relevant commands: `/adk-integration` to add services, `/adk-eval` to set up tests.
+Then offer the relevant next steps: `adk integrations add <name>` to add services (or `/adk-integration` where that command is available), `/adk-eval` to set up tests.
 
 Follow all ADK CLI best practices from the skill documentation.

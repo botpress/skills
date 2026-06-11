@@ -1,23 +1,23 @@
 # Integration Management
 
-Integrations connect your agent to external platforms and services. Manage them entirely through the CLI — never hand-edit lock files.
+Integrations connect your agent to external platforms and services. Manage them entirely through the CLI — never hand-edit the generated snapshots under `.adk/dependencies/`.
 
 ## CLI Commands
 
 All integration management uses the `adk integrations` subcommand family. Every mutation command supports `--target <env>` (dev or prod, default: dev) and `--format <format>` (text or json).
 
-> **Deprecated aliases:** The old flat commands (`adk add`, `adk remove`, `adk search`, `adk list`, `adk info`, `adk upgrade`) still work as shims but emit deprecation warnings. Use the `adk integrations` subcommands instead.
+> **Removed flat commands:** The old flat commands (`adk add`, `adk remove`, `adk search`, `adk list`, `adk info`, `adk upgrade`) were removed entirely — they now error as unknown commands. Use the `adk integrations` subcommands instead.
 
 ### Discovery
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `adk integrations search <query>` | Search by keyword | `--format json`, `--limit <n>` (default: 20) |
-| `adk integrations list --available` | Browse all Hub integrations | `--format json`, `--limit <n>` (default: 50) |
-| `adk integrations list` | Show installed dependencies | `--format json`, `--verbose` |
-| `adk integrations info <name>` | Full integration details | `--actions`, `--channels`, `--events`, `--full`, `--format json` |
+| `adk integrations search <query>` | Search the Hub by keyword | `--interface <name>`, `--format json` |
+| `adk integrations list` | Show installed dependencies | `--target <env>`, `--verbose`, `--format json` |
+| `adk integrations info <name>` | Full integration details (includes Channels, Actions, Events) | `--format json` |
+| `adk integrations status` | Explain unready dependencies | `--target <env>`, `--format json` |
 
-Use `--format json` for programmatic inspection of config schemas, action shapes, and event payloads.
+Use `--format json` for programmatic inspection of config schemas, action shapes, and event payloads. To browse the Hub, use `adk integrations search <query>`.
 
 ### Mutations
 
@@ -34,50 +34,26 @@ Use `--format json` for programmatic inspection of config schemas, action shapes
 
 | Command | Description | Key Flags |
 |---------|-------------|-----------|
-| `adk integrations pull-lock` | Pull cloud state into lock file | `--target <env>`, `--dry-run` |
-| `adk integrations push-lock` | Push lock file to cloud | `--target <env>`, `--dry-run`, `--yes` |
-| `adk integrations copy` | Copy integration state between environments | `--from <env>`, `--to <env>` |
-| `adk integrations diff` | Show differences between lock file and cloud | `--target <env>` |
+| `adk integrations copy` | Copy integration state between environments | `--from <env>`, `--to <env>`, `--dry-run`, `--yes` |
+| `adk integrations diff` | Show differences between local snapshot and cloud | `--target <env>` |
+| `adk integrations status` | Explain why dependencies aren't ready | `--target <env>` |
 
-## Lock File System
+## Dependency State
 
-Integration state lives in per-environment lock files at the project root:
+**Botpress Cloud is the source of truth** for dependency state. The CLI keeps generated per-environment snapshots under `.adk/dependencies/`:
 
-- `dependencies.dev.lock.json` — development environment
-- `dependencies.prod.lock.json` — production environment
-
-```json
-{
-  "version": 1,
-  "env": "dev",
-  "integrations": {
-    "slack": {
-      "name": "slack",
-      "version": "3.0.0",
-      "enabled": true,
-      "config": {
-        "replyBehaviour": "start-conversation",
-        "apiSecret": "${env:SLACK_SECRET}"
-      }
-    },
-    "browser": {
-      "name": "browser",
-      "version": "0.8.6",
-      "enabled": true,
-      "config": {}
-    }
-  },
-  "plugins": {}
-}
-```
+- `.adk/dependencies/dev.json` — development environment
+- `.adk/dependencies/prod.json` — production environment
+- `.adk/dependencies/migration.json` — marker recording that legacy state was migrated
 
 **Key principles:**
-- Cloud is the source of truth. The lock file is a local reflection refreshed after every mutation.
-- Never edit lock files by hand — use `adk integrations` commands.
+- Snapshots are a generated cache, refreshed from Cloud after every mutation. Never hand-edit them and never commit them as desired state.
 - The `--target` flag controls which environment (dev/prod) a command operates on.
+- To move state between environments, use `adk integrations copy --from dev --to prod` (preview with `--dry-run`, compare with `adk integrations diff`).
+- `adk integrations status` explains unready dependencies (`unconfigured`, `missingFields`, `authorizationPending`).
 - Config values support env substitution: `${env:API_KEY}` resolves to `process.env.API_KEY` at apply time.
 
-**Migration from agent.config.ts:** Projects with a legacy `dependencies` block in `agent.config.ts` are auto-migrated to lock files on the first CLI command. The migration is one-shot and skipped if lock files already exist.
+**Migration from legacy state:** Older projects kept dependency state in a `dependencies` block in `agent.config.ts` and/or root lock files (`dependencies.dev.lock.json`, `dependencies.prod.lock.json`). Both are legacy: on first contact the CLI migrates that state **to Cloud** (the config block is removed from the file, the root lock files are read once and deleted), then regenerates the `.adk/dependencies/` snapshots from Cloud. Neither legacy source is used at runtime.
 
 ## Integration Lifecycle
 
@@ -85,7 +61,7 @@ Integration state lives in per-environment lock files at the project root:
 
 ```bash
 adk integrations search slack
-adk integrations list --available
+adk integrations search --interface llm
 adk integrations info slack --format json
 ```
 
@@ -99,7 +75,7 @@ adk integrations add agi/linear@2.0.0
 
 Always pin to a specific version. Without `--alias`, the integration name becomes the alias.
 
-What happens: the integration is resolved, an entry is written to the lock file, and the integration starts **disabled** with status `registration_pending`.
+What happens: the integration is resolved, installed on the Cloud bot (the local `.adk/dependencies/` snapshot is regenerated from Cloud), and starts **disabled** with status `registration_pending`.
 
 ### 3. Configure
 
@@ -124,7 +100,7 @@ registration_pending → registered       (success)
                      → registration_failed  (error)
 ```
 
-Check status with `adk integrations list`.
+Check status with `adk integrations list`. If a dependency isn't ready, `adk integrations status` explains why (`unconfigured`, `missingFields`, `authorizationPending`).
 
 ### 5. Use in Code
 

@@ -36,7 +36,8 @@ adk init [name]
 **Options:**
 
 - `name` - Project name (optional, prompts if omitted)
-- `-t, --template <template>` - Template to use: `blank` or `hello-world`
+- `-t, --template <template>` - Template to use: `blank`, `hello-world`, `botpress-desk`, `slack-triage`, `knowledge-assistant`, or `crm-enrichment`
+- `--list-templates` - List available templates and exit
 - `-y, --yes` - Skip prompts and use sensible defaults
 - `--defaults` - Alias for `--yes`
 - `--skip-link` - Skip the linking step after project creation
@@ -159,8 +160,9 @@ adk dev [options]
 
 - `-p, --port <port>` - Bot port (default: 3000)
 - `--port-console <port>` - UI console port (default: 3001)
-- `--non-interactive` - Emit structured NDJSON events to stdout without the Ink/TUI (CI/agent-friendly)
+- `--non-interactive` - Emit structured NDJSON events to stdout without the terminal UI (CI/agent-friendly)
 - `-v, --verbose` - Show additional details (project path, log file)
+- `--no-watch` - Disable file watching and hot reload
 - `--otlp` - Enable OTLP trace export to an external collector (default port 4318)
 - `--port-otlp <port>` - Port for the OTLP collector endpoint (Jaeger, otel-tui, etc.)
 
@@ -211,6 +213,7 @@ adk deploy [options]
 - `-y, --yes` - Auto-approve non-destructive deploy-plan changes without prompting
 - `--confirm-storage-changes` - Explicitly confirm destructive table/KB/asset deletions
 - `--dry-run` - Compute the deploy plan without applying changes
+- `--allow-unconfigured` - Deploy even if enabled dependencies are unconfigured/unresolved (ships them inert)
 - `--format <format>` - Output format (`json`; requires `--yes` or `--dry-run`)
 
 **What it does:**
@@ -293,7 +296,7 @@ Current project scaffolds do not add `agent.json` to `.gitignore` automatically,
 
 - `adk link --workspace <id> --bot <id>` is the best AI-driven path.
 - If only one workspace exists, `adk link` may auto-select it.
-- Even with flags, the command still uses the interactive Ink flow internally, so do not assume it is safe in every no-TTY environment.
+- Even with flags, the command still uses the interactive terminal UI flow internally, so do not assume it is safe in every no-TTY environment.
 
 ### adk chat
 
@@ -440,10 +443,10 @@ adk kill --all --dry-run    # preview
 
 ### adk logs
 
-Read recent log entries from the linked bot.
+Read recent log entries from the **local dev log store** (`.adk/bot/logs/`, populated by `adk dev`). This does not query the linked Cloud bot.
 
 ```bash
-adk logs [level] [options]
+adk logs [tokens...] [options]
 ```
 
 **Options:**
@@ -451,7 +454,9 @@ adk logs [level] [options]
 - `level` - Filter by severity: `error`, `warning`, `info` (positional, optional)
 - `--format <format>` - `text` or `json`
 - `--follow` - Stream live
+- `--summary` - Emit a single JSON summary snapshot (requires `--format json`)
 - `since=<duration>` - Filter to a recent window (e.g., `since=1h`)
+- `limit=<n>` - Max entries to show (default: 50)
 
 **Examples:**
 
@@ -460,6 +465,7 @@ adk logs                           # recent entries, all levels
 adk logs error --format json       # errors as JSON
 adk logs --follow --format json    # stream live
 adk logs warning since=1h          # last hour of warnings
+adk logs --summary --format json   # aggregate summary snapshot
 ```
 
 ### adk traces
@@ -616,7 +622,10 @@ adk evals [name] [options]
 
 - `name` - Run a specific eval by name (positional, optional)
 - `--tag <tag>` - Filter by tag
-- `--type <type>` - Filter by type (e.g., `regression`)
+- `--type <type>` - Filter by type (`capability` or `regression`)
+- `--judge-model <model>` - Model to use for `llm_judge` assertions (e.g., `openai:gpt-4o`)
+- `--server <url>` - Dev server URL (auto-starts in lightweight mode if not running)
+- `--prod` - Run evals on the production bot via Vortex
 - `--verbose` / `-v` - Show all assertions
 - `--format <format>` - `text` (default) or `json`
 
@@ -640,33 +649,31 @@ adk evals runs --latest -v
 
 Manage integrations, plugins, and interfaces. All subcommands support `--target <env>` (dev or prod, default: dev) and `--format <format>` (text or json).
 
-> **Deprecated aliases:** The old flat commands (`adk add`, `adk remove`, `adk search`, `adk list`, `adk info`, `adk upgrade`) still work as shims but emit deprecation warnings.
+> **Removed flat commands:** The old flat commands (`adk add`, `adk remove`, `adk search`, `adk list`, `adk info`, `adk upgrade`) were **removed entirely** — they now error as unknown commands. Use the `adk integrations <verb>` and `adk plugins <verb>` groups instead.
 
 #### Discovery
 
 ```bash
-adk integrations search <query>          # Search by keyword
-adk integrations list --available        # Browse all Hub integrations
+adk integrations search <query>          # Search the Hub by keyword
+adk integrations search --interface <name>  # Find integrations implementing an interface
 adk integrations list                    # Show installed dependencies
 adk integrations info <name>             # Full integration details
+adk integrations status                  # Readiness of installed dependencies
 ```
 
 **`adk integrations search` options:**
+- `--interface <name>` - List integrations that implement this interface (query becomes optional)
 - `--format json` - Machine-readable output
-- `--limit <n>` - Max results (default: 20)
 
 **`adk integrations list` options:**
-- `--available` - Browse Hub instead of installed
+- `--target <env>` - Environment (dev/prod, default: dev)
+- `--verbose` - Show config values
 - `--format json` - Machine-readable output
-- `--verbose` - Show config details
-- `--limit <n>` - Max results (default: 50)
 
 **`adk integrations info` options:**
-- `--actions` - Show only actions
-- `--channels` - Show only channels
-- `--events` - Show only events
-- `--full` - Show all sections
 - `--format json` - Machine-readable output
+
+The default `info` output already includes the Channels, Actions, and Events sections — there are no per-section flags. To browse the Hub, use `adk integrations search <query>`.
 
 #### Mutations
 
@@ -688,6 +695,11 @@ adk integrations configure <alias>       # Set/unset config values
 **`adk integrations configure` options:**
 - `--set key=value` - Set config values (repeatable)
 - `--unset key` - Remove config keys (repeatable)
+- `--target <env>` - Environment (dev/prod)
+
+**`adk integrations upgrade` options:**
+- `<alias>` - Integration alias to upgrade (required)
+- `--to <version>` - Target a specific version (default: latest)
 - `--target <env>` - Environment (dev/prod)
 
 **Examples:**
@@ -712,23 +724,23 @@ adk integrations enable slack
 adk integrations remove slack
 ```
 
-#### State Management
+#### Dependency state
+
+Botpress Cloud is the source of truth for dependency state. The CLI keeps generated snapshots under `.adk/dependencies/` (`dev.json`, `prod.json`) — these are a cache, never hand-edited or committed as desired state. There are no `pull-lock`/`push-lock` commands.
 
 ```bash
-adk integrations pull-lock               # Pull cloud state into lock file
-adk integrations push-lock               # Push lock file to cloud
-adk integrations copy                    # Copy state between environments
-adk integrations diff                    # Show lock vs cloud differences
+adk integrations copy --from dev --to prod   # Copy state between environments
+adk integrations diff                        # Compare local snapshot vs cloud
+adk integrations status                      # Explain unready dependencies
 ```
 
-`adk pull-lock` and `adk push-lock` (no subcommand) run pull/push for both integrations and plugins at once.
+**`adk integrations copy` options:**
+- `--from <env>` - Source env (dev or prod, required)
+- `--to <env>` - Target env (dev or prod, required)
+- `--dry-run` - Show what would change without writing
+- `--yes` - Allow destructive changes without confirmation
 
-**`adk integrations pull-lock` options:**
-- `--dry-run` - Preview without writing the lock file
-
-**`adk integrations push-lock` options:**
-- `--dry-run` - Preview without applying
-- `--yes` - Skip confirmation
+`adk integrations status` reports why a dependency isn't ready (`unconfigured`, `missingFields`, `authorizationPending`).
 
 ### adk plugins
 
@@ -744,18 +756,17 @@ adk plugins upgrade <alias>              # Upgrade version
 adk plugins enable <alias>               # Enable a disabled plugin
 adk plugins disable <alias>              # Disable without removing
 adk plugins configure <alias>            # Set config and interface mappings
-adk plugins pull-lock                    # Pull cloud state into lock file
-adk plugins push-lock                    # Push lock file to cloud
-adk plugins copy                         # Copy state between environments
-adk plugins diff                         # Show lock vs cloud differences
+adk plugins status                       # Readiness of installed plugins
+adk plugins copy --from dev --to prod    # Copy state between environments
+adk plugins diff                         # Compare local snapshot vs cloud
 ```
 
 **Plugin-specific flags:**
-- `adk plugins add --dep iface=alias` - Wire interface dependency (repeatable)
-- `adk plugins configure --map iface=alias` - Remap interface dependency
+- `adk plugins add --dep iface=integrationAlias` - Wire interface dependency (repeatable)
+- `adk plugins configure --map iface=integrationAlias` - Remap interface dependency
 
 **Shared with `adk integrations upgrade`:**
-- `--to <version>` - Target specific version
+- `--to <version>` - Target specific version (alias argument is required)
 
 Plugins require interfaces implemented by installed integrations. The CLI auto-resolves dependencies when unambiguous. See **[Plugins](./plugins.md)** for details.
 
@@ -794,7 +805,7 @@ adk self-upgrade
 
 **Note:** The ADK automatically checks for updates every 24 hours and shows a notification when a new version is available. On Windows, you may need to restart your terminal after upgrading.
 
-**This is different from `adk upgrade`** which upgrades integrations, not the CLI itself.
+**This is different from `adk integrations upgrade`** which upgrades integrations, not the CLI itself.
 
 ### adk kb
 
@@ -918,38 +929,9 @@ Download remote assets to local directory.
 adk assets pull
 ```
 
-### adk mcp
+### MCP (no CLI command)
 
-Start the MCP (Model Context Protocol) server for AI assistant integration.
-
-```bash
-adk mcp [--cwd <path>]
-```
-
-The MCP server provides tools for AI assistants (Claude Code, Cursor, VS Code) to debug, test, and manage your ADK project. See **[MCP Server](./mcp-server.md)** for details.
-
-### adk mcp:init
-
-Generate MCP configuration files for AI assistants.
-
-```bash
-adk mcp:init [options]
-```
-
-**Options:**
-
-- `--all` - Generate for all supported tools
-- `--tool <name>` - Generate for specific tool (claude-code, vscode, cursor)
-- `--force` - Overwrite existing config
-- `--project-dir <path>` - ADK project subdirectory (for monorepos)
-
-**Example:**
-
-```bash
-adk mcp:init --all
-```
-
-See **[MCP Server](./mcp-server.md)** for monorepo setup and troubleshooting.
+There is no `adk mcp` or `adk mcp:init` command. The only MCP server in the ADK is an internal Streamable-HTTP server mounted at `/mcp` on the `adk dev` server, used by Agent(0) — it is not a user-facing command. See **[MCP Server](./mcp-server.md)** for details.
 
 ### adk profiles
 
@@ -1188,11 +1170,8 @@ adk dev
 ### Managing Integrations
 
 ```bash
-# Search for integrations
+# Search the Hub for integrations
 adk integrations search slack
-
-# List all available integrations
-adk integrations list --available
 
 # Get detailed info about an integration
 adk integrations info slack
@@ -1260,18 +1239,18 @@ adk workflows run <name>      # Start a workflow
 adk workflows runs            # List or inspect workflow runs
 
 # Dependencies (integrations, plugins, interfaces)
-adk integrations search <query>    # Search for integrations
+adk integrations search <query>    # Search the Hub for integrations
 adk integrations list              # List installed dependencies
-adk integrations list --available  # List all available integrations
 adk integrations info <name>       # Show integration details
 adk integrations add <name>@<ver>  # Add integration
 adk integrations remove <alias>    # Remove integration
-adk integrations upgrade [alias]   # Upgrade dependency
+adk integrations upgrade <alias>   # Upgrade dependency
 adk integrations enable <alias>    # Enable integration
 adk integrations disable <alias>   # Disable integration
 adk integrations configure <alias> # Set/unset config values
-adk integrations pull-lock         # Pull cloud state to lock file
-adk integrations push-lock         # Push lock file to cloud
+adk integrations status            # Explain unready dependencies
+adk integrations copy --from dev --to prod  # Copy state between environments
+adk integrations diff              # Compare local snapshot vs cloud
 
 # Plugins
 adk plugins search <query>        # Search for plugins
@@ -1279,16 +1258,19 @@ adk plugins list                   # List installed plugins
 adk plugins add <name>@<version>   # Add plugin
 adk plugins remove <alias>         # Remove plugin
 adk plugins configure <alias>      # Set config / remap interfaces
-adk plugins pull-lock              # Pull cloud state to lock file
-adk plugins push-lock              # Push lock file to cloud
+adk plugins status                 # Explain unready plugins
+adk plugins copy --from dev --to prod  # Copy state between environments
 
-# Lock file (both integrations + plugins at once)
-adk pull-lock                      # Pull cloud state for both
-adk push-lock                      # Push lock files to cloud for both
+# Interfaces (read-only)
+adk interfaces list                # List built-in interfaces
+adk interfaces info <name>         # Show interface details
 
-# MCP (AI Assistant Integration)
-adk mcp                  # Start MCP server
-adk mcp:init --all       # Generate MCP config files
+# Project portability
+adk export [output]                # Export project as portable archive
+adk import <archive> [dir]         # Import archive and link new bots
+
+# Agent(0)
+adk agent0 upgrade                 # Create/update Agent(0) capability bundle
 
 # CLI Management
 adk self-upgrade         # Upgrade ADK CLI itself
@@ -1328,7 +1310,7 @@ adk assets pull          # Download remote assets
 ## See Also
 
 - **[Agent Configuration](./agent-config.md)** - agent.config.ts, agent.json, environment variables, and project files
-- **[MCP Server](./mcp-server.md)** - AI assistant integration (Claude Code, Cursor, VS Code)
+- **[MCP Server](./mcp-server.md)** - Internal MCP server mounted on the `adk dev` server
 - **[Conversations](./conversations.md)** - Conversation handlers
 - **[Workflows](./workflows.md)** - Long-running processes
 - **[Patterns & Mistakes](./patterns-mistakes.md)** - Best practices

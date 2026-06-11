@@ -32,27 +32,17 @@ export default new Conversation({
 });
 ```
 
-### Configuration (agent.config.ts)
+### Configuration (CLI)
 
-```typescript
-import { defineConfig } from "@botpress/runtime";
+Add and configure the Desk integration via the CLI — not in `agent.config.ts`:
 
-export default defineConfig({
-  name: "support-bot",
-
-  dependencies: {
-    integrations: {
-      desk: {
-        enabled: true,
-        configuration: {
-          displayName: "Support Bot",
-          botHandle: "SupportBot",
-          canBeAssigned: true,
-        },
-      },
-    },
-  },
-});
+```bash
+adk integrations add desk
+adk integrations configure desk \
+  --set displayName="Support Bot" \
+  --set botHandle=SupportBot \
+  --set canBeAssigned=true
+adk integrations enable desk
 ```
 
 ---
@@ -87,29 +77,19 @@ Each bot is identified by its `botHandle` (e.g., "@SupportBot", "@TriageBot").
 
 ## Configuration
 
-All Desk configuration lives in `agent.config.ts` inside the `dependencies.integrations.desk` block:
+All Desk configuration is managed via the `adk integrations` CLI (state lives in Botpress Cloud, not `agent.config.ts`):
 
-```typescript
-import { defineConfig } from "@botpress/runtime";
-
-export default defineConfig({
-  name: "my-agent",
-
-  dependencies: {
-    integrations: {
-      desk: {
-        enabled: true,
-        configuration: {
-          displayName: "My Support Bot",
-          botHandle: "MySupportBot",
-          displayAvatarUrl: "https://example.com/bot-avatar.png",
-          canBeAssigned: true,
-        },
-      },
-    },
-  },
-});
+```bash
+adk integrations add desk
+adk integrations configure desk \
+  --set displayName="My Support Bot" \
+  --set botHandle=MySupportBot \
+  --set displayAvatarUrl=https://example.com/bot-avatar.png \
+  --set canBeAssigned=true
+adk integrations enable desk
 ```
+
+Verify with `adk integrations list --verbose` or `adk integrations status`.
 
 ### Configuration Options
 

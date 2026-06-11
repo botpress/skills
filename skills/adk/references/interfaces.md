@@ -77,7 +77,7 @@ These are aggregated in:
 
 Interfaces and integrations are complementary. See **[integrations.md](./integrations.md)** for integration management.
 
-- **Integrations** are concrete connections to external services (Slack, webchat, Linear). You add them with `adk add`.
+- **Integrations** are concrete connections to external services (Slack, webchat, Linear). You add them with `adk integrations add`.
 - **Interfaces** are abstract contracts. An integration *implements* an interface by declaring compatible actions with matching schemas.
 - When you add an integration that implements an interface, the ADK automatically detects this and generates the mapping. No user action is required.
 
