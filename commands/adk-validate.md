@@ -1,7 +1,7 @@
 ---
 name: adk-validate
 description: Validate an ADK primitive or a feature (a set of related primitives)
-argument-hint: "[primitive or feature name]"
+argument-hint: '[primitive or feature name]'
 ---
 
 Load the `adk` skill, then validate the named target immediately.
@@ -16,7 +16,7 @@ This is the proactive counterpart to `/adk-debug`: nothing is necessarily broken
 2. **Resolve the target — primitive or feature.** Try in this order:
    - **Exact primitive match.** Glob `src/**/<name>.ts`. If exactly one file matches, that's the target.
    - **Multiple primitive matches.** List them with their types (action / tool / workflow / etc.) and ask which one — or whether the user wants to validate the whole set as a feature.
-   - **No exact match — treat as a feature.** Search the codebase for the term: file names, exported symbols, string literals, and comments under `src/`. Present the candidate set ("Found these files that look like the *<name>* feature: …") and confirm with the user before proceeding. If nothing plausible turns up, suggest the closest exact filename hits and stop.
+   - **No exact match — treat as a feature.** Search the codebase for the term: file names, exported symbols, string literals, and comments under `src/`. Present the candidate set ("Found these files that look like the _<name>_ feature: …") and confirm with the user before proceeding. If nothing plausible turns up, suggest the closest exact filename hits and stop.
 3. **Read each file in the target set.** Identify the type of each from its directory.
 4. **Filter the baseline output.** From the type-check and `adk check` output captured in step 1, pull out diagnostics that mention any name or file path in the target set.
 5. **Static checks** (read the sources and verify):
@@ -28,4 +28,4 @@ This is the proactive counterpart to `/adk-debug`: nothing is necessarily broken
    - Any referenced sibling primitive (table, action, tool) actually exists in `src/`.
    - **Feature-level only:** the primitives in the set actually wire together — e.g., the workflow's action calls resolve to existing actions, the table the workflow writes to matches the schema the action reads.
    - No hardcoded secrets, tokens, or API keys.
-6. **Report.** Group findings as ❌ Errors → ⚠️ Warnings → ✅ Passed, with each finding tagged by file. For a feature target, also include a short "wiring" subsection that summarizes how the primitives connect. End with one line: *"Run `/adk-test <name>` to actually invoke it."* Do not apply fixes from this command — let the user decide which to take.
+6. **Report.** Group findings as ❌ Errors → ⚠️ Warnings → ✅ Passed, with each finding tagged by file. For a feature target, also include a short "wiring" subsection that summarizes how the primitives connect. End with one line: _"Run `/adk-test <name>` to actually invoke it."_ Do not apply fixes from this command — let the user decide which to take.

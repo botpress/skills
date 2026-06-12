@@ -12,11 +12,11 @@ Interfaces are an abstraction layer over integrations. They define a standard co
 
 Every ADK project includes these interfaces (defined in `@botpress/adk` constants):
 
-| Interface | Version | Purpose |
-|-----------|---------|---------|
+| Interface          | Version | Purpose                                                    |
+| ------------------ | ------- | ---------------------------------------------------------- |
 | `typing-indicator` | `0.0.3` | Start/stop typing indicators across messaging integrations |
-| `llm` | `9.0.0` | Standard LLM operations |
-| `listable` | `0.0.2` | List operations on integration resources |
+| `llm`              | `9.0.0` | Standard LLM operations                                    |
+| `listable`         | `0.0.2` | List operations on integration resources                   |
 
 These are hard-coded in the ADK and synced automatically during `adk dev` and `adk build`. Users cannot modify this list.
 
@@ -29,22 +29,22 @@ These are hard-coded in the ADK and synced automatically during `adk dev` and `a
 The `typing-indicator` interface powers `conversation.startTyping()` and `conversation.stopTyping()`. These work automatically for any integration that implements the interface (webchat, Slack, etc.) with no integration-specific code needed:
 
 ```typescript
-import { Conversation } from "@botpress/runtime";
+import { Conversation } from '@botpress/runtime'
 
 export const Chat = new Conversation({
-  channel: "webchat.channel",
+  channel: 'webchat.channel',
 
   async handler({ conversation, execute }) {
-    await conversation.startTyping();
+    await conversation.startTyping()
 
     // Do work...
 
     await execute({
-      instructions: "Help the user",
-    });
+      instructions: 'Help the user',
+    })
     // Typing stops automatically when a message is sent
-  }
-});
+  },
+})
 ```
 
 If the conversation's integration does not implement `typing-indicator`, the calls silently no-op (errors are caught and swallowed).
@@ -70,6 +70,7 @@ The ADK generates interface types in `.adk/interfaces/`. Each interface gets:
 - `<interface_name>/actions.ts` - Per-integration action types and mapping constants
 
 These are aggregated in:
+
 - `.adk/interfaces.d.ts` - Global `Interfaces` type declaration
 - `.adk/interfaces.ts` - Runtime `Interfaces` const (the mapping object)
 
@@ -78,7 +79,7 @@ These are aggregated in:
 Interfaces and integrations are complementary. See **[integrations.md](./integrations.md)** for integration management.
 
 - **Integrations** are concrete connections to external services (Slack, webchat, Linear). You add them with `adk integrations add`.
-- **Interfaces** are abstract contracts. An integration *implements* an interface by declaring compatible actions with matching schemas.
+- **Interfaces** are abstract contracts. An integration _implements_ an interface by declaring compatible actions with matching schemas.
 - When you add an integration that implements an interface, the ADK automatically detects this and generates the mapping. No user action is required.
 
 ## Scope and Limitations

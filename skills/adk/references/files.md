@@ -7,9 +7,9 @@ The Files API provides structured file storage with automatic indexing, semantic
 All file operations use the Botpress client. Get the client using the Context API:
 
 ```typescript
-import { context } from "@botpress/runtime";
+import { context } from '@botpress/runtime'
 
-const client = context.get("client");
+const client = context.get('client')
 ```
 
 This pattern is used in all examples below. See **[Context API](./context-api.md)** for more details.
@@ -17,6 +17,7 @@ This pattern is used in all examples below. See **[Context API](./context-api.md
 ## Basic Concepts
 
 ### What is the Files API?
+
 - **Persistent storage**: Upload and manage files for your bot
 - **Semantic search**: Optional vector indexing for searchable content
 - **CDN delivery**: Fast file access through CloudFront
@@ -26,6 +27,7 @@ This pattern is used in all examples below. See **[Context API](./context-api.md
 ### File Properties
 
 Files have the following core properties:
+
 - **id**: Unique file identifier
 - **key**: User-defined unique key per bot
 - **url**: CDN URL for file content access
@@ -43,64 +45,64 @@ Files have the following core properties:
 
 ```typescript
 const { file } = await client.uploadFile({
-  key: "documents/report-2024.pdf",           // Unique key
-  content: fileBuffer,                        // File content (Buffer/ArrayBuffer/Blob/string)
-  contentType: "application/pdf",             // MIME type
+  key: 'documents/report-2024.pdf', // Unique key
+  content: fileBuffer, // File content (Buffer/ArrayBuffer/Blob/string)
+  contentType: 'application/pdf', // MIME type
   tags: {
-    category: "reports",
-    year: "2024"
+    category: 'reports',
+    year: '2024',
   },
-  index: true,                                 // Enable semantic search
-  accessPolicies: ["public_content"]          // Make publicly accessible
-});
+  index: true, // Enable semantic search
+  accessPolicies: ['public_content'], // Make publicly accessible
+})
 
-console.log("File ID:", file.id);
-console.log("File URL:", file.url);
+console.log('File ID:', file.id)
+console.log('File URL:', file.url)
 ```
 
 ### Upload Options
 
 ```typescript
 await client.uploadFile({
-  key: "unique-file-key",                     // Required: Unique identifier
-  content: fileBuffer,                        // Required: File content
-  contentType: "text/plain",                  // Optional: MIME type
+  key: 'unique-file-key', // Required: Unique identifier
+  content: fileBuffer, // Required: File content
+  contentType: 'text/plain', // Optional: MIME type
 
   // Indexing options
-  index: true,                                // Enable semantic search
+  index: true, // Enable semantic search
   indexing: {
     configuration: {
       vision: {
-        transcribePages: true,                // OCR for images/PDFs
-        indexPages: "all"                     // Index all pages
-      }
-    }
+        transcribePages: true, // OCR for images/PDFs
+        indexPages: 'all', // Index all pages
+      },
+    },
   },
 
   // Access control
   accessPolicies: [
-    "public_content",                         // Public URL access
-    "integrations"                            // Integration access
+    'public_content', // Public URL access
+    'integrations', // Integration access
   ],
 
   // Organization
   tags: {
-    category: "documents",
-    department: "sales"
+    category: 'documents',
+    department: 'sales',
   },
 
   // Custom metadata
   metadata: {
-    author: "John Doe",
-    version: "1.0"
+    author: 'John Doe',
+    version: '1.0',
   },
 
   // Expiry (max 90 days)
   expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
 
   // Immediate public access (requires public_content policy)
-  publicContentImmediatelyAccessible: true
-});
+  publicContentImmediatelyAccessible: true,
+})
 ```
 
 ### Uploading Text Content
@@ -109,11 +111,11 @@ For simple text/JSON content:
 
 ```typescript
 const { file } = await client.uploadFile({
-  key: "config/settings.json",
-  content: jsonContent,                       // String content
-  contentType: "application/json",
-  index: false
-});
+  key: 'config/settings.json',
+  content: jsonContent, // String content
+  contentType: 'application/json',
+  index: false,
+})
 ```
 
 ### Uploading from URL
@@ -122,11 +124,11 @@ To upload from an external URL:
 
 ```typescript
 const { file } = await client.uploadFile({
-  key: "imported/image.jpg",
-  url: "https://example.com/image.jpg",       // Fetch from URL
-  contentType: "image/jpeg",
-  index: false
-});
+  key: 'imported/image.jpg',
+  url: 'https://example.com/image.jpg', // Fetch from URL
+  contentType: 'image/jpeg',
+  index: false,
+})
 ```
 
 ## Retrieving Files
@@ -136,17 +138,17 @@ const { file } = await client.uploadFile({
 ```typescript
 // Get by ID
 const { file } = await client.getFile({
-  id: "file_abc123"
-});
+  id: 'file_abc123',
+})
 
 // Get by key
 const { file } = await client.getFile({
-  id: "documents/report-2024.pdf"  // Can use key as ID
-});
+  id: 'documents/report-2024.pdf', // Can use key as ID
+})
 
-console.log("File URL:", file.url);
-console.log("File size:", file.size);
-console.log("Status:", file.status);
+console.log('File URL:', file.url)
+console.log('File size:', file.size)
+console.log('Status:', file.status)
 ```
 
 ### Access File Content
@@ -154,36 +156,36 @@ console.log("Status:", file.status);
 Files are accessed via URL. The URL type depends on access policies:
 
 ```typescript
-const { file } = await client.getFile({ id: fileId });
+const { file } = await client.getFile({ id: fileId })
 
 // For public files: permanent CDN URL
 // For private files: temporary presigned S3 URL
 
-const response = await fetch(file.url);
-const content = await response.text();
+const response = await fetch(file.url)
+const content = await response.text()
 
 // For JSON files
-const data = await response.json();
+const data = await response.json()
 
 // For binary files
-const buffer = await response.arrayBuffer();
+const buffer = await response.arrayBuffer()
 ```
 
 ### File Status States
 
 ```typescript
 type FileStatus =
-  | "upload_pending"      // Awaiting content upload
-  | "upload_completed"    // Upload successful
-  | "upload_failed"       // Upload failed
-  | "indexing_pending"    // Queued for indexing
-  | "indexing_completed"  // Indexed and searchable
-  | "indexing_failed"     // Indexing failed
+  | 'upload_pending' // Awaiting content upload
+  | 'upload_completed' // Upload successful
+  | 'upload_failed' // Upload failed
+  | 'indexing_pending' // Queued for indexing
+  | 'indexing_completed' // Indexed and searchable
+  | 'indexing_failed' // Indexing failed
 
 // Check file status
-const { file } = await client.getFile({ id: fileId });
-if (file.status === "indexing_completed") {
-  console.log("File is indexed and searchable");
+const { file } = await client.getFile({ id: fileId })
+if (file.status === 'indexing_completed') {
+  console.log('File is indexed and searchable')
 }
 ```
 
@@ -194,18 +196,18 @@ if (file.status === "indexing_completed") {
 ```typescript
 const { files, meta } = await client.listFiles({
   limit: 20,
-  offset: 0
-});
+  offset: 0,
+})
 
-files.forEach(file => {
-  console.log(file.key, file.size, file.status);
-});
+files.forEach((file) => {
+  console.log(file.key, file.size, file.status)
+})
 
 // Pagination
 if (meta.nextToken) {
   const nextPage = await client.listFiles({
-    nextToken: meta.nextToken
-  });
+    nextToken: meta.nextToken,
+  })
 }
 ```
 
@@ -214,42 +216,42 @@ if (meta.nextToken) {
 ```typescript
 // Single tag filter
 const { files } = await client.listFiles({
-  tags: { category: "reports" }
-});
+  tags: { category: 'reports' },
+})
 
 // Multiple values (OR condition)
 const { files } = await client.listFiles({
   tags: {
-    category: ["reports", "documents"]
-  }
-});
+    category: ['reports', 'documents'],
+  },
+})
 
 // Exclude values
 const { files } = await client.listFiles({
   tags: {
     category: {
-      not: "archived"
-    }
-  }
-});
+      not: 'archived',
+    },
+  },
+})
 ```
 
 ### Filtering by IDs
 
 ```typescript
 const { files } = await client.listFiles({
-  ids: ["file_123", "file_456", "file_789"]
-});
+  ids: ['file_123', 'file_456', 'file_789'],
+})
 ```
 
 ### Sorting
 
 ```typescript
 const { files } = await client.listFiles({
-  sortBy: "createdAt",
-  sortOrder: "desc",
-  limit: 10
-});
+  sortBy: 'createdAt',
+  sortOrder: 'desc',
+  limit: 10,
+})
 
 // Available sort fields:
 // - key
@@ -265,38 +267,38 @@ const { files } = await client.listFiles({
 
 ```typescript
 const { passages } = await client.searchFiles({
-  query: "machine learning algorithms",
-  limit: 5
-});
+  query: 'machine learning algorithms',
+  limit: 5,
+})
 
-passages.forEach(passage => {
-  console.log("File:", passage.file.key);
-  console.log("Content:", passage.content);
-  console.log("Similarity:", passage.score);
-  console.log("Page:", passage.meta.pageNumber);
-});
+passages.forEach((passage) => {
+  console.log('File:', passage.file.key)
+  console.log('Content:', passage.content)
+  console.log('Similarity:', passage.score)
+  console.log('Page:', passage.meta.pageNumber)
+})
 ```
 
 ### Search Options
 
 ```typescript
 const { passages } = await client.searchFiles({
-  query: "customer feedback",
+  query: 'customer feedback',
 
   // Filtering
-  tags: { category: "support" },
+  tags: { category: 'support' },
 
   // Context
-  contextDepth: 2,              // Include 2 surrounding passages
-  includeBreadcrumb: true,      // Include document structure
-  withContext: true,            // Return detailed context
+  contextDepth: 2, // Include 2 surrounding passages
+  includeBreadcrumb: true, // Include document structure
+  withContext: true, // Return detailed context
 
   // Consolidation
-  consolidate: true,            // Group by file, sort by position
+  consolidate: true, // Group by file, sort by position
 
   // Pagination
-  limit: 10
-});
+  limit: 10,
+})
 ```
 
 ### Search Result Structure
@@ -305,38 +307,39 @@ const { passages } = await client.searchFiles({
 {
   passages: [
     {
-      content: "The matched text passage...",
-      score: 0.89,                           // Similarity score (0-1)
+      content: 'The matched text passage...',
+      score: 0.89, // Similarity score (0-1)
       meta: {
-        type: "paragraph",                   // passage | title | subtitle | etc.
-        subtype: "text",
+        type: 'paragraph', // passage | title | subtitle | etc.
+        subtype: 'text',
         pageNumber: 5,
         position: 12,
-        sourceUrl: "https://..."
+        sourceUrl: 'https://...',
       },
       file: {
-        id: "file_abc123",
-        key: "documents/report.pdf",
-        contentType: "application/pdf",
-        tags: { category: "reports" },
-        createdAt: "2024-01-15T10:30:00Z",
-        updatedAt: "2024-01-15T10:30:00Z"
+        id: 'file_abc123',
+        key: 'documents/report.pdf',
+        contentType: 'application/pdf',
+        tags: { category: 'reports' },
+        createdAt: '2024-01-15T10:30:00Z',
+        updatedAt: '2024-01-15T10:30:00Z',
       },
-      context: [                            // Only if withContext: true
+      context: [
+        // Only if withContext: true
         {
-          type: "preceding",
-          content: "Previous passage..."
+          type: 'preceding',
+          content: 'Previous passage...',
         },
         {
-          type: "current",
-          content: "The matched text passage..."
+          type: 'current',
+          content: 'The matched text passage...',
         },
         {
-          type: "subsequent",
-          content: "Next passage..."
-        }
-      ]
-    }
+          type: 'subsequent',
+          content: 'Next passage...',
+        },
+      ],
+    },
   ]
 }
 ```
@@ -351,19 +354,19 @@ const { file } = await client.updateFileMetadata({
   id: fileId,
 
   metadata: {
-    version: "2.0",
-    updatedBy: "Jane Doe"
+    version: '2.0',
+    updatedBy: 'Jane Doe',
   },
 
   tags: {
-    status: "reviewed",
-    newTag: "value"
+    status: 'reviewed',
+    newTag: 'value',
   },
 
-  accessPolicies: ["public_content"],
+  accessPolicies: ['public_content'],
 
-  expiresAt: new Date("2024-12-31").toISOString()
-});
+  expiresAt: new Date('2024-12-31').toISOString(),
+})
 ```
 
 ### Metadata Update Behavior
@@ -373,26 +376,26 @@ const { file } = await client.updateFileMetadata({
 await client.updateFileMetadata({
   id: fileId,
   metadata: {
-    newKey: "newValue"
+    newKey: 'newValue',
     // Other metadata keys remain unchanged
-  }
-});
+  },
+})
 
 // Delete metadata key
 await client.updateFileMetadata({
   id: fileId,
   metadata: {
-    oldKey: null  // Removes this key
-  }
-});
+    oldKey: null, // Removes this key
+  },
+})
 
 // Delete tag
 await client.updateFileMetadata({
   id: fileId,
   tags: {
-    oldTag: null  // Removes this tag
-  }
-});
+    oldTag: null, // Removes this tag
+  },
+})
 ```
 
 ### Replace File Content
@@ -402,8 +405,8 @@ await client.updateFileMetadata({
 const { file } = await client.uploadFile({
   key: existingFileKey,
   content: newContent,
-  contentType: "text/plain"
-});
+  contentType: 'text/plain',
+})
 ```
 
 ## Managing File Passages
@@ -413,15 +416,15 @@ const { file } = await client.uploadFile({
 ```typescript
 const { passages, meta } = await client.listFilePassages({
   id: fileId,
-  limit: 20
-});
+  limit: 20,
+})
 
-passages.forEach(passage => {
-  console.log("Passage ID:", passage.id);
-  console.log("Content:", passage.content);
-  console.log("Type:", passage.meta.type);
-  console.log("Page:", passage.meta.pageNumber);
-});
+passages.forEach((passage) => {
+  console.log('Passage ID:', passage.id)
+  console.log('Content:', passage.content)
+  console.log('Type:', passage.meta.type)
+  console.log('Page:', passage.meta.pageNumber)
+})
 ```
 
 ### Set Custom Passages
@@ -432,20 +435,20 @@ await client.setFilePassages({
   id: fileId,
   passages: [
     {
-      content: "# Introduction\n\nThis is the first section...",
-      type: "title"
+      content: '# Introduction\n\nThis is the first section...',
+      type: 'title',
     },
     {
-      content: "Main content paragraph here.",
-      type: "paragraph",
-      pageNumber: 1
+      content: 'Main content paragraph here.',
+      type: 'paragraph',
+      pageNumber: 1,
     },
     {
-      content: "## Subsection\n\nMore details...",
-      type: "subtitle"
-    }
-  ]
-});
+      content: '## Subsection\n\nMore details...',
+      type: 'subtitle',
+    },
+  ],
+})
 
 // File status becomes "indexing_pending"
 // Check status later to confirm completion
@@ -457,15 +460,16 @@ await client.setFilePassages({
 
 ```typescript
 // Delete by ID
-await client.deleteFile({ id: "file_abc123" });
+await client.deleteFile({ id: 'file_abc123' })
 
 // Delete by key
-await client.deleteFile({ id: "documents/report.pdf" });
+await client.deleteFile({ id: 'documents/report.pdf' })
 ```
 
 ### Cleanup
 
 When a file is deleted:
+
 - File metadata removed from database
 - File content removed from S3
 - Vector embeddings removed (if indexed)
@@ -484,9 +488,9 @@ The Files API provides low-level file management. Knowledge Bases use the Files 
 ```typescript
 const { file } = await client.copyFile({
   idOrKey: sourceFileId,
-  destinationKey: "backups/report-copy.pdf",
-  overwrite: false  // Fail if destination exists
-});
+  destinationKey: 'backups/report-copy.pdf',
+  overwrite: false, // Fail if destination exists
+})
 ```
 
 ### Copy Across Bots
@@ -494,10 +498,10 @@ const { file } = await client.copyFile({
 ```typescript
 const { file } = await client.copyFile({
   idOrKey: sourceFileId,
-  destinationKey: "imported/report.pdf",
+  destinationKey: 'imported/report.pdf',
   destinationBotId: targetBotId,
-  overwrite: true
-});
+  overwrite: true,
+})
 ```
 
 ## Supported File Types
@@ -509,19 +513,19 @@ These file types support semantic search indexing:
 ```typescript
 const INDEXABLE_TYPES = {
   // Documents
-  pdf: "application/pdf",
-  docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  pdf: 'application/pdf',
+  docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 
   // Text
-  txt: "text/plain",
-  md: "text/markdown",
-  html: "text/html",
+  txt: 'text/plain',
+  md: 'text/markdown',
+  html: 'text/html',
 
   // Images (with vision processing)
-  jpg: "image/jpeg",
-  jpeg: "image/jpeg",
-  png: "image/png"
-};
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+}
 ```
 
 ### Vision Processing
@@ -530,19 +534,19 @@ For images and PDFs with vision enabled:
 
 ```typescript
 await client.uploadFile({
-  key: "documents/invoice.pdf",
+  key: 'documents/invoice.pdf',
   content: pdfBuffer,
-  contentType: "application/pdf",
+  contentType: 'application/pdf',
   index: true,
   indexing: {
     configuration: {
       vision: {
-        transcribePages: true,    // OCR text extraction
-        indexPages: "all"         // or [1, 2, 3] for specific pages
-      }
-    }
-  }
-});
+        transcribePages: true, // OCR text extraction
+        indexPages: 'all', // or [1, 2, 3] for specific pages
+      },
+    },
+  },
+})
 ```
 
 ## Usage in Actions/Workflows
@@ -550,90 +554,90 @@ await client.uploadFile({
 ### In Actions
 
 ```typescript
-import { Action, z, context } from "@botpress/runtime";
+import { Action, z, context } from '@botpress/runtime'
 
 export const uploadDocument = new Action({
-  name: "uploadDocument",
+  name: 'uploadDocument',
   input: z.object({
     content: z.string(),
-    filename: z.string()
+    filename: z.string(),
   }),
   output: z.object({
     fileId: z.string(),
-    fileUrl: z.string()
+    fileUrl: z.string(),
   }),
 
   async handler({ input }) {
-    const client = context.get("client");
+    const client = context.get('client')
 
     // Upload file
     const { file } = await client.uploadFile({
       key: `uploads/${input.filename}`,
       content: input.content,
-      contentType: "text/plain",
+      contentType: 'text/plain',
       index: true,
       tags: {
-        source: "action",
-        type: "user-upload"
-      }
-    });
+        source: 'action',
+        type: 'user-upload',
+      },
+    })
 
     return {
       fileId: file.id,
-      fileUrl: file.url
-    };
-  }
-});
+      fileUrl: file.url,
+    }
+  },
+})
 ```
 
 ### In Workflows
 
 ```typescript
-import { Workflow, z, context } from "@botpress/runtime";
+import { Workflow, z, context } from '@botpress/runtime'
 
 export const ProcessDocumentWorkflow = new Workflow({
-  name: "processDocument",
+  name: 'processDocument',
   input: z.object({ documentKey: z.string() }),
 
   async handler({ input, step }) {
-    const client = context.get("client");
+    const client = context.get('client')
 
     // Get file
-    const file = await step("get-file", async () => {
+    const file = await step('get-file', async () => {
       const { file } = await client.getFile({
-        id: input.documentKey
-      });
-      return file;
-    });
+        id: input.documentKey,
+      })
+      return file
+    })
 
     // Wait for indexing
-    await step("wait-indexing", async () => {
-      let status = file.status;
-      while (status === "INDEXING_PENDING") {
-        await new Promise(resolve => setTimeout(resolve, 1000));
+    await step('wait-indexing', async () => {
+      let status = file.status
+      while (status === 'INDEXING_PENDING') {
+        await new Promise((resolve) => setTimeout(resolve, 1000))
         const { file: updated } = await client.getFile({
-          id: file.id
-        });
-        status = updated.status;
+          id: file.id,
+        })
+        status = updated.status
       }
-      return status;
-    });
+      return status
+    })
 
     // Search content
-    const results = await step("search", async () => {
+    const results = await step('search', async () => {
       const { passages } = await client.searchFiles({
-        query: "important findings",
-        tags: { key: input.documentKey }
-      });
-      return passages;
-    });
+        query: 'important findings',
+        tags: { key: input.documentKey },
+      })
+      return passages
+    })
 
     return {
       processed: true,
-      findings: results.length
-    };
-  }
-});
+      findings: results.length,
+    }
+  },
+})
 ```
 
 ## Best Practices
@@ -643,13 +647,13 @@ export const ProcessDocumentWorkflow = new Workflow({
 ```typescript
 // ✅ Good - Clear, hierarchical structure
 await client.uploadFile({
-  key: "documents/2024/reports/q1-sales.pdf"
-});
+  key: 'documents/2024/reports/q1-sales.pdf',
+})
 
 // ❌ Bad - Unclear, no structure
 await client.uploadFile({
-  key: "file123.pdf"
-});
+  key: 'file123.pdf',
+})
 ```
 
 ### 2. Tag Appropriately
@@ -674,21 +678,21 @@ tags: {
 
 ```typescript
 // ✅ Good - Check and handle status
-const { file } = await client.getFile({ id: fileId });
+const { file } = await client.getFile({ id: fileId })
 
 switch (file.status) {
-  case "UPLOAD_PENDING":
-    console.log("Waiting for upload...");
-    break;
-  case "INDEXING_PENDING":
-    console.log("Indexing in progress...");
-    break;
-  case "INDEXING_COMPLETED":
+  case 'UPLOAD_PENDING':
+    console.log('Waiting for upload...')
+    break
+  case 'INDEXING_PENDING':
+    console.log('Indexing in progress...')
+    break
+  case 'INDEXING_COMPLETED':
     // File is searchable
-    break;
-  case "INDEXING_FAILED":
-    console.error("Indexing failed:", file.failedStatusReason);
-    break;
+    break
+  case 'INDEXING_FAILED':
+    console.error('Indexing failed:', file.failedStatusReason)
+    break
 }
 ```
 
@@ -697,15 +701,15 @@ switch (file.status) {
 ```typescript
 // ✅ Good - Reasonable expiry for temporary files
 await client.uploadFile({
-  key: "temp/cache-data.json",
-  expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 1 day
-});
+  key: 'temp/cache-data.json',
+  expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 1 day
+})
 
 // For permanent files, omit expiresAt
 await client.uploadFile({
-  key: "documents/permanent-record.pdf"
+  key: 'documents/permanent-record.pdf',
   // No expiresAt = never expires
-});
+})
 ```
 
 ### 5. Optimize Indexing
@@ -713,30 +717,30 @@ await client.uploadFile({
 ```typescript
 // ✅ Good - Index only searchable content
 await client.uploadFile({
-  key: "documents/report.pdf",
+  key: 'documents/report.pdf',
   content: pdfBuffer,
-  index: true  // Searchable document
-});
+  index: true, // Searchable document
+})
 
 await client.uploadFile({
-  key: "images/logo.png",
+  key: 'images/logo.png',
   content: imageBuffer,
-  index: false  // Not searchable, save quota
-});
+  index: false, // Not searchable, save quota
+})
 
 // ✅ Good - Use vision only when needed
 await client.uploadFile({
-  key: "documents/scanned-invoice.pdf",
+  key: 'documents/scanned-invoice.pdf',
   content: pdfBuffer,
   index: true,
   indexing: {
     configuration: {
       vision: {
-        transcribePages: true  // OCR needed
-      }
-    }
-  }
-});
+        transcribePages: true, // OCR needed
+      },
+    },
+  },
+})
 ```
 
 ## Common Patterns
@@ -744,22 +748,19 @@ await client.uploadFile({
 ### File Upload with Validation
 
 ```typescript
-export const uploadWithValidation = async (
-  fileContent: Buffer,
-  filename: string
-) => {
-  const client = context.get("client");
+export const uploadWithValidation = async (fileContent: Buffer, filename: string) => {
+  const client = context.get('client')
 
   // Validate file size (max 100MB)
-  const MAX_SIZE = 100 * 1024 * 1024;
+  const MAX_SIZE = 100 * 1024 * 1024
   if (fileContent.length > MAX_SIZE) {
-    throw new Error("File too large");
+    throw new Error('File too large')
   }
 
   // Validate file type
-  const contentType = getContentType(filename);
+  const contentType = getContentType(filename)
   if (!ALLOWED_TYPES.includes(contentType)) {
-    throw new Error("File type not allowed");
+    throw new Error('File type not allowed')
   }
 
   // Upload
@@ -770,45 +771,42 @@ export const uploadWithValidation = async (
     index: true,
     tags: {
       originalName: filename,
-      uploadedAt: new Date().toISOString()
-    }
-  });
+      uploadedAt: new Date().toISOString(),
+    },
+  })
 
-  return file;
-};
+  return file
+}
 ```
 
 ### Search with Context
 
 ```typescript
-export const searchWithContext = async (
-  query: string,
-  category?: string
-) => {
-  const client = context.get("client");
+export const searchWithContext = async (query: string, category?: string) => {
+  const client = context.get('client')
 
   const { passages } = await client.searchFiles({
     query,
     tags: category ? { category } : undefined,
     contextDepth: 2,
     includeBreadcrumb: true,
-    limit: 5
-  });
+    limit: 5,
+  })
 
-  return passages.map(p => ({
+  return passages.map((p) => ({
     content: p.content,
     source: p.file.key,
     relevance: p.score,
-    location: `Page ${p.meta.pageNumber || "N/A"}`
-  }));
-};
+    location: `Page ${p.meta.pageNumber || 'N/A'}`,
+  }))
+}
 ```
 
 ### Bulk File Operations
 
 ```typescript
 export const bulkUpload = async (files: FileData[]) => {
-  const client = context.get("client");
+  const client = context.get('client')
 
   const results = await Promise.allSettled(
     files.map(async (fileData) => {
@@ -816,23 +814,19 @@ export const bulkUpload = async (files: FileData[]) => {
         key: fileData.key,
         content: fileData.content,
         contentType: fileData.contentType,
-        index: true
-      });
+        index: true,
+      })
 
-      return file;
+      return file
     })
-  );
+  )
 
-  const successful = results
-    .filter(r => r.status === "fulfilled")
-    .map(r => r.value);
+  const successful = results.filter((r) => r.status === 'fulfilled').map((r) => r.value)
 
-  const failed = results
-    .filter(r => r.status === "rejected")
-    .map(r => r.reason);
+  const failed = results.filter((r) => r.status === 'rejected').map((r) => r.reason)
 
-  return { successful, failed };
-};
+  return { successful, failed }
+}
 ```
 
 ## Troubleshooting
@@ -883,18 +877,18 @@ The current Files API uses direct content upload:
 ```typescript
 // ✅ CURRENT - Direct content parameter
 await client.uploadFile({
-  key: "unique-key",
-  content: fileBuffer,           // Direct upload
-  contentType: "application/pdf",
-  tags: { category: "docs" }
-});
+  key: 'unique-key',
+  content: fileBuffer, // Direct upload
+  contentType: 'application/pdf',
+  tags: { category: 'docs' },
+})
 
 // Alternative: Upload from URL
 await client.uploadFile({
-  key: "unique-key",
-  url: "https://example.com/file.pdf",  // Fetch from URL
-  tags: { category: "docs" }
-});
+  key: 'unique-key',
+  url: 'https://example.com/file.pdf', // Fetch from URL
+  tags: { category: 'docs' },
+})
 ```
 
 ### Retrieving File Content
@@ -902,17 +896,18 @@ await client.uploadFile({
 Files are accessed via their URL:
 
 ```typescript
-const { file } = await client.getFile({ id: fileId });
+const { file } = await client.getFile({ id: fileId })
 
 // Fetch file content
-const response = await fetch(file.url);
-const content = await response.arrayBuffer();
+const response = await fetch(file.url)
+const content = await response.arrayBuffer()
 
 // For text/JSON
-const text = await response.text();
-const json = await response.json();
+const text = await response.text()
+const json = await response.json()
 ```
 
 **URL Types:**
+
 - **Public files** (`public_content` policy): Permanent CDN URL
 - **Private files**: Temporary presigned URL (use shortly after retrieval)

@@ -20,6 +20,7 @@ const result = await client.callAction({
 ```
 
 **Key Points:**
+
 - `type`: Must match the `name` field in your Action definition
 - `input`: Must match the input schema defined in your Action (Zod schema)
 - Returns: `{ output: TypedOutput }` where output type is inferred from your Action definition
@@ -30,11 +31,11 @@ First, create an API client instance with bot and workspace credentials:
 
 ```typescript
 const client = new APIClient({
-  apiUrl: "https://api.botpress.cloud",
+  apiUrl: 'https://api.botpress.cloud',
   workspaceId: props?.workspaceId,
-  token: getPat() ?? "",
+  token: getPat() ?? '',
   botId: props?.botId,
-});
+})
 ```
 
 ## Type-Safe Action Calls
@@ -44,18 +45,19 @@ The ADK generates type definitions for all your actions, enabling full TypeScrip
 ### Using BotActionDefinitions
 
 ```typescript
-import type { BotActionDefinitions } from "@botpress/runtime/_types/actions";
+import type { BotActionDefinitions } from '@botpress/runtime/_types/actions'
 
 // Extract specific action types for your bot's actions
-export type SendMessageAction = BotActionDefinitions["sendMessage"];
-export type GetUserAction = BotActionDefinitions["getUser"];
-export type UpdateStatusAction = BotActionDefinitions["updateStatus"];
-export type CreateTicketAction = BotActionDefinitions["createTicket"];
-export type CloseTicketAction = BotActionDefinitions["closeTicket"];
-export type AssignAgentAction = BotActionDefinitions["assignAgent"];
+export type SendMessageAction = BotActionDefinitions['sendMessage']
+export type GetUserAction = BotActionDefinitions['getUser']
+export type UpdateStatusAction = BotActionDefinitions['updateStatus']
+export type CreateTicketAction = BotActionDefinitions['createTicket']
+export type CloseTicketAction = BotActionDefinitions['closeTicket']
+export type AssignAgentAction = BotActionDefinitions['assignAgent']
 ```
 
 Each action type contains:
+
 - `input`: The expected input schema type
 - `output`: The returned output schema type
 
@@ -65,10 +67,10 @@ TypeScript automatically infers the correct types when you use these definitions
 
 ```typescript
 // ✅ TypeScript knows exactly what input fields are required
-async function sendMessage(input: SendMessageAction["input"]) {
-  const result = await client.callAction({ type: "sendMessage", input });
+async function sendMessage(input: SendMessageAction['input']) {
+  const result = await client.callAction({ type: 'sendMessage', input })
   // ✅ TypeScript knows the structure of result.output
-  return result.output as SendMessageAction["output"];
+  return result.output as SendMessageAction['output']
 }
 ```
 
@@ -77,14 +79,15 @@ async function sendMessage(input: SendMessageAction["input"]) {
 ### 1. Simple Action Call: sendMessage
 
 ```typescript
-export async function sendMessage(input: SendMessageAction["input"]) {
-  const client = getApiClient({ botId, workspaceId });
-  const result = await client.callAction({ type: "sendMessage", input });
-  return result.output as SendMessageAction["output"];
+export async function sendMessage(input: SendMessageAction['input']) {
+  const client = getApiClient({ botId, workspaceId })
+  const result = await client.callAction({ type: 'sendMessage', input })
+  return result.output as SendMessageAction['output']
 }
 ```
 
 **Breakdown:**
+
 - Creates a service wrapper function for reusability
 - Uses typed input parameter for compile-time safety
 - Casts output to maintain type information throughout the app
@@ -99,11 +102,12 @@ if (!ticket?.assignedTo?.id && currentUser?.agentId) {
     agentId: currentUser.agentId,
     assigneeId: currentUser.agentId,
     ticketId: ticketId,
-  });
+  })
 }
 ```
 
 **Breakdown:**
+
 - Checks condition before calling action (only if unassigned)
 - Part of a larger mutation workflow (called within `mutationFn`)
 - Uses await to ensure assignment completes before continuing
@@ -113,23 +117,24 @@ if (!ticket?.assignedTo?.id && currentUser?.agentId) {
 
 ```typescript
 type CloseTicketParams = {
-  ticketId: string;
-  agentId: string;
-};
+  ticketId: string
+  agentId: string
+}
 
 export async function closeTicket({ ticketId, agentId }: CloseTicketParams) {
   const result = await client.callAction({
-    type: "closeTicket",
+    type: 'closeTicket',
     input: {
       ticketId: ticketId,
       agentId,
     },
-  });
-  return result.output as CloseTicketAction["output"];
+  })
+  return result.output as CloseTicketAction['output']
 }
 ```
 
 **Breakdown:**
+
 - Defines custom params type for better API ergonomics
 - Maps friendly parameter names to action input field names
 - Centralizes client creation and action calling logic
@@ -139,25 +144,26 @@ export async function closeTicket({ ticketId, agentId }: CloseTicketParams) {
 
 ```typescript
 type SnoozeTicketParams = {
-  ticketId: string;
-  snoozeUntil: string | null;  // ← Can be null to unsnooze
-  agentId: string;
-};
+  ticketId: string
+  snoozeUntil: string | null // ← Can be null to unsnooze
+  agentId: string
+}
 
 export async function snoozeTicket({ ticketId, snoozeUntil, agentId }: SnoozeTicketParams) {
   const result = await client.callAction({
-    type: "snoozeTicket",
+    type: 'snoozeTicket',
     input: {
       ticketId: ticketId,
       agentId,
-      snoozeUntil,  // ← Passing null clears the snooze
+      snoozeUntil, // ← Passing null clears the snooze
     },
-  });
-  return result.output as SnoozeTicketAction["output"];
+  })
+  return result.output as SnoozeTicketAction['output']
 }
 ```
 
 **Breakdown:**
+
 - Demonstrates nullable fields (snooze vs unsnooze behavior)
 - Same action handles two use cases based on null value
 - Type system ensures null handling is explicit
@@ -166,32 +172,28 @@ export async function snoozeTicket({ ticketId, snoozeUntil, agentId }: SnoozeTic
 
 ```typescript
 type UpdateTicketTagsParams = {
-  ticketId: string;
-  agentId: string;
-  tagsToAdd?: string[];      // ← Optional fields
-  tagsToRemove?: string[];   // ← Optional fields
-};
+  ticketId: string
+  agentId: string
+  tagsToAdd?: string[] // ← Optional fields
+  tagsToRemove?: string[] // ← Optional fields
+}
 
-export async function updateTicketTags({
-  ticketId,
-  agentId,
-  tagsToAdd,
-  tagsToRemove
-}: UpdateTicketTagsParams) {
+export async function updateTicketTags({ ticketId, agentId, tagsToAdd, tagsToRemove }: UpdateTicketTagsParams) {
   const result = await client.callAction({
-    type: "updateTicketTags",
+    type: 'updateTicketTags',
     input: {
       ticketId: ticketId,
       agentId,
-      tagsToAdd,      // ← May be undefined
-      tagsToRemove,   // ← May be undefined
+      tagsToAdd, // ← May be undefined
+      tagsToRemove, // ← May be undefined
     },
-  });
-  return result.output as UpdateTicketTagsAction["output"];
+  })
+  return result.output as UpdateTicketTagsAction['output']
 }
 ```
 
 **Breakdown:**
+
 - Both optional parameters allow flexible tag operations
 - Can add tags only, remove tags only, or both in one call
 - Undefined values are handled gracefully by the action
@@ -250,6 +252,7 @@ const { mutate: send, isPending: isLoading } = useMutation({
 ```
 
 **Breakdown:**
+
 - `mutationFn`: Async function containing action call(s)
 - `isPending`: Automatically tracks loading state for UI
 - `onSuccess`: Callback for cache invalidation and UI updates
@@ -267,16 +270,17 @@ const handleClose = async () => {
     await closeTicket({
       ticketId,
       agentId: currentUser.id,
-    });
+    })
     // Update local state or redirect
-    navigate("/tickets");
+    navigate('/tickets')
   } catch (error) {
-    toast.error("Failed to close ticket");
+    toast.error('Failed to close ticket')
   }
-};
+}
 ```
 
 **When to use direct calls:**
+
 - One-off operations without loading states
 - Background operations that don't affect UI
 - Server-side rendering contexts
@@ -287,17 +291,18 @@ const handleClose = async () => {
 ### Try/Catch Pattern
 
 **Basic service-level error handling:**
+
 ```typescript
-export async function assignUserToConversation(input: AssignToConversationAction["input"]) {
+export async function assignUserToConversation(input: AssignToConversationAction['input']) {
   try {
     const result = await client.callAction({
-      type: "assignConversation",
+      type: 'assignConversation',
       input,
-    });
-    return result.output as AssignToConversationAction["output"];
+    })
+    return result.output as AssignToConversationAction['output']
   } catch (error) {
-    console.error("Failed to assign conversation:", error);
-    throw error; // Re-throw for component-level handling
+    console.error('Failed to assign conversation:', error)
+    throw error // Re-throw for component-level handling
   }
 }
 ```
@@ -305,6 +310,7 @@ export async function assignUserToConversation(input: AssignToConversationAction
 ### Mutation Error Handling
 
 **Component-level error handling with useMutation:**
+
 ```typescript
 const { mutate, isPending, error } = useMutation({
   mutationFn: async (params) => {
@@ -336,15 +342,15 @@ const { mutate: snooze, isPending } = useMutation({
   mutationFn: snoozeTicket,
   onMutate: () => {
     // Show immediate feedback
-    toast.loading("Snoozing ticket...", { id: "snooze" });
+    toast.loading('Snoozing ticket...', { id: 'snooze' })
   },
   onSuccess: () => {
-    toast.success("Ticket snoozed", { id: "snooze" });
+    toast.success('Ticket snoozed', { id: 'snooze' })
   },
   onError: (error) => {
-    toast.error(`Failed: ${error.message}`, { id: "snooze" });
+    toast.error(`Failed: ${error.message}`, { id: 'snooze' })
   },
-});
+})
 ```
 
 ## Optimistic Updates
@@ -355,24 +361,24 @@ Optimistic updates provide instant UI feedback by updating the cache before the 
 
 ```typescript
 export const sendNewMessage = createOptimisticAction<{
-  message: string;
-  agentId: string;
-  ticketId: string;
-  messageType: "comment" | "note";
-  attachmentUrls?: string[];
+  message: string
+  agentId: string
+  ticketId: string
+  messageType: 'comment' | 'note'
+  attachmentUrls?: string[]
   attachmentFiles?: Array<{
-    content_type: string;
-    data: string;
-    name: string;
-  }>;
+    content_type: string
+    data: string
+    name: string
+  }>
 }>({
   onMutate: (props) => {
     // Optimistic guess at the change - insert immediately into UI
     getTicketMessagesCollection(props.ticketId).insert(
       {
-        id: Math.floor(Math.random() * 1000000000),  // Temporary ID
+        id: Math.floor(Math.random() * 1000000000), // Temporary ID
         content: props.message,
-        author: { id: props.agentId, type: "agent" },
+        author: { id: props.agentId, type: 'agent' },
         attachments: [],
         computed: {},
         ticketId: props.ticketId,
@@ -380,13 +386,13 @@ export const sendNewMessage = createOptimisticAction<{
         createdAt: new Date().toISOString(),
         details: {},
         externalId: undefined,
-        messageId: "",
+        messageId: '',
         redacted: false,
-        state: "sent",
+        state: 'sent',
         updatedAt: new Date().toISOString(),
       },
-      { optimistic: true }  // ← Marks this as optimistic
-    );
+      { optimistic: true } // ← Marks this as optimistic
+    )
   },
   mutationFn: async (props) => {
     // Send the intent to the server
@@ -397,20 +403,22 @@ export const sendNewMessage = createOptimisticAction<{
       messageType: props.messageType,
       attachmentUrls: props.attachmentUrls,
       attachmentFiles: props.attachmentFiles,
-    });
+    })
     // Refetch to replace optimistic data with server data
-    await getTicketMessagesCollection(props.ticketId).utils.refetch();
+    await getTicketMessagesCollection(props.ticketId).utils.refetch()
   },
-});
+})
 ```
 
 **Breakdown:**
+
 1. **onMutate**: Immediately inserts a temporary message into the UI
 2. **mutationFn**: Sends the real message to the server
 3. **Refetch**: Replaces optimistic data with server response
 4. If server call fails, optimistic update is automatically rolled back
 
 **Benefits:**
+
 - UI feels instant and responsive
 - No waiting for server round-trip
 - Automatic rollback on errors
@@ -423,33 +431,33 @@ const { mutate: updateTags } = useMutation({
   mutationFn: updateTicketTags,
   onMutate: async (variables) => {
     // Cancel outgoing refetches
-    await queryClient.cancelQueries({ queryKey: ["ticket", variables.ticketId] });
+    await queryClient.cancelQueries({ queryKey: ['ticket', variables.ticketId] })
 
     // Snapshot previous value
-    const previous = queryClient.getQueryData(["ticket", variables.ticketId]);
+    const previous = queryClient.getQueryData(['ticket', variables.ticketId])
 
     // Optimistically update
-    queryClient.setQueryData(["ticket", variables.ticketId], (old: any) => ({
+    queryClient.setQueryData(['ticket', variables.ticketId], (old: any) => ({
       ...old,
       tags: [
         ...(old.tags || []).filter((tag: string) => !variables.tagsToRemove?.includes(tag)),
         ...(variables.tagsToAdd || []),
       ],
-    }));
+    }))
 
-    return { previous }; // Return context for rollback
+    return { previous } // Return context for rollback
   },
   onError: (err, variables, context) => {
     // Rollback on error
     if (context?.previous) {
-      queryClient.setQueryData(["ticket", variables.ticketId], context.previous);
+      queryClient.setQueryData(['ticket', variables.ticketId], context.previous)
     }
   },
   onSettled: (data, error, variables) => {
     // Always refetch after error or success
-    queryClient.invalidateQueries({ queryKey: ["ticket", variables.ticketId] });
+    queryClient.invalidateQueries({ queryKey: ['ticket', variables.ticketId] })
   },
-});
+})
 ```
 
 ## Chaining Multiple Actions
@@ -466,22 +474,23 @@ mutationFn: async (params) => {
       agentId: currentUser.agentId,
       assigneeId: currentUser.agentId,
       ticketId: ticketId,
-    });
+    })
   }
 
   // Second action: Send message (depends on assignment)
   return sendNewMessage({
-    agentId: currentUser?.agentId ?? "",
+    agentId: currentUser?.agentId ?? '',
     message: params.content,
     ticketId,
     messageType: params.type,
     attachmentUrls: params.attachmentUrls,
     attachmentFiles: params.attachmentFiles,
-  });
+  })
 }
 ```
 
 **When to use sequential:**
+
 - Second action needs data from first action's output
 - Actions have side effects that must complete in order
 - Business logic requires specific sequence
@@ -503,20 +512,22 @@ mutationFn: async ({ ticketId, agentId, newTags, messageContent }) => {
       agentId,
       body: messageContent,
       ticketId: ticketId,
-      messageType: "comment",
+      messageType: 'comment',
     }),
-  ]);
+  ])
 
-  return { tagResult, messageResult };
+  return { tagResult, messageResult }
 }
 ```
 
 **Benefits:**
+
 - Faster execution (runs in parallel)
 - Reduced total latency
 - All-or-nothing atomicity (if one fails, both fail)
 
 **When to use parallel:**
+
 - Actions are completely independent
 - No shared state or dependencies
 - Want to minimize total execution time
@@ -529,27 +540,27 @@ mutationFn: async ({ ticketId, agentId, resolution }) => {
   await updateTicketTags({
     ticketId,
     agentId,
-    tagsToAdd: ["resolved", resolution.category],
-  });
+    tagsToAdd: ['resolved', resolution.category],
+  })
 
   // Step 2: Send resolution message
   await sendMessage({
     agentId,
     body: resolution.message,
     ticketId: ticketId,
-    messageType: "comment",
-  });
+    messageType: 'comment',
+  })
 
   // Step 3: Close ticket
   const closeResult = await closeTicket({
     ticketId,
     agentId,
-  });
+  })
 
   // Step 4: Log to analytics (fire-and-forget)
-  logResolution(ticketId, resolution).catch(console.error);
+  logResolution(ticketId, resolution).catch(console.error)
 
-  return closeResult;
+  return closeResult
 }
 ```
 
@@ -558,34 +569,37 @@ mutationFn: async ({ ticketId, agentId, resolution }) => {
 ### 1. Always Use Service Layer
 
 **❌ Don't call actions directly in components:**
+
 ```typescript
 // Bad - direct action call in component
 const handleSend = async () => {
-  const client = getApiClient({ botId, workspaceId });
+  const client = getApiClient({ botId, workspaceId })
   const result = await client.callAction({
-    type: "sendMessage",
+    type: 'sendMessage',
     input: { adminId, body: message, intercomConversationId: conversationId },
-  });
-};
+  })
+}
 ```
 
 **✅ Do create service functions:**
+
 ```typescript
 // Good - service layer
 // services/message.ts
-export async function sendMessage(input: SendMessageAction["input"]) {
-  const client = getApiClient({ botId, workspaceId });
-  const result = await client.callAction({ type: "sendMessage", input });
-  return result.output as SendMessageAction["output"];
+export async function sendMessage(input: SendMessageAction['input']) {
+  const client = getApiClient({ botId, workspaceId })
+  const result = await client.callAction({ type: 'sendMessage', input })
+  return result.output as SendMessageAction['output']
 }
 
 // Component
 const handleSend = async () => {
-  await sendMessage({ agentId, body: message, ticketId: ticketId });
-};
+  await sendMessage({ agentId, body: message, ticketId: ticketId })
+}
 ```
 
 **Why:**
+
 - Centralized client configuration
 - Easier to test and mock
 - Reusable across components
@@ -594,43 +608,47 @@ const handleSend = async () => {
 ### 2. Type All Inputs/Outputs
 
 **❌ Don't use any or lose type information:**
+
 ```typescript
 // Bad - no types
 async function doSomething(data: any) {
-  const result = await client.callAction({ type: "someAction", input: data });
-  return result.output; // ← Type is unknown
+  const result = await client.callAction({ type: 'someAction', input: data })
+  return result.output // ← Type is unknown
 }
 ```
 
 **✅ Do use generated action types:**
+
 ```typescript
 // Good - full type safety
-async function doSomething(input: SomeAction["input"]) {
-  const result = await client.callAction({ type: "someAction", input });
-  return result.output as SomeAction["output"];
+async function doSomething(input: SomeAction['input']) {
+  const result = await client.callAction({ type: 'someAction', input })
+  return result.output as SomeAction['output']
 }
 ```
 
 ### 3. Handle Errors Gracefully
 
 **✅ Always provide error handling:**
+
 ```typescript
 const { mutate, error } = useMutation({
   mutationFn: sendMessage,
   onError: (error) => {
     // User feedback
-    toast.error("Failed to send message");
+    toast.error('Failed to send message')
     // Logging
-    console.error("Send message error:", error);
+    console.error('Send message error:', error)
     // Optional: Sentry/analytics
-    captureException(error);
+    captureException(error)
   },
-});
+})
 ```
 
 ### 4. Show Loading States
 
 **✅ Disable buttons during mutations:**
+
 ```typescript
 const { mutate: send, isPending } = useMutation({
   mutationFn: sendMessage,
@@ -649,49 +667,51 @@ return (
 ### 5. Provide User Feedback
 
 **✅ Communicate action results:**
+
 ```typescript
 const { mutate } = useMutation({
   mutationFn: closeTicket,
   onSuccess: () => {
-    toast.success("Ticket closed");
-    navigate("/tickets");
+    toast.success('Ticket closed')
+    navigate('/tickets')
   },
   onError: (error) => {
-    toast.error(`Failed: ${error.message}`);
+    toast.error(`Failed: ${error.message}`)
   },
-});
+})
 ```
 
 ### 6. Invalidate Queries After Mutations
 
 **✅ Keep cache fresh:**
+
 ```typescript
 const { mutate } = useMutation({
   mutationFn: updateTicketTags,
   onSuccess: (data, variables) => {
     // Invalidate specific ticket
     queryClient.invalidateQueries({
-      queryKey: ["ticket", variables.ticketId]
-    });
+      queryKey: ['ticket', variables.ticketId],
+    })
     // Invalidate list views
     queryClient.invalidateQueries({
-      queryKey: ["tickets"]
-    });
+      queryKey: ['tickets'],
+    })
   },
-});
+})
 ```
 
 ## Common Patterns Summary
 
-| Pattern | Use Case | Example |
-|---------|----------|---------|
-| **Simple Call** | Single action, no dependencies | `sendMessage()` |
-| **Conditional Call** | Only execute if condition met | Assign if unassigned |
-| **Service Wrapper** | Reusable action with custom params | All service functions |
-| **Sequential Chain** | Actions depend on each other | Assign → Send |
-| **Parallel Execution** | Independent actions | Tags + Message together |
-| **Optimistic Update** | Instant UI feedback | Message appears immediately |
-| **Error Recovery** | Rollback on failure | Restore previous state |
+| Pattern                | Use Case                           | Example                     |
+| ---------------------- | ---------------------------------- | --------------------------- |
+| **Simple Call**        | Single action, no dependencies     | `sendMessage()`             |
+| **Conditional Call**   | Only execute if condition met      | Assign if unassigned        |
+| **Service Wrapper**    | Reusable action with custom params | All service functions       |
+| **Sequential Chain**   | Actions depend on each other       | Assign → Send               |
+| **Parallel Execution** | Independent actions                | Tags + Message together     |
+| **Optimistic Update**  | Instant UI feedback                | Message appears immediately |
+| **Error Recovery**     | Rollback on failure                | Restore previous state      |
 
 ## Additional Resources
 
@@ -709,6 +729,7 @@ Error: Action "myAction" not found
 ```
 
 **Fix:** Ensure action name in `callAction()` matches the `name` field in your Action definition:
+
 ```typescript
 // Action definition
 export default new Action({ name: "sendMessage", ... });
@@ -724,20 +745,22 @@ Type 'string' is not assignable to type 'number'
 ```
 
 **Fix:** Check your input matches the action's Zod schema:
+
 ```typescript
 // Action expects number
 input: z.object({ count: z.number() })
 
 // ✅ Correct
-client.callAction({ type: "increment", input: { count: 5 } });
+client.callAction({ type: 'increment', input: { count: 5 } })
 
 // ❌ Wrong
-client.callAction({ type: "increment", input: { count: "5" } });
+client.callAction({ type: 'increment', input: { count: '5' } })
 ```
 
 ### Missing types after adding new action
 
 **Fix:** Regenerate types by restarting `adk dev`:
+
 ```bash
 # Stop dev server
 # Start again to regenerate types
@@ -751,11 +774,11 @@ Error: Unauthorized
 ```
 
 **Fix:** Verify client token and permissions:
+
 ```typescript
 const client = new APIClient({
   token: getPat(), // ← Ensure token is valid
-  botId: "...",
-  workspaceId: "...",
-});
+  botId: '...',
+  workspaceId: '...',
+})
 ```
-

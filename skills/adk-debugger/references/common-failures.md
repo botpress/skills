@@ -50,10 +50,10 @@ adk chat --single "Hello" --format json
 
 **Common causes:**
 
-| Cause | How to Verify |
-|-------|--------------|
-| No dev bot created | Check that `agent.local.json` has `devId` (set automatically on the first `adk dev` run, or manually via `adk link --local`). If missing, run `adk dev` at least once to create the dev bot. |
-| Integration not configured | Check Dev Console at localhost:3001 — look for unconfigured integrations |
+| Cause                      | How to Verify                                                                                                                                                                                |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| No dev bot created         | Check that `agent.local.json` has `devId` (set automatically on the first `adk dev` run, or manually via `adk link --local`). If missing, run `adk dev` at least once to create the dev bot. |
+| Integration not configured | Check Dev Console at localhost:3001 — look for unconfigured integrations                                                                                                                     |
 
 **Fix:** Work through the checklist top to bottom. Most "bot not responding" issues are missing config or a stopped dev server.
 
@@ -73,11 +73,11 @@ Look for `tool_call` spans with `success: false`. Some tools could be workflows 
 
 **Common causes:**
 
-| Cause | Trace Evidence |
-|-------|---------------|
-| Handler throws an error | `error` field has the exception message |
-| Input schema mismatch | `error` mentions validation or type error |
-| Integration auth expired | `error` mentions 401, unauthorized, or token expired |
+| Cause                      | Trace Evidence                                        |
+| -------------------------- | ----------------------------------------------------- |
+| Handler throws an error    | `error` field has the exception message               |
+| Input schema mismatch      | `error` mentions validation or type error             |
+| Integration auth expired   | `error` mentions 401, unauthorized, or token expired  |
 | Missing integration config | `error` mentions missing configuration or credentials |
 
 **Fix:**
@@ -131,13 +131,13 @@ Also check the Dev Console at localhost:3001 for integration status.
 
 **Common causes:**
 
-| Cause | How to Identify |
-|-------|----------------|
-| Auth expired or missing | Error mentions 401, unauthorized, or token |
-| Rate limited | Error mentions 429 or rate limit |
-| Wrong config values | Integration actions fail with config-related errors |
-| Events not registered in dev mode | Events work in production but not locally — re-run `adk dev` |
-| Channel routing misconfigured | Messages arrive but aren't routed to the right conversation handler |
+| Cause                             | How to Identify                                                     |
+| --------------------------------- | ------------------------------------------------------------------- |
+| Auth expired or missing           | Error mentions 401, unauthorized, or token                          |
+| Rate limited                      | Error mentions 429 or rate limit                                    |
+| Wrong config values               | Integration actions fail with config-related errors                 |
+| Events not registered in dev mode | Events work in production but not locally — re-run `adk dev`        |
+| Channel routing misconfigured     | Messages arrive but aren't routed to the right conversation handler |
 
 **Fix:**
 
@@ -204,21 +204,21 @@ Look for spans with type `code_execution_exception`.
 
 ### How the files work
 
-| File | Purpose | Git Status | Created By |
-|------|---------|-----------|-----------|
-| `agent.json` | Primary config: `botId`, `workspaceId`, `apiUrl` | Committed | `adk link` |
+| File               | Purpose                                                    | Git Status | Created By                                                   |
+| ------------------ | ---------------------------------------------------------- | ---------- | ------------------------------------------------------------ |
+| `agent.json`       | Primary config: `botId`, `workspaceId`, `apiUrl`           | Committed  | `adk link`                                                   |
 | `agent.local.json` | Local overrides: `botId`, `workspaceId`, `apiUrl`, `devId` | Gitignored | `adk dev` or `adk link --local` (sets `devId`), manual edits |
 
 **`agent.local.json` fields take precedence over `agent.json` fields.** If both files define `botId`, the local one wins.
 
 ### Common issues
 
-| Issue | Cause | Fix |
-|-------|-------|-----|
-| Wrong bot ID used | `agent.local.json` overrides `agent.json` botId | Check both files, remove or update the local override |
-| `adk chat` fails with "no devId" | `adk dev` hasn't been run yet (devId not set) | Run `adk dev` at least once to create the dev bot |
-| Different behavior on teammate's machine | They have different `agent.local.json` | Expected — local overrides are per-developer |
-| Deploy targets wrong bot | `agent.json` has wrong botId | Update `agent.json` via `adk link` or `adk config:set` |
+| Issue                                    | Cause                                           | Fix                                                    |
+| ---------------------------------------- | ----------------------------------------------- | ------------------------------------------------------ |
+| Wrong bot ID used                        | `agent.local.json` overrides `agent.json` botId | Check both files, remove or update the local override  |
+| `adk chat` fails with "no devId"         | `adk dev` hasn't been run yet (devId not set)   | Run `adk dev` at least once to create the dev bot      |
+| Different behavior on teammate's machine | They have different `agent.local.json`          | Expected — local overrides are per-developer           |
+| Deploy targets wrong bot                 | `agent.json` has wrong botId                    | Update `agent.json` via `adk link` or `adk config:set` |
 
 ### Checking your config
 

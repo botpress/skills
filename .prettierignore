@@ -1,0 +1,4 @@
+# Generator-owned JSON — written by jq in scripts/sync-versions.sh; jq style wins here.
+/.claude-plugin/
+# CI yaml is maintainer-owned; also lets the format check run without workflow-scope pushes.
+/.github/

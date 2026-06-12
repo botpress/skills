@@ -5,25 +5,30 @@
 A service layer sits between your UI components and the raw Botpress client, providing:
 
 **Abstraction**: Hide low-level client APIs behind domain-specific functions
+
 - UI calls `listTickets()` instead of `client.findTableRows({ table: "..." })`
 - Changes to table names or structure only affect the service layer
 
 **Type Safety**: Strong typing for inputs and outputs
+
 - Extract types from action/table definitions
 - TypeScript catches errors at compile time
 - IntelliSense guides developers
 
 **Reusability**: Share logic across components
+
 - `getTicketById()` used by multiple views
 - Consistent query patterns (filters, pagination)
 - Single source of truth for API calls
 
 **Testability**: Mock services instead of the entire client
+
 - Test UI logic without real API calls
 - Inject fake data easily
 - Faster test execution
 
 **Maintainability**: Centralized business logic
+
 - One place to add logging, error handling, caching
 - Easier to refactor
 - Self-documenting through function names
@@ -44,11 +49,13 @@ services/
 ```
 
 **Each service handles:**
+
 - Queries (reading from tables)
 - Commands (calling actions)
 - Type definitions for that domain
 
 **Example layout:**
+
 - `tickets.ts` (~150 lines): List, get, assign, snooze, open, close, update tags
 - `messages.ts` (~45 lines): List messages, get latest message
 - `message.ts` (~10 lines): Send single message
@@ -62,16 +69,17 @@ Actions are backend operations exposed to the frontend. Wrap them with domain-sp
 ### Basic Pattern
 
 ```typescript
-export async function assignUserToTicket(input: AssignTicketAction["input"]) {
+export async function assignUserToTicket(input: AssignTicketAction['input']) {
   const result = await client.callAction({
-    type: "assignTicket",
+    type: 'assignTicket',
     input,
-  });
-  return result.output as AssignTicketAction["output"];
+  })
+  return result.output as AssignTicketAction['output']
 }
 ```
 
 **Key points**:
+
 - Function name is domain-specific (`assignUserToTicket`)
 - Input type extracted from action definition (`AssignTicketAction["input"]`)
 - Output type extracted and cast (`AssignTicketAction["output"]`)
@@ -83,25 +91,26 @@ Sometimes you want friendlier parameters than the raw action input:
 
 ```typescript
 type SnoozeTicketParams = {
-  ticketId: string;
-  snoozeUntil: string | null;
-  agentId: string;
-};
+  ticketId: string
+  snoozeUntil: string | null
+  agentId: string
+}
 
 export async function snoozeTicket({ ticketId, snoozeUntil, agentId }: SnoozeTicketParams) {
   const result = await client.callAction({
-    type: "snoozeTicket",
+    type: 'snoozeTicket',
     input: {
       ticketId,
       agentId,
       snoozeUntil,
     },
-  });
-  return result.output as SnoozeTicketAction["output"];
+  })
+  return result.output as SnoozeTicketAction['output']
 }
 ```
 
 **Why custom params?**
+
 - UI calls `snoozeTicket({ ticketId, ... })` — cleaner
 - Maps to backend's expected field names
 - Can add validation, defaults, transformations
@@ -110,29 +119,29 @@ export async function snoozeTicket({ ticketId, snoozeUntil, agentId }: SnoozeTic
 
 ```typescript
 type OpenTicketParams = {
-  ticketId: string;
-  agentId: string;
-};
+  ticketId: string
+  agentId: string
+}
 
 export async function openTicket({ ticketId, agentId }: OpenTicketParams) {
   const result = await client.callAction({
-    type: "openTicket",
+    type: 'openTicket',
     input: { ticketId, agentId },
-  });
-  return result.output as OpenTicketAction["output"];
+  })
+  return result.output as OpenTicketAction['output']
 }
 
 type CloseTicketParams = {
-  ticketId: string;
-  agentId: string;
-};
+  ticketId: string
+  agentId: string
+}
 
 export async function closeTicket({ ticketId, agentId }: CloseTicketParams) {
   const result = await client.callAction({
-    type: "closeTicket",
+    type: 'closeTicket',
     input: { ticketId, agentId },
-  });
-  return result.output as CloseTicketAction["output"];
+  })
+  return result.output as CloseTicketAction['output']
 }
 ```
 
@@ -142,28 +151,23 @@ export async function closeTicket({ ticketId, agentId }: CloseTicketParams) {
 
 ```typescript
 type UpdateTicketTagsParams = {
-  ticketId: string;
-  agentId: string;
-  tagsToAdd?: string[];
-  tagsToRemove?: string[];
-};
+  ticketId: string
+  agentId: string
+  tagsToAdd?: string[]
+  tagsToRemove?: string[]
+}
 
-export async function updateTicketTags({
-  ticketId,
-  agentId,
-  tagsToAdd,
-  tagsToRemove
-}: UpdateTicketTagsParams) {
+export async function updateTicketTags({ ticketId, agentId, tagsToAdd, tagsToRemove }: UpdateTicketTagsParams) {
   const result = await client.callAction({
-    type: "updateTicketTags",
+    type: 'updateTicketTags',
     input: {
       ticketId,
       agentId,
       tagsToAdd,
       tagsToRemove,
     },
-  });
-  return result.output as UpdateTicketTagsAction["output"];
+  })
+  return result.output as UpdateTicketTagsAction['output']
 }
 ```
 
@@ -172,10 +176,10 @@ export async function updateTicketTags({
 ### Minimal Example
 
 ```typescript
-export async function sendMessage(input: SendMessageAction["input"]) {
-  const client = getApiClient({ botId, workspaceId });
-  const result = await client.callAction({ type: "sendMessage", input });
-  return result.output as SendMessageAction["output"];
+export async function sendMessage(input: SendMessageAction['input']) {
+  const client = getApiClient({ botId, workspaceId })
+  const result = await client.callAction({ type: 'sendMessage', input })
+  return result.output as SendMessageAction['output']
 }
 ```
 
@@ -192,24 +196,25 @@ Table queries benefit from domain-specific functions with common filters and typ
 ```typescript
 type ListTicketsParams = Pick<
   Parameters<typeof client.findTableRows>[0],
-  "filter" | "group" | "limit" | "offset" | "orderBy" | "orderDirection" | "search"
->;
+  'filter' | 'group' | 'limit' | 'offset' | 'orderBy' | 'orderDirection' | 'search'
+>
 
-type TicketRow = BaseTableRow & TicketTableRow;
+type TicketRow = BaseTableRow & TicketTableRow
 
 export async function listTickets(params: ListTicketsParams) {
   const result = await client.findTableRows({
-    table: "TicketsTable",
-    ...params
-  });
+    table: 'TicketsTable',
+    ...params,
+  })
   return {
     ...result,
     rows: result.rows as TicketRow[],
-  };
+  }
 }
 ```
 
 **Key points**:
+
 - `Pick` utility extracts allowed parameters from client method signature
 - `TicketRow` type combines base table fields with domain-specific fields
 - Hardcoded table name — UI doesn't need to know this
@@ -222,18 +227,19 @@ export async function listTickets(params: ListTicketsParams) {
 ```typescript
 export async function getTicketById(ticketId: string) {
   const result = await client.findTableRows({
-    table: "TicketsTable",
+    table: 'TicketsTable',
     filter: { ticketId },
     limit: 1,
-  });
+  })
   if (!result.rows.length) {
-    throw new Error(`Ticket with ID ${ticketId} not found`);
+    throw new Error(`Ticket with ID ${ticketId} not found`)
   }
-  return result.rows[0] as BaseTableRow & TicketTableRow;
+  return result.rows[0] as BaseTableRow & TicketTableRow
 }
 ```
 
 **Pattern**:
+
 - Simple parameter (just the ID)
 - Filter to single row
 - Error if not found
@@ -242,34 +248,35 @@ export async function getTicketById(ticketId: string) {
 ### Aggregation Pattern (GROUP BY)
 
 ```typescript
-type TicketCountByState = Record<"open" | "closed" | "snoozed", number>;
+type TicketCountByState = Record<'open' | 'closed' | 'snoozed', number>
 
 export async function getTicketCountsByState(filter?: Record<string, unknown>) {
   const result = await client.findTableRows({
-    table: "TicketsTable",
+    table: 'TicketsTable',
     group: {
-      state: "key",
-      ticketId: ["count"],
+      state: 'key',
+      ticketId: ['count'],
     },
     filter,
-  });
+  })
 
   const counts: TicketCountByState = {
     open: 0,
     closed: 0,
     snoozed: 0,
-  };
+  }
 
   result.rows.forEach((row) => {
-    const state = row.state as "open" | "closed" | "snoozed";
-    counts[state] = (row as unknown as { ticketIdCount: number }).ticketIdCount;
-  });
+    const state = row.state as 'open' | 'closed' | 'snoozed'
+    counts[state] = (row as unknown as { ticketIdCount: number }).ticketIdCount
+  })
 
-  return counts;
+  return counts
 }
 ```
 
 **Aggregation pattern**:
+
 - Use `group` parameter for SQL-like GROUP BY
 - Field name + `"key"` groups by that field
 - Field name + `["count"]` counts rows per group
@@ -281,31 +288,32 @@ export async function getTicketCountsByState(filter?: Record<string, unknown>) {
 ```typescript
 type ListMessagesParams = Pick<
   Parameters<typeof client.findTableRows>[0],
-  "filter" | "group" | "limit" | "offset" | "orderBy" | "orderDirection" | "search"
->;
+  'filter' | 'group' | 'limit' | 'offset' | 'orderBy' | 'orderDirection' | 'search'
+>
 
-type MessageRow = BaseTableRow & MessageTableRow;
+type MessageRow = BaseTableRow & MessageTableRow
 
 export async function listMessages(
   ticketId: string,
-  { orderBy = "createdAt", orderDirection = "asc", limit = 1000, ...params }: ListMessagesParams
+  { orderBy = 'createdAt', orderDirection = 'asc', limit = 1000, ...params }: ListMessagesParams
 ) {
   const result = await client.findTableRows({
-    table: "MessagesTable",
+    table: 'MessagesTable',
     filter: { ticketId },
     orderBy,
     orderDirection,
     limit,
     ...params,
-  });
+  })
   return {
     ...result,
     rows: result.rows as MessageRow[],
-  };
+  }
 }
 ```
 
 **Pattern**:
+
 - First parameter is required filter (ticketId)
 - Second parameter is optional query params with defaults
 - Merge params with defaults and required filters
@@ -315,20 +323,21 @@ export async function listMessages(
 ```typescript
 export async function getLatestMessageInTicket(ticketId: string) {
   const result = await client.findTableRows({
-    table: "MessagesTable",
-    filter: { ticketId, type: "comment" },
-    orderBy: "createdAt",
-    orderDirection: "desc",
+    table: 'MessagesTable',
+    filter: { ticketId, type: 'comment' },
+    orderBy: 'createdAt',
+    orderDirection: 'desc',
     limit: 1,
-  });
+  })
   if (!result.rows.length) {
-    throw new Error(`No messages found for ticket with ID ${ticketId}`);
+    throw new Error(`No messages found for ticket with ID ${ticketId}`)
   }
-  return result.rows[0] as BaseTableRow & MessageTableRow;
+  return result.rows[0] as BaseTableRow & MessageTableRow
 }
 ```
 
 **Pattern**:
+
 - Combine filter + orderBy desc + limit 1
 - Returns single row (most recent)
 - Error if empty
@@ -343,29 +352,30 @@ Type safety comes from extracting types from your action and table definitions.
 
 ```typescript
 // In your types file (e.g., types/index.ts)
-import type { BotActionDefinitions } from "@botpress/runtime/_types/actions";
+import type { BotActionDefinitions } from '@botpress/runtime/_types/actions'
 
-export type SendMessageAction = BotActionDefinitions["sendMessage"];
-export type AssignTicketAction = BotActionDefinitions["assignTicket"];
-export type SnoozeTicketAction = BotActionDefinitions["snoozeTicket"];
-export type OpenTicketAction = BotActionDefinitions["openTicket"];
-export type CloseTicketAction = BotActionDefinitions["closeTicket"];
-export type UpdateTicketTagsAction = BotActionDefinitions["updateTicketTags"];
+export type SendMessageAction = BotActionDefinitions['sendMessage']
+export type AssignTicketAction = BotActionDefinitions['assignTicket']
+export type SnoozeTicketAction = BotActionDefinitions['snoozeTicket']
+export type OpenTicketAction = BotActionDefinitions['openTicket']
+export type CloseTicketAction = BotActionDefinitions['closeTicket']
+export type UpdateTicketTagsAction = BotActionDefinitions['updateTicketTags']
 ```
 
 **Then in services**:
+
 ```typescript
 import type {
   AssignTicketAction,
   SnoozeTicketAction,
   OpenTicketAction,
   CloseTicketAction,
-  UpdateTicketTagsAction
-} from "../types";
+  UpdateTicketTagsAction,
+} from '../types'
 
-export async function assignUserToTicket(input: AssignTicketAction["input"]) {
+export async function assignUserToTicket(input: AssignTicketAction['input']) {
   // ...
-  return result.output as AssignTicketAction["output"];
+  return result.output as AssignTicketAction['output']
 }
 ```
 
@@ -373,26 +383,27 @@ export async function assignUserToTicket(input: AssignTicketAction["input"]) {
 
 ```typescript
 // In your types file
-import type { TableDefinitions } from "@botpress/runtime/_types/tables";
+import type { TableDefinitions } from '@botpress/runtime/_types/tables'
 
 // BaseTableRow: id is number, timestamps are camelCase
-export type BaseTableRow = { id: number; createdAt: string; updatedAt: string };
-export type TicketTableRow = TableDefinitions["TicketsTable"]["Output"];
-export type MessageTableRow = TableDefinitions["MessagesTable"]["Output"];
+export type BaseTableRow = { id: number; createdAt: string; updatedAt: string }
+export type TicketTableRow = TableDefinitions['TicketsTable']['Output']
+export type MessageTableRow = TableDefinitions['MessagesTable']['Output']
 ```
 
 **Then in services**:
-```typescript
-import type { BaseTableRow, TicketTableRow } from "../types";
 
-type TicketRow = BaseTableRow & TicketTableRow;
+```typescript
+import type { BaseTableRow, TicketTableRow } from '../types'
+
+type TicketRow = BaseTableRow & TicketTableRow
 
 export async function listTickets(params: ListTicketsParams) {
-  const result = await client.findTableRows({ table: "TicketsTable", ...params });
+  const result = await client.findTableRows({ table: 'TicketsTable', ...params })
   return {
     ...result,
     rows: result.rows as TicketRow[],
-  };
+  }
 }
 ```
 
@@ -403,11 +414,12 @@ Extract types from client methods using TypeScript utilities:
 ```typescript
 type ListTicketsParams = Pick<
   Parameters<typeof client.findTableRows>[0],
-  "filter" | "group" | "limit" | "offset" | "orderBy" | "orderDirection" | "search"
->;
+  'filter' | 'group' | 'limit' | 'offset' | 'orderBy' | 'orderDirection' | 'search'
+>
 ```
 
 **What this does**:
+
 - `Parameters<typeof client.findTableRows>[0]` — get first parameter type
 - `Pick<..., "filter" | "group" | ...>` — extract specific fields
 - Result: Type-safe parameter object matching client API
@@ -419,6 +431,7 @@ type ListTicketsParams = Pick<
 ### Consistent Naming
 
 **Good**:
+
 - `listTickets()` — returns array
 - `getTicketById()` — returns single item or throws
 - `createTicket()` — creates new
@@ -426,6 +439,7 @@ type ListTicketsParams = Pick<
 - `deleteTicket()` — removes
 
 **Conventions**:
+
 - `list*` for queries returning arrays
 - `get*` for queries returning single items
 - `create*`, `update*`, `delete*` for mutations
@@ -435,40 +449,40 @@ type ListTicketsParams = Pick<
 
 ```typescript
 if (!result.rows.length) {
-  throw new Error(`Ticket with ID ${ticketId} not found`);
+  throw new Error(`Ticket with ID ${ticketId} not found`)
 }
 ```
 
 **When to throw**:
+
 - Expected single item, got none
 - Invalid parameters (validate before API call)
 - Business rule violations
 
 **When to return empty**:
+
 - List queries (return `[]` if no results)
 - Optional lookups (return `null` or `undefined`)
 
 ### Reusable Utilities
 
 ```typescript
-async function findOne<T>(
-  table: string,
-  filter: Record<string, unknown>
-): Promise<T> {
-  const result = await client.findTableRows({ table, filter, limit: 1 });
+async function findOne<T>(table: string, filter: Record<string, unknown>): Promise<T> {
+  const result = await client.findTableRows({ table, filter, limit: 1 })
   if (!result.rows.length) {
-    throw new Error(`No row found in ${table} with filter ${JSON.stringify(filter)}`);
+    throw new Error(`No row found in ${table} with filter ${JSON.stringify(filter)}`)
   }
-  return result.rows[0] as T;
+  return result.rows[0] as T
 }
 
 // Then use in services
 export async function getTicketById(ticketId: string) {
-  return findOne<TicketRow>("TicketsTable", { ticketId });
+  return findOne<TicketRow>('TicketsTable', { ticketId })
 }
 ```
 
 **Reusable patterns**:
+
 - `findOne()` — Get single row or throw
 - `findMany()` — Get array with defaults
 - `callTypedAction()` — Wrapper for action calls with logging
@@ -478,12 +492,12 @@ export async function getTicketById(ticketId: string) {
 
 ```typescript
 // Module-level client: When all functions use same config
-import { getApiClient } from "../stores/clientsStore";
-const client = getApiClient({ botId, workspaceId });
+import { getApiClient } from '../stores/clientsStore'
+const client = getApiClient({ botId, workspaceId })
 
 // Or per-function client: When config might vary
-export async function sendMessage(input: SendMessageAction["input"]) {
-  const client = getApiClient({ botId, workspaceId });
+export async function sendMessage(input: SendMessageAction['input']) {
+  const client = getApiClient({ botId, workspaceId })
   // ...
 }
 ```
@@ -506,6 +520,7 @@ type SnoozeTicketParams = {
 ```
 
 **Organization**:
+
 - Import shared types from types file
 - Define query params at module level
 - Define custom params near function that uses them
@@ -530,7 +545,7 @@ When creating a service layer:
 - [ ] Return empty arrays for list queries with no results
 - [ ] Add defaults for common query parameters (limit, orderBy)
 - [ ] Extract reusable patterns into utility functions
-- [ ] Follow consistent naming conventions (list*, get*, create*, etc.)
+- [ ] Follow consistent naming conventions (list*, get*, create\*, etc.)
 
 **Result**: Type-safe, testable, maintainable service layer that hides Botpress client complexity from UI code.
 

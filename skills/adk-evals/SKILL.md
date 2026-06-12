@@ -26,6 +26,7 @@ Use this skill when the developer asks about:
 Or when you are developing an ADK bot and need to write the equivalent of unit/end-to-end tests.
 
 **Trigger questions:**
+
 - "How do I write an eval?"
 - "How do I test my workflow?"
 - "How do I assert that a tool was called with specific params?"
@@ -37,11 +38,11 @@ Or when you are developing an ADK bot and need to write the equivalent of unit/e
 
 ## Available Documentation
 
-| File | Contents |
-|------|----------|
-| `references/eval-format.md` | Complete file format — all fields, turn types, assertion categories, match operators, setup, outcome, options |
-| `references/testing-workflow.md` | Running evals, interpreting output, using traces, the write → test → iterate loop, CI integration |
-| `references/test-patterns.md` | Per-primitive patterns for actions, tools, workflows, conversations, and state |
+| File                             | Contents                                                                                                      |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `references/eval-format.md`      | Complete file format — all fields, turn types, assertion categories, match operators, setup, outcome, options |
+| `references/testing-workflow.md` | Running evals, interpreting output, using traces, the write → test → iterate loop, CI integration             |
+| `references/test-patterns.md`    | Per-primitive patterns for actions, tools, workflows, conversations, and state                                |
 
 ## How to Answer
 
@@ -73,10 +74,7 @@ export default new Eval({
     {
       user: 'Hi!',
       assert: {
-        response: [
-          { not_contains: 'error' },
-          { llm_judge: 'Response is friendly and offers to help' },
-        ],
+        response: [{ not_contains: 'error' }, { llm_judge: 'Response is friendly and offers to help' }],
         tools: [{ not_called: 'createTicket' }],
         state: [{ path: 'conversation.greeted', equals: true }],
       },
@@ -96,21 +94,21 @@ export default new Eval({
 
 ### Turn types
 
-| Turn | When to use |
-|------|------------|
-| `user: 'message'` | Standard user message |
+| Turn                       | When to use                                      |
+| -------------------------- | ------------------------------------------------ |
+| `user: 'message'`          | Standard user message                            |
 | `event: { type, payload }` | Non-message trigger (webhook, integration event) |
-| `expectSilence: true` | Assert bot does NOT respond |
+| `expectSilence: true`      | Assert bot does NOT respond                      |
 
 ### Assertion categories
 
-| Category | What it checks |
-|----------|---------------|
+| Category   | What it checks                                              |
+| ---------- | ----------------------------------------------------------- |
 | `response` | Bot reply text (contains, not_contains, matches, llm_judge) |
-| `tools` | Tool calls (called, not_called, call_order, params) |
-| `state` | Bot/user/conversation state (equals, changed) |
-| `workflow` | Workflow execution (entered, completed) |
-| `timing` | Response time in ms (lte, gte) |
+| `tools`    | Tool calls (called, not_called, call_order, params)         |
+| `state`    | Bot/user/conversation state (equals, changed)               |
+| `workflow` | Workflow execution (entered, completed)                     |
+| `timing`   | Response time in ms (lte, gte)                              |
 
 ### CLI commands
 
@@ -143,7 +141,9 @@ adk evals runs --latest -v       # with full details
 
 ```typescript
 // WRONG — missing user or event
-{ expectSilence: true }
+{
+  expectSilence: true
+}
 ```
 
 ---
@@ -159,7 +159,9 @@ adk evals runs --latest -v       # with full details
 
 ```typescript
 // INCOMPLETE — doesn't verify params were correct
-{ called: 'createTicket' }
+{
+  called: 'createTicket'
+}
 ```
 
 ---
@@ -193,8 +195,8 @@ setup: {
 ```typescript
 // WRONG — depends on the bot correctly processing setup turns
 conversation: [
-  { user: 'I am on the pro plan' },      // hoping bot sets user.plan
-  { user: 'I need help with billing' },   // actual test turn
+  { user: 'I am on the pro plan' }, // hoping bot sets user.plan
+  { user: 'I need help with billing' }, // actual test turn
 ]
 ```
 
@@ -203,20 +205,24 @@ conversation: [
 ## Example Questions
 
 **Writing evals:**
+
 - "Write an eval that tests my createTicket tool is called with the right priority"
 - "How do I assert that the bot stays silent after an internal event?"
 - "How do I test a multi-turn conversation where context is retained?"
 
 **Running evals:**
+
 - "How do I run only regression evals?"
 - "How do I see which assertions failed and why?"
 - "How do I integrate evals into GitHub Actions?"
 
 **Debugging:**
+
 - "My eval says the tool wasn't called but I think it was — how do I check?"
 - "How do I inspect what the bot actually did during an eval?"
 
 **Per-primitive:**
+
 - "How do I test a workflow that uses step.sleep()?"
 - "How do I test that state changed from the seeded value?"
 

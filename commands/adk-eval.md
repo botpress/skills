@@ -1,7 +1,7 @@
 ---
 name: adk-eval
 description: Write, run, or debug evals for an ADK bot
-argument-hint: "[what to test]"
+argument-hint: '[what to test]'
 ---
 
 Load the `adk-evals` and `adk` skills, then help with evals immediately.

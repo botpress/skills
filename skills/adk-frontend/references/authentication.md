@@ -18,6 +18,7 @@ Personal Access Tokens (PATs) are the primary authentication mechanism for Botpr
 ### Token Scopes
 
 PATs inherit permissions from the user who created them:
+
 - Workspace-level operations (list bots, manage resources)
 - Bot-level operations (send messages, query tables)
 - User profile access via `client.getAccount()`
@@ -47,10 +48,10 @@ This pattern uses **cookie-based storage** for PATs instead of localStorage:
 
 ```typescript
 // ✅ GOOD - Secure cookie settings
-document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`
 
 // ⚠️  BETTER - Add Secure flag in production
-document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax;Secure`;
+document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax;Secure`
 
 // 🔒 BEST - HttpOnly cookies (requires server-side rendering)
 // Set via HTTP header: Set-Cookie: token=...; HttpOnly; Secure; SameSite=Strict
@@ -64,18 +65,19 @@ Here's a complete authentication system implementation. Let's walk through every
 
 ```typescript
 interface AuthContextType {
-  token: string | null;
-  isAuthenticated: boolean;
-  userProfile: (BaseTableRow & AgentTableRow) | null;
-  isLoadingProfile: boolean;
-  login: (token: string) => void;
-  logout: () => void;
+  token: string | null
+  isAuthenticated: boolean
+  userProfile: (BaseTableRow & AgentTableRow) | null
+  isLoadingProfile: boolean
+  login: (token: string) => void
+  logout: () => void
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | undefined>(undefined)
 ```
 
 **What it provides:**
+
 - `token` - The PAT itself
 - `isAuthenticated` - Boolean flag for auth status
 - `userProfile` - User data fetched from bot tables
@@ -86,32 +88,33 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 ### 2. Cookie Helper Functions (Lines 22-38)
 
 ```typescript
-const TOKEN_COOKIE_KEY = "botpress_pat";
+const TOKEN_COOKIE_KEY = 'botpress_pat'
 
 // Set cookie with 1-year expiration
 function setCookie(name: string, value: string, days = 365) {
-  const expires = new Date();
-  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
-  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+  const expires = new Date()
+  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000)
+  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`
 }
 
 // Retrieve cookie by name
 function getCookie(name: string): string | null {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
+  const value = `; ${document.cookie}`
+  const parts = value.split(`; ${name}=`)
   if (parts.length === 2) {
-    return parts.pop()?.split(";").shift() || null;
+    return parts.pop()?.split(';').shift() || null
   }
-  return null;
+  return null
 }
 
 // Delete cookie by setting expiration to past date
 function deleteCookie(name: string) {
-  document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
+  document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`
 }
 ```
 
 **Key points:**
+
 - Default 1-year expiration (PATs are long-lived)
 - `SameSite=Lax` provides CSRF protection
 - `path=/` makes cookie available to entire app
@@ -124,26 +127,27 @@ The `AuthProvider` component manages authentication state and orchestrates the l
 #### State Management (Lines 42-46)
 
 ```typescript
-const [token, setToken] = useState<string | null>(null);
-const [userProfile, setUserProfile] = useState<(BaseTableRow & AgentTableRow) | null>(null);
-const [isLoading, setIsLoading] = useState(true);
-const [isLoadingProfile, setIsLoadingProfile] = useState(false);
-const posthog = usePostHog();
+const [token, setToken] = useState<string | null>(null)
+const [userProfile, setUserProfile] = useState<(BaseTableRow & AgentTableRow) | null>(null)
+const [isLoading, setIsLoading] = useState(true)
+const [isLoadingProfile, setIsLoadingProfile] = useState(false)
+const posthog = usePostHog()
 ```
 
 #### Load Token from Cookie on Mount (Lines 49-55)
 
 ```typescript
 useEffect(() => {
-  const storedToken = getCookie(TOKEN_COOKIE_KEY);
+  const storedToken = getCookie(TOKEN_COOKIE_KEY)
   if (storedToken) {
-    setToken(storedToken);
+    setToken(storedToken)
   }
-  setIsLoading(false);
-}, []);
+  setIsLoading(false)
+}, [])
 ```
 
 **What happens:**
+
 1. On app startup, check for existing PAT in cookies
 2. If found, restore authentication state
 3. Stop showing loading spinner
@@ -155,29 +159,29 @@ This is the most complex part - it handles profile fetching with automatic retry
 ```typescript
 useEffect(() => {
   if (!token) {
-    setUserProfile(null);
-    setIsLoadingProfile(false);
-    return;
+    setUserProfile(null)
+    setIsLoadingProfile(false)
+    return
   }
 
   const fetchUserProfile = async () => {
-    setIsLoadingProfile(true);
+    setIsLoadingProfile(true)
     try {
       // Step 1: Get account info from Botpress API
-      const client = getApiClient();
-      const { account: user } = await client.getAccount({});
+      const client = getApiClient()
+      const { account: user } = await client.getAccount({})
 
       if (!user.email) {
-        throw new Error("User email not found in account data");
+        throw new Error('User email not found in account data')
       }
 
       // Step 2: Fetch user profile from bot's admin table
-      const result = await getMyUserProfile(user.email);
-      setUserProfile(result);
+      const result = await getMyUserProfile(user.email)
+      setUserProfile(result)
 
       // Step 3: Clear reload flag on success
       if (typeof window !== 'undefined') {
-        sessionStorage.removeItem('auth_reload_attempted');
+        sessionStorage.removeItem('auth_reload_attempted')
       }
 
       // Step 4: Identify user in PostHog analytics
@@ -185,43 +189,42 @@ useEffect(() => {
         posthog?.identify(result.id, {
           email: result.email,
           name: result.name,
-        });
+        })
       }
     } catch (error) {
-      console.error("Failed to fetch user profile:", error);
+      console.error('Failed to fetch user profile:', error)
 
       // Retry logic: Reload page once on failure
-      const hasReloaded = typeof window !== 'undefined'
-        ? sessionStorage.getItem('auth_reload_attempted')
-        : null;
+      const hasReloaded = typeof window !== 'undefined' ? sessionStorage.getItem('auth_reload_attempted') : null
 
       if (!hasReloaded) {
         // First failure - try reloading
-        console.log("Authentication failed, reloading page to reinitialize...");
+        console.log('Authentication failed, reloading page to reinitialize...')
         if (typeof window !== 'undefined') {
-          sessionStorage.setItem('auth_reload_attempted', 'true');
-          window.location.reload();
+          sessionStorage.setItem('auth_reload_attempted', 'true')
+          window.location.reload()
         }
       } else {
         // Second failure - logout
-        console.error("Authentication failed after reload, logging out...");
+        console.error('Authentication failed after reload, logging out...')
         if (typeof window !== 'undefined') {
-          sessionStorage.removeItem('auth_reload_attempted');
+          sessionStorage.removeItem('auth_reload_attempted')
         }
-        setToken(null);
-        setUserProfile(null);
-        deleteCookie(TOKEN_COOKIE_KEY);
+        setToken(null)
+        setUserProfile(null)
+        deleteCookie(TOKEN_COOKIE_KEY)
       }
     } finally {
-      setIsLoadingProfile(false);
+      setIsLoadingProfile(false)
     }
-  };
+  }
 
-  fetchUserProfile();
-}, [token, posthog]);
+  fetchUserProfile()
+}, [token, posthog])
 ```
 
 **What happens:**
+
 1. When token changes, fetch user profile
 2. First, get account info from Botpress API (`client.getAccount()`)
 3. Use email to query bot's admin table for full profile
@@ -236,12 +239,13 @@ Sometimes the Botpress client can get into a stale state. A page reload often fi
 
 ```typescript
 const login = (newToken: string) => {
-  setToken(newToken);
-  setCookie(TOKEN_COOKIE_KEY, newToken);
-};
+  setToken(newToken)
+  setCookie(TOKEN_COOKIE_KEY, newToken)
+}
 ```
 
 **What happens:**
+
 1. Update state with new token
 2. Persist token to cookie
 3. Triggers profile fetch via useEffect
@@ -250,14 +254,15 @@ const login = (newToken: string) => {
 
 ```typescript
 const logout = () => {
-  setToken(null);
-  setUserProfile(null);
-  deleteCookie(TOKEN_COOKIE_KEY);
-  posthog?.reset();
-};
+  setToken(null)
+  setUserProfile(null)
+  deleteCookie(TOKEN_COOKIE_KEY)
+  posthog?.reset()
+}
 ```
 
 **What happens:**
+
 1. Clear token from state
 2. Clear user profile
 3. Delete cookie
@@ -281,11 +286,11 @@ Shows a spinner while checking for stored token on mount.
 
 ```typescript
 export function useAuth() {
-  const context = useContext(AuthContext);
+  const context = useContext(AuthContext)
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error('useAuth must be used within an AuthProvider')
   }
-  return context;
+  return context
 }
 ```
 
@@ -295,7 +300,7 @@ Custom hook to access auth context with type safety.
 
 ```typescript
 export function getPat() {
-  return getCookie(TOKEN_COOKIE_KEY);
+  return getCookie(TOKEN_COOKIE_KEY)
 }
 ```
 
@@ -308,11 +313,12 @@ The profile fetching strategy uses two data sources:
 ### 1. Botpress Account API
 
 ```typescript
-const client = getApiClient();
-const { account: user } = await client.getAccount({});
+const client = getApiClient()
+const { account: user } = await client.getAccount({})
 ```
 
 Returns basic account information:
+
 - `id` - Botpress user ID
 - `email` - User's email address
 - `displayName` - Display name
@@ -325,25 +331,27 @@ Returns basic account information:
 ```typescript
 // From services/users.ts
 export async function getMyUserProfile(email: string) {
-  const client = getApiClient({ botId, workspaceId });
+  const client = getApiClient({ botId, workspaceId })
   const result = await client.findTableRows({
-    table: "AgentsTable",
+    table: 'AgentsTable',
     filter: { email },
     limit: 1,
-  });
+  })
   if (!result.rows.length) {
-    throw new Error(`User with email ${email} not found`);
+    throw new Error(`User with email ${email} not found`)
   }
-  return result.rows[0] as BaseTableRow & AgentTableRow;
+  return result.rows[0] as BaseTableRow & AgentTableRow
 }
 ```
 
 **What it does:**
+
 1. Use email from account API as lookup key
 2. Query bot's admin table for full profile
 3. Return combined type with all user data
 
 **Why two sources?**
+
 - Botpress API provides authentication info
 - Bot tables provide application-specific data (roles, preferences, metadata)
 
@@ -353,17 +361,18 @@ The API client is initialized with the PAT from cookies:
 
 ```typescript
 // From stores/clientsStore.ts
-import { getPat } from "../lib/auth";
+import { getPat } from '../lib/auth'
 
 const newClient = new APIClient({
-  apiUrl: "https://api.botpress.cloud",
+  apiUrl: 'https://api.botpress.cloud',
   workspaceId: props?.workspaceId,
-  token: getPat() ?? "",
+  token: getPat() ?? '',
   botId: props?.botId,
-});
+})
 ```
 
 **Key points:**
+
 - `token` is pulled from cookie via `getPat()`
 - Client is scoped to specific workspace/bot
 - Clients are cached in Zustand store by key
@@ -377,14 +386,14 @@ This pattern uses TanStack Router's context system for route protection:
 ```typescript
 interface RouterContext {
   auth?: {
-    userProfile: (BaseTableRow & AgentTableRow) | null;
-    isAuthenticated: boolean;
-  };
+    userProfile: (BaseTableRow & AgentTableRow) | null
+    isAuthenticated: boolean
+  }
 }
 
 export const router = createRouter({
   routeTree,
-  context: {} as RouterContext
+  context: {} as RouterContext,
 })
 ```
 
@@ -408,7 +417,7 @@ export function InnerApp() {
 }
 ```
 
-### 3. Check Auth in Root Route (__root.tsx)
+### 3. Check Auth in Root Route (\_\_root.tsx)
 
 ```typescript
 export const Route = createRootRoute({
@@ -448,6 +457,7 @@ function RootComponent() {
 ```
 
 **What happens:**
+
 1. On every route change, check `isAuthenticated`
 2. If not authenticated (and not on callback route), show auth screen
 3. Auth callback route is special-cased to complete OAuth flow
@@ -464,7 +474,7 @@ export const Route = createFileRoute('/admin')({
       throw redirect({ to: '/inbox' })
     }
   },
-  component: AdminComponent
+  component: AdminComponent,
 })
 ```
 
@@ -559,6 +569,7 @@ User is authenticated!
 ```
 
 **Security notes:**
+
 - PAT is passed in URL query parameter (brief exposure)
 - Immediately stored in cookie and removed from URL via navigation
 - Cookie has `SameSite=Lax` protection
@@ -567,15 +578,16 @@ User is authenticated!
 ## Logout Flow
 
 ```typescript
-const { logout } = useAuth();
+const { logout } = useAuth()
 
 const handleLogout = () => {
-  logout();
+  logout()
   // User is automatically redirected to AuthScreen by RootComponent
-};
+}
 ```
 
 **What happens:**
+
 1. Call `logout()` from auth context
 2. Token cleared from state
 3. Profile cleared from state
@@ -619,7 +631,7 @@ if (result) {
   posthog?.identify(result.id, {
     email: result.email,
     name: result.name,
-  });
+  })
 }
 ```
 
@@ -627,11 +639,11 @@ if (result) {
 
 ```typescript
 const logout = () => {
-  setToken(null);
-  setUserProfile(null);
-  deleteCookie(TOKEN_COOKIE_KEY);
-  posthog?.reset(); // Clear user identity
-};
+  setToken(null)
+  setUserProfile(null)
+  deleteCookie(TOKEN_COOKIE_KEY)
+  posthog?.reset() // Clear user identity
+}
 ```
 
 ### 4. Track Events Throughout App
@@ -659,13 +671,14 @@ function MyComponent() {
 
 ```typescript
 // Development
-document.cookie = `token=${value};path=/;SameSite=Lax`;
+document.cookie = `token=${value};path=/;SameSite=Lax`
 
 // Production (HTTPS only)
-document.cookie = `token=${value};path=/;SameSite=Strict;Secure`;
+document.cookie = `token=${value};path=/;SameSite=Strict;Secure`
 ```
 
 **Key settings:**
+
 - `Secure` - Only send over HTTPS (production)
 - `SameSite=Strict` - Strongest CSRF protection (may break OAuth flows)
 - `SameSite=Lax` - Balance of security and compatibility (recommended)
@@ -679,15 +692,15 @@ useEffect(() => {
   if (token) {
     const checkTokenValidity = async () => {
       try {
-        await client.getAccount({});
+        await client.getAccount({})
       } catch (error) {
         // Token invalid/expired - logout
-        logout();
+        logout()
       }
-    };
-    checkTokenValidity();
+    }
+    checkTokenValidity()
   }
-}, []);
+}, [])
 ```
 
 ### 3. Error Handling
@@ -727,10 +740,10 @@ Always show loading states during async operations to prevent UI flashing.
 
 ```typescript
 // ❌ NEVER commit PATs
-const DEFAULT_TOKEN = "bp_pat_abc123..."; // WRONG!
+const DEFAULT_TOKEN = 'bp_pat_abc123...' // WRONG!
 
 // ✅ Use environment variables
-const DEFAULT_TOKEN = import.meta.env.VITE_BOTPRESS_PAT;
+const DEFAULT_TOKEN = import.meta.env.VITE_BOTPRESS_PAT
 
 // ⚠️  Even better - no defaults, force user to authenticate
 // Don't provide any default token in production
@@ -745,7 +758,7 @@ const DEFAULT_TOKEN = import.meta.env.VITE_BOTPRESS_PAT;
 ```typescript
 // Enforce HTTPS in production
 if (import.meta.env.PROD && window.location.protocol !== 'https:') {
-  window.location.href = window.location.href.replace('http:', 'https:');
+  window.location.href = window.location.href.replace('http:', 'https:')
 }
 ```
 
@@ -757,13 +770,13 @@ Implement automatic logout when tokens expire:
 // Wrap API calls with error handling (Client has no event emitter)
 async function safeApiCall<T>(fn: () => Promise<T>): Promise<T> {
   try {
-    return await fn();
+    return await fn()
   } catch (error: any) {
     if (error.status === 401) {
-      logout();
-      window.location.href = '/';
+      logout()
+      window.location.href = '/'
     }
-    throw error;
+    throw error
   }
 }
 ```
@@ -772,10 +785,10 @@ async function safeApiCall<T>(fn: () => Promise<T>): Promise<T> {
 
 ```typescript
 // ❌ WRONG
-console.log("User token:", token);
+console.log('User token:', token)
 
 // ✅ CORRECT
-console.log("User authenticated:", !!token);
+console.log('User authenticated:', !!token)
 ```
 
 ### 4. CORS Configuration
@@ -784,10 +797,12 @@ Ensure your API allows requests from your frontend domain:
 
 ```typescript
 // Backend CORS configuration
-app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS.split(','),
-  credentials: true // Required for cookies
-}));
+app.use(
+  cors({
+    origin: process.env.ALLOWED_ORIGINS.split(','),
+    credentials: true, // Required for cookies
+  })
+)
 ```
 
 ### 5. Rate Limiting
@@ -796,14 +811,14 @@ Implement rate limiting on authentication endpoints:
 
 ```typescript
 // Example with express-rate-limit
-import rateLimit from 'express-rate-limit';
+import rateLimit from 'express-rate-limit'
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5 // 5 requests per window
-});
+  max: 5, // 5 requests per window
+})
 
-app.post('/auth/login', authLimiter, handleLogin);
+app.post('/auth/login', authLimiter, handleLogin)
 ```
 
 ### 6. Session Timeout
@@ -811,27 +826,30 @@ app.post('/auth/login', authLimiter, handleLogin);
 Implement automatic logout after inactivity:
 
 ```typescript
-let inactivityTimer: NodeJS.Timeout;
+let inactivityTimer: NodeJS.Timeout
 
 const resetInactivityTimer = () => {
-  clearTimeout(inactivityTimer);
-  inactivityTimer = setTimeout(() => {
-    logout();
-    alert("Session expired due to inactivity");
-  }, 30 * 60 * 1000); // 30 minutes
-};
+  clearTimeout(inactivityTimer)
+  inactivityTimer = setTimeout(
+    () => {
+      logout()
+      alert('Session expired due to inactivity')
+    },
+    30 * 60 * 1000
+  ) // 30 minutes
+}
 
 // Reset timer on user activity
 useEffect(() => {
-  window.addEventListener('mousemove', resetInactivityTimer);
-  window.addEventListener('keypress', resetInactivityTimer);
+  window.addEventListener('mousemove', resetInactivityTimer)
+  window.addEventListener('keypress', resetInactivityTimer)
 
   return () => {
-    window.removeEventListener('mousemove', resetInactivityTimer);
-    window.removeEventListener('keypress', resetInactivityTimer);
-    clearTimeout(inactivityTimer);
-  };
-}, []);
+    window.removeEventListener('mousemove', resetInactivityTimer)
+    window.removeEventListener('keypress', resetInactivityTimer)
+    clearTimeout(inactivityTimer)
+  }
+}, [])
 ```
 
 ## Complete Implementation Checklist
@@ -867,6 +885,7 @@ useEffect(() => {
 ## Reference Implementation
 
 **Recommended file structure:**
+
 - Auth provider: `packages/frontend/src/lib/auth.tsx`
 - Client store: `packages/frontend/src/stores/clientsStore.ts`
 - User services: `packages/frontend/src/services/users.ts`

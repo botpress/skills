@@ -470,7 +470,7 @@ adk logs --summary --format json   # aggregate summary snapshot
 
 ### adk traces
 
-Read execution traces — tool calls, action invocations, LLM steps, error context — for understanding *what happened* during a turn, beyond what `adk logs` reports. Reads from the local SQLite trace store under `.adk/`.
+Read execution traces — tool calls, action invocations, LLM steps, error context — for understanding _what happened_ during a turn, beyond what `adk logs` reports. Reads from the local SQLite trace store under `.adk/`.
 
 ```bash
 adk traces [tokens...] [options]
@@ -662,15 +662,18 @@ adk integrations status                  # Readiness of installed dependencies
 ```
 
 **`adk integrations search` options:**
+
 - `--interface <name>` - List integrations that implement this interface (query becomes optional)
 - `--format json` - Machine-readable output
 
 **`adk integrations list` options:**
+
 - `--target <env>` - Environment (dev/prod, default: dev)
 - `--verbose` - Show config values
 - `--format json` - Machine-readable output
 
 **`adk integrations info` options:**
+
 - `--format json` - Machine-readable output
 
 The default `info` output already includes the Channels, Actions, and Events sections — there are no per-section flags. To browse the Hub, use `adk integrations search <query>`.
@@ -687,17 +690,20 @@ adk integrations configure <alias>       # Set/unset config values
 ```
 
 **`adk integrations add` options:**
+
 - `--alias <name>` - Custom alias for code access
 - `--target <env>` - Environment (dev/prod)
 - `--config key=value` - Set config at install time (repeatable)
 - `--format json`
 
 **`adk integrations configure` options:**
+
 - `--set key=value` - Set config values (repeatable)
 - `--unset key` - Remove config keys (repeatable)
 - `--target <env>` - Environment (dev/prod)
 
 **`adk integrations upgrade` options:**
+
 - `<alias>` - Integration alias to upgrade (required)
 - `--to <version>` - Target a specific version (default: latest)
 - `--target <env>` - Environment (dev/prod)
@@ -735,6 +741,7 @@ adk integrations status                      # Explain unready dependencies
 ```
 
 **`adk integrations copy` options:**
+
 - `--from <env>` - Source env (dev or prod, required)
 - `--to <env>` - Target env (dev or prod, required)
 - `--dry-run` - Show what would change without writing
@@ -762,10 +769,12 @@ adk plugins diff                         # Compare local snapshot vs cloud
 ```
 
 **Plugin-specific flags:**
+
 - `adk plugins add --dep iface=integrationAlias` - Wire interface dependency (repeatable)
 - `adk plugins configure --map iface=integrationAlias` - Remap interface dependency
 
 **Shared with `adk integrations upgrade`:**
+
 - `--to <version>` - Target specific version (alias argument is required)
 
 Plugins require interfaces implemented by installed integrations. The CLI auto-resolves dependencies when unambiguous. See **[Plugins](./plugins.md)** for details.
@@ -1069,6 +1078,7 @@ adk run <script> [args...] [options]
 **Description:**
 
 Executes a TypeScript script with access to the full ADK runtime, including:
+
 - Bot client with authentication
 - All tables, workflows, and actions from your project
 - Type-safe access to your bot's configuration
@@ -1084,18 +1094,18 @@ Executes a TypeScript script with access to the full ADK runtime, including:
 
 ```typescript
 // scripts/migrate-users.ts
-import { UsersTable } from "../src/tables/Users";
+import { UsersTable } from '../src/tables/Users'
 
-const { rows } = await UsersTable.findRows({ limit: 100 });
+const { rows } = await UsersTable.findRows({ limit: 100 })
 
 for (const user of rows) {
   await UsersTable.updateRows({
-    rows: [{ id: user.id, migrated: true }]
-  });
-  console.log(`Migrated user: ${user.id}`);
+    rows: [{ id: user.id, migrated: true }],
+  })
+  console.log(`Migrated user: ${user.id}`)
 }
 
-console.log(`✅ Migrated ${rows.length} users`);
+console.log(`✅ Migrated ${rows.length} users`)
 ```
 
 **Examples:**

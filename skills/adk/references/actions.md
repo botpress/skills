@@ -5,6 +5,7 @@ Actions are callable, strongly-typed functions that encapsulate reusable logic a
 ## Overview
 
 Actions enable you to:
+
 - Create reusable business logic across your bot
 - Call integration APIs with type safety
 - Expose functionality as AI-callable tools
@@ -53,22 +54,23 @@ export default new Action({
 ```
 
 **Why use `export const`?**
+
 - Enables direct imports: `import { myAction } from "./actions/myAction"`
 - Can pass to `execute()`: `tools: [myAction.asTool()]`
 - Better for action composition and reusability
 
 ## Action Properties
 
-| Property | Type | Required | Description |
-|----------|------|----------|-------------|
-| **name** | `string` | Yes | Unique alphanumeric identifier (no spaces or special characters) |
-| **input** | `z.ZodTypeAny` | Yes | Zod schema defining input parameters |
-| **output** | `z.ZodTypeAny` | Yes | Zod schema defining return type |
-| **handler** | `function` | Yes | Async function implementing the action logic |
-| **title** | `string` | No | Human-readable display name |
-| **description** | `string` | No | Description of the action's functionality |
-| **attributes** | `Record<string, string>` | No | Custom metadata for categorization |
-| **cached** | `boolean` | No | Enable caching for identical inputs (defaults to `false`) |
+| Property        | Type                     | Required | Description                                                      |
+| --------------- | ------------------------ | -------- | ---------------------------------------------------------------- |
+| **name**        | `string`                 | Yes      | Unique alphanumeric identifier (no spaces or special characters) |
+| **input**       | `z.ZodTypeAny`           | Yes      | Zod schema defining input parameters                             |
+| **output**      | `z.ZodTypeAny`           | Yes      | Zod schema defining return type                                  |
+| **handler**     | `function`               | Yes      | Async function implementing the action logic                     |
+| **title**       | `string`                 | No       | Human-readable display name                                      |
+| **description** | `string`                 | No       | Description of the action's functionality                        |
+| **attributes**  | `Record<string, string>` | No       | Custom metadata for categorization                               |
+| **cached**      | `boolean`                | No       | Enable caching for identical inputs (defaults to `false`)        |
 
 ## Handler Syntax
 
@@ -78,44 +80,44 @@ Action handlers receive a props object containing `input` and `client`. Both met
 
 ```typescript
 export const fetchUser = new Action({
-  name: "fetchUser",
+  name: 'fetchUser',
   input: z.object({ userId: z.string() }),
   output: z.object({
     name: z.string(),
-    email: z.string()
+    email: z.string(),
   }),
 
   async handler({ input, client }) {
     // input: validated input matching your input schema
     // client: Botpress API client for making API calls
-    const { user } = await client.getUser({ id: input.userId });
+    const { user } = await client.getUser({ id: input.userId })
     return {
       name: user.name,
-      email: user.tags.email
-    };
-  }
-});
+      email: user.tags.email,
+    }
+  },
+})
 ```
 
 ### Arrow Function Syntax
 
 ```typescript
 export const updateUser = new Action({
-  name: "updateUser",
+  name: 'updateUser',
   input: z.object({
     userId: z.string(),
-    name: z.string()
+    name: z.string(),
   }),
   output: z.object({ success: z.boolean() }),
 
   handler: async ({ input, client }) => {
     await client.updateUser({
       id: input.userId,
-      name: input.name
-    });
-    return { success: true };
-  }
-});
+      name: input.name,
+    })
+    return { success: true }
+  },
+})
 ```
 
 ### Common Mistakes
@@ -123,29 +125,32 @@ export const updateUser = new Action({
 ```typescript
 // ❌ WRONG - Destructuring input fields directly
 export const fetchUser = new Action({
-  name: "fetchUser",
+  name: 'fetchUser',
   input: z.object({ userId: z.string() }),
   output: z.object({ name: z.string() }),
 
-  async handler({ userId }) {  // ❌ Wrong! Must be { input }
-    return { name: userId };
-  }
-});
+  async handler({ userId }) {
+    // ❌ Wrong! Must be { input }
+    return { name: userId }
+  },
+})
 
 // ✅ CORRECT - Use { input } wrapper
 export const fetchUser = new Action({
-  name: "fetchUser",
+  name: 'fetchUser',
   input: z.object({ userId: z.string() }),
   output: z.object({ name: z.string() }),
 
-  async handler({ input }) {  // ✅ Correct
-    const { userId } = input;  // Destructure inside handler
-    return { name: userId };
-  }
-});
+  async handler({ input }) {
+    // ✅ Correct
+    const { userId } = input // Destructure inside handler
+    return { name: userId }
+  },
+})
 ```
 
 **Key points:**
+
 - Handler receives `{ input, client }` props object
 - Both method syntax and arrow functions work
 - Destructure input fields **inside** the handler body, not in the parameter
@@ -157,39 +162,39 @@ export const fetchUser = new Action({
 ### From Workflows
 
 ```typescript
-import { Workflow, actions } from "@botpress/runtime";
+import { Workflow, actions } from '@botpress/runtime'
 
 export default new Workflow({
-  name: "processOrder",
+  name: 'processOrder',
   input: z.object({ orderId: z.string() }),
 
   handler: async ({ input }) => {
     // Call your custom actions
-    const order = await actions.fetchOrder({ orderId: input.orderId });
-    const result = await actions.processPayment({ order });
+    const order = await actions.fetchOrder({ orderId: input.orderId })
+    const result = await actions.processPayment({ order })
 
-    return result;
-  }
-});
+    return result
+  },
+})
 ```
 
 ### From Other Actions
 
 ```typescript
-import { Action, actions, z } from "@botpress/runtime";
+import { Action, actions, z } from '@botpress/runtime'
 
 export default new Action({
-  name: "compositeAction",
+  name: 'compositeAction',
   input: z.object({ userId: z.string() }),
   output: z.object({ success: z.boolean() }),
 
   async handler({ input }) {
     // Compose multiple actions
-    const userData = await actions.fetchUser({ userId: input.userId });
-    const profile = await actions.buildProfile({ user: userData });
-    return { success: true };
-  }
-});
+    const userData = await actions.fetchUser({ userId: input.userId })
+    const profile = await actions.buildProfile({ user: userData })
+    return { success: true }
+  },
+})
 ```
 
 ### Integration Actions
@@ -197,15 +202,15 @@ export default new Action({
 Call integration actions from within your actions:
 
 ```typescript
-import { actions } from "@botpress/runtime";
+import { actions } from '@botpress/runtime'
 
 // Inside action handler
 await actions.slack.sendMessage({
-  channel: "#general",
-  text: "Message from bot"
-});
+  channel: '#general',
+  text: 'Message from bot',
+})
 
-await actions.linear.issueList({ first: 10 });
+await actions.linear.issueList({ first: 10 })
 ```
 
 See **[Integration Actions](./integration-actions.md)** for complete guide.
@@ -219,64 +224,61 @@ Direct imports are best for the global proxies that actually exist at runtime, s
 ### Method 1: Direct Imports (Global Context Proxies)
 
 ```typescript
-import { Action, z, user, bot, adk } from "@botpress/runtime";
-import { context } from "@botpress/runtime";
+import { Action, z, user, bot, adk } from '@botpress/runtime'
+import { context } from '@botpress/runtime'
 
 export default new Action({
-  name: "updateUserProfile",
+  name: 'updateUserProfile',
   input: z.object({ name: z.string() }),
   output: z.object({ success: z.boolean() }),
 
   async handler({ input }) {
     // Access user state directly (when in conversation context)
-    user.state.profileName = input.name;
-    user.tags.profileComplete = "true";
+    user.state.profileName = input.name
+    user.tags.profileComplete = 'true'
 
     // Access bot state
-    bot.state.totalUsers += 1;
+    bot.state.totalUsers += 1
 
     // Access conversation (when in conversation context)
-    const conversation = context.get("conversation", { optional: true });
-    console.log(conversation?.id);
+    const conversation = context.get('conversation', { optional: true })
+    console.log(conversation?.id)
 
     // Use ADK utilities
-    const extracted = await adk.zai.extract(
-      input.name,
-      z.object({ firstName: z.string(), lastName: z.string() })
-    );
+    const extracted = await adk.zai.extract(input.name, z.object({ firstName: z.string(), lastName: z.string() }))
 
-    return { success: true };
-  }
-});
+    return { success: true }
+  },
+})
 ```
 
 ### Method 2: Context API (Explicit Retrieval)
 
 ```typescript
-import { Action, z, context } from "@botpress/runtime";
+import { Action, z, context } from '@botpress/runtime'
 
 export default new Action({
-  name: "checkContext",
+  name: 'checkContext',
   input: z.object({}),
   output: z.object({ hasUser: z.boolean() }),
 
   async handler({ input }) {
     // Optional context (may not be available in all scenarios)
-    const user = context.get("user", { optional: true });
-    const conversation = context.get("conversation", { optional: true });
-    const message = context.get("message", { optional: true });
+    const user = context.get('user', { optional: true })
+    const conversation = context.get('conversation', { optional: true })
+    const message = context.get('message', { optional: true })
 
     // Always available
-    const client = context.get("client");
-    const citations = context.get("citations");
+    const client = context.get('client')
+    const citations = context.get('citations')
 
     if (user) {
-      console.log(`User: ${user.id}`);
+      console.log(`User: ${user.id}`)
     }
 
-    return { hasUser: !!user };
-  }
-});
+    return { hasUser: !!user }
+  },
+})
 ```
 
 **Which method to use?**
@@ -296,6 +298,7 @@ See **[Context API](./context-api.md)** for complete details on all context keys
 **Purpose:** Wrap integration actions with bot-specific logic, data transformation, and local persistence.
 
 **When to use:**
+
 - Syncing external resources (products, issues, orders) to local tables
 - Normalizing data from different integrations
 - Adding business logic or validation
@@ -305,49 +308,49 @@ See **[Context API](./context-api.md)** for complete details on all context keys
 
 ```typescript
 export default new Action({
-  name: "syncResource",
-  description: "Fetch and sync external resource to local storage",
+  name: 'syncResource',
+  description: 'Fetch and sync external resource to local storage',
 
   input: z.object({
-    resourceId: z.string().describe("External resource identifier"),
+    resourceId: z.string().describe('External resource identifier'),
   }),
 
-  output: BotResourceSchema,  // Your normalized schema
+  output: BotResourceSchema, // Your normalized schema
 
   async handler({ input }) {
     // 1. Call integration action
     const externalData = await actions.integration.getResource({
-      id: input.resourceId
-    });
+      id: input.resourceId,
+    })
 
     // 2. Transform to bot schema
-    const normalizedData = transformToBotSchema(externalData);
+    const normalizedData = transformToBotSchema(externalData)
 
     // 3. Persist to table (prevents duplicates)
     await ResourceTable.upsertRows({
       rows: [normalizedData],
-      keyColumn: "id"  // Unique identifier
-    });
+      keyColumn: 'id', // Unique identifier
+    })
 
     // 4. Return normalized data
-    return normalizedData;
-  }
-});
+    return normalizedData
+  },
+})
 ```
 
 **Real Example - Shopify: Sync Products**
 
 ```typescript
-import { Action, actions, z } from "@botpress/runtime";
-import { ProductsTable } from "../tables/shopify";
+import { Action, actions, z } from '@botpress/runtime'
+import { ProductsTable } from '../tables/shopify'
 
 export default new Action({
-  name: "syncProduct",
-  description: "Sync a Shopify product to local database",
+  name: 'syncProduct',
+  description: 'Sync a Shopify product to local database',
 
   input: z.object({
-    productId: z.string().describe("Shopify product ID"),
-    includeVariants: z.boolean().default(true)
+    productId: z.string().describe('Shopify product ID'),
+    includeVariants: z.boolean().default(true),
   }),
 
   output: z.object({
@@ -355,15 +358,15 @@ export default new Action({
     title: z.string(),
     price: z.number(),
     inventory: z.number(),
-    lastSynced: z.string()
+    lastSynced: z.string(),
   }),
 
   async handler({ input }) {
     // 1. Fetch from Shopify
     const shopifyProduct = await actions.shopify.getProduct({
       id: input.productId,
-      fields: ["id", "title", "variants", "inventory"]
-    });
+      fields: ['id', 'title', 'variants', 'inventory'],
+    })
 
     // 2. Transform to bot schema
     const product = {
@@ -371,21 +374,22 @@ export default new Action({
       title: shopifyProduct.title,
       price: shopifyProduct.variants[0].price,
       inventory: shopifyProduct.variants.reduce((sum, v) => sum + v.inventory_quantity, 0),
-      lastSynced: new Date().toISOString()
-    };
+      lastSynced: new Date().toISOString(),
+    }
 
     // 3. Upsert to table
     await ProductsTable.upsertRows({
       rows: [product],
-      keyColumn: "id"
-    });
+      keyColumn: 'id',
+    })
 
-    return product;
-  }
-});
+    return product
+  },
+})
 ```
 
 **Key Benefits:**
+
 - **Consistency**: All external data follows your bot's schema
 - **Performance**: Local table queries are faster than API calls
 - **Reliability**: Works even if integration is temporarily unavailable
@@ -398,23 +402,23 @@ export default new Action({
 **Real Example - Linear: Update Issue Status**
 
 ```typescript
-import { Action, actions, z } from "@botpress/runtime";
-import { IssuesTable } from "../tables/linear";
+import { Action, actions, z } from '@botpress/runtime'
+import { IssuesTable } from '../tables/linear'
 
 export default new Action({
-  name: "updateIssueStatus",
+  name: 'updateIssueStatus',
 
   input: z.object({
     issueId: z.string(),
     stateId: z.string(),
-    comment: z.string().optional()
+    comment: z.string().optional(),
   }),
 
   output: z.object({
     id: z.string(),
     title: z.string(),
     state: z.string(),
-    updatedAt: z.string()
+    updatedAt: z.string(),
   }),
 
   async handler({ input }) {
@@ -423,29 +427,30 @@ export default new Action({
       id: input.issueId,
       stateId: input.stateId,
       ...(input.comment && {
-        commentBody: input.comment
-      })
-    });
+        commentBody: input.comment,
+      }),
+    })
 
     // 2. Transform and sync to table
     const normalized = {
       id: issue.id,
       title: issue.title,
       state: issue.state.name,
-      updatedAt: new Date().toISOString()
-    };
+      updatedAt: new Date().toISOString(),
+    }
 
     await IssuesTable.upsertRows({
       rows: [normalized],
-      keyColumn: "id"
-    });
+      keyColumn: 'id',
+    })
 
-    return normalized;
-  }
-});
+    return normalized
+  },
+})
 ```
 
 **When to use this pattern:**
+
 - Tracking order fulfillment status
 - Managing ticket/issue lifecycle
 - Handling conversation states
@@ -456,53 +461,57 @@ export default new Action({
 **Core Principles:**
 
 ```typescript
-import { z } from "@botpress/runtime";
+import { z } from '@botpress/runtime'
 
 // 1. Always export both type and schema
-export type Product = z.infer<typeof ProductSchema>;
+export type Product = z.infer<typeof ProductSchema>
 export const ProductSchema = z.object({
   id: z.string(),
   name: z.string(),
-  price: z.number()
-});
+  price: z.number(),
+})
 
 // 2. Use .describe() on every field (helps AI tools)
 const schema = z.object({
-  productId: z.string().describe("Unique product identifier"),
-  price: z.number().describe("Price in cents"),
-  inStock: z.boolean().describe("Whether product is available")
-});
+  productId: z.string().describe('Unique product identifier'),
+  price: z.number().describe('Price in cents'),
+  inStock: z.boolean().describe('Whether product is available'),
+})
 
 // 3. ISO strings for dates (NOT z.date())
 const timeFields = z.object({
-  createdAt: z.string().describe("Creation date as ISO 8601 string"),
-  updatedAt: z.string().optional().describe("Last update date")
-});
+  createdAt: z.string().describe('Creation date as ISO 8601 string'),
+  updatedAt: z.string().optional().describe('Last update date'),
+})
 
 // 4. Use .optional() for optional fields
 const optionalFields = z.object({
-  name: z.string(),                    // Required
-  description: z.string().optional(),  // Optional
-  metadata: z.record(z.unknown()).optional()
-});
+  name: z.string(), // Required
+  description: z.string().optional(), // Optional
+  metadata: z.record(z.unknown()).optional(),
+})
 
 // 5. Use .passthrough() for external API data
-const externalData = z.object({
-  id: z.string(),
-  // Allow unknown fields from external API
-}).passthrough();
+const externalData = z
+  .object({
+    id: z.string(),
+    // Allow unknown fields from external API
+  })
+  .passthrough()
 
 // 6. Define nested objects explicitly
 const structured = z.object({
-  product: z.object({               // ✅ Explicit structure
+  product: z.object({
+    // ✅ Explicit structure
     id: z.string(),
-    name: z.string()
+    name: z.string(),
   }),
-  metadata: z.record(z.unknown())   // ❌ Use only when structure is truly unknown
-});
+  metadata: z.record(z.unknown()), // ❌ Use only when structure is truly unknown
+})
 ```
 
 **Key Patterns:**
+
 1. **Export both type and schema** - TypeScript type from `z.infer<>`
 2. **Describe every field** - Helps AI tools and documentation
 3. **ISO strings for dates** - Use `z.string()` not `z.date()`
@@ -518,70 +527,70 @@ Actions can be converted to AI-callable tools using the `.asTool()` method. This
 ### Basic Usage
 
 ```typescript
-import { actions, Conversation } from "@botpress/runtime";
+import { actions, Conversation } from '@botpress/runtime'
 
 export default new Conversation({
   handler: async ({ execute }) => {
     await execute({
-      instructions: "Help the user with their request",
+      instructions: 'Help the user with their request',
       tools: [
         // Convert existing actions to tools
         actions.fetchUser.asTool(),
         actions.sendEmail.asTool(),
-        actions.searchDatabase.asTool()
-      ]
-    });
-  }
-});
+        actions.searchDatabase.asTool(),
+      ],
+    })
+  },
+})
 ```
 
 ### Tool Patterns: Blocking vs Non-Blocking
 
 #### Pattern Comparison
 
-| Pattern | Returns | Execution | Example |
-|---------|---------|-----------|---------|
-| **Direct Action** | Final result | Synchronous | `fetchUser()` |
-| **Workflow Wrapper** | Workflow ID | Asynchronous | `startIndexing()` |
+| Pattern              | Returns      | Execution    | Example           |
+| -------------------- | ------------ | ------------ | ----------------- |
+| **Direct Action**    | Final result | Synchronous  | `fetchUser()`     |
+| **Workflow Wrapper** | Workflow ID  | Asynchronous | `startIndexing()` |
 
 #### 1. Direct Actions
 
 Actions that complete and return results immediately:
 
 ```typescript
-import { Action, z } from "@botpress/runtime";
+import { Action, z } from '@botpress/runtime'
 
 export default new Action({
-  name: "calculateShipping",
-  description: "Calculate shipping cost for an order",
+  name: 'calculateShipping',
+  description: 'Calculate shipping cost for an order',
 
   input: z.object({
     weight: z.number(),
-    destination: z.string()
+    destination: z.string(),
   }),
 
   output: z.object({
     cost: z.number(),
-    estimatedDays: z.number()
+    estimatedDays: z.number(),
   }),
 
   async handler({ input }) {
     // Business logic that completes immediately
-    const baseRate = 5.99;
-    const perKg = 2.50;
-    const cost = baseRate + (input.weight * perKg);
+    const baseRate = 5.99
+    const perKg = 2.5
+    const cost = baseRate + input.weight * perKg
 
-    const estimatedDays = input.destination === "domestic" ? 3 : 7;
+    const estimatedDays = input.destination === 'domestic' ? 3 : 7
 
-    return { cost, estimatedDays };
-  }
-});
+    return { cost, estimatedDays }
+  },
+})
 
 // Use as tool - AI can call this during conversation
 await execute({
-  instructions: "Help the user with shipping",
-  tools: [actions.calculateShipping.asTool()]
-});
+  instructions: 'Help the user with shipping',
+  tools: [actions.calculateShipping.asTool()],
+})
 ```
 
 #### 2. Workflow Wrappers
@@ -589,69 +598,66 @@ await execute({
 Actions that start workflows and return workflow ID:
 
 ```typescript
-import { Action, z } from "@botpress/runtime";
-import { DataAnalysisWorkflow } from "../workflows/data-analysis";
+import { Action, z } from '@botpress/runtime'
+import { DataAnalysisWorkflow } from '../workflows/data-analysis'
 
 export default new Action({
-  name: "startDataAnalysis",
-  description: "Start data analysis workflow",
+  name: 'startDataAnalysis',
+  description: 'Start data analysis workflow',
 
   input: z.object({
-    datasetId: z.string()
+    datasetId: z.string(),
   }),
 
   output: z.object({
-    workflowId: z.string()
+    workflowId: z.string(),
   }),
 
   async handler({ input }) {
     // Calls workflow.start() - returns immediately
     const instance = await DataAnalysisWorkflow.start({
-      datasetId: input.datasetId
-    });
-    return { workflowId: instance.id };
-  }
-});
+      datasetId: input.datasetId,
+    })
+    return { workflowId: instance.id }
+  },
+})
 
 // Companion action to check status
 export const checkAnalysisStatus = new Action({
-  name: "checkAnalysisStatus",
-  description: "Check workflow status",
+  name: 'checkAnalysisStatus',
+  description: 'Check workflow status',
 
   input: z.object({
-    workflowId: z.string()
+    workflowId: z.string(),
   }),
 
   output: z.object({
-    status: z.string()
+    status: z.string(),
   }),
 
   async handler({ input, client }) {
-    const { workflow } = await client.getWorkflow({ id: input.workflowId });
-    return { status: workflow.status };
-  }
-});
+    const { workflow } = await client.getWorkflow({ id: input.workflowId })
+    return { status: workflow.status }
+  },
+})
 
 // Use both as tools
 await execute({
-  instructions: "Help the user",
-  tools: [
-    actions.startDataAnalysis.asTool(),
-    actions.checkAnalysisStatus.asTool()
-  ]
-});
+  instructions: 'Help the user',
+  tools: [actions.startDataAnalysis.asTool(), actions.checkAnalysisStatus.asTool()],
+})
 ```
 
 ### Custom Tool Conversion
 
 ```typescript
 // Basic conversion
-const shippingTool = actions.calculateShipping.asTool();
+const shippingTool = actions.calculateShipping.asTool()
 
 // With custom description
 const analysisTool = actions.startDataAnalysis.asTool({
-  description: "Analyze dataset and return workflow ID"
-});
+  description: 'Analyze dataset and return workflow ID',
+})
 ```
 
 > **See Also:** [Exposing Workflows as Tools](./workflows.md#exposing-workflows-as-tools-non-blocking-pattern) for comprehensive workflow wrapper patterns and tracking examples.
@@ -667,50 +673,50 @@ const analysisTool = actions.startDataAnalysis.asTool({
 
 ```typescript
 export default new Action({
-  name: "fetchUserProfile",
-  description: "Fetches complete user profile with preferences",
+  name: 'fetchUserProfile',
+  description: 'Fetches complete user profile with preferences',
 
   input: z.object({
     userId: z.string().uuid(), // Validate UUID format
-    includePreferences: z.boolean().default(false)
+    includePreferences: z.boolean().default(false),
   }),
 
   output: z.object({
     user: z.object({
       id: z.string(),
       name: z.string(),
-      email: z.string().email()
+      email: z.string().email(),
     }),
-    preferences: z.object({
-      language: z.string(),
-      timezone: z.string()
-    }).optional()
+    preferences: z
+      .object({
+        language: z.string(),
+        timezone: z.string(),
+      })
+      .optional(),
   }),
 
   cached: true, // Cache for performance
 
   async handler({ input, client }) {
     // Validate user exists
-    const { user } = await client.getUser({ id: input.userId });
+    const { user } = await client.getUser({ id: input.userId })
     if (!user) {
-      throw new Error(`User ${input.userId} not found`);
+      throw new Error(`User ${input.userId} not found`)
     }
 
     // Conditionally fetch preferences
-    const preferences = input.includePreferences
-      ? await fetchUserPreferences(input.userId)
-      : undefined;
+    const preferences = input.includePreferences ? await fetchUserPreferences(input.userId) : undefined
 
     return {
       user: {
         id: user.id,
         name: user.name,
-        email: user.tags.email
+        email: user.tags.email,
       },
-      preferences
-    };
-  }
-});
+      preferences,
+    }
+  },
+})
 ```
 
 ## Common Patterns
@@ -721,27 +727,27 @@ Combine multiple actions for complex operations:
 
 ```typescript
 export default new Action({
-  name: "processOrder",
+  name: 'processOrder',
   input: z.object({ orderId: z.string() }),
   output: z.object({ success: z.boolean() }),
 
   async handler({ input }) {
     // Compose multiple actions
-    const order = await actions.fetchOrder({ id: input.orderId });
-    const validated = await actions.validateOrder({ order });
+    const order = await actions.fetchOrder({ id: input.orderId })
+    const validated = await actions.validateOrder({ order })
 
     if (validated.isValid) {
       await actions.chargePayment({
         amount: order.total,
-        customerId: order.customerId
-      });
-      await actions.sendConfirmation({ order });
-      await actions.updateInventory({ items: order.items });
+        customerId: order.customerId,
+      })
+      await actions.sendConfirmation({ order })
+      await actions.updateInventory({ items: order.items })
     }
 
-    return { success: validated.isValid };
-  }
-});
+    return { success: validated.isValid }
+  },
+})
 ```
 
 ### Error Recovery Pattern
@@ -750,33 +756,33 @@ Handle failures gracefully with retries:
 
 ```typescript
 export default new Action({
-  name: "resilientFetch",
+  name: 'resilientFetch',
   input: z.object({ url: z.string().url() }),
   output: z.object({ data: z.unknown() }),
 
   async handler({ input }) {
-    const maxRetries = 3;
-    let lastError;
+    const maxRetries = 3
+    let lastError
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        const response = await fetch(input.url);
+        const response = await fetch(input.url)
         if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
+          throw new Error(`HTTP ${response.status}`)
         }
-        return { data: await response.json() };
+        return { data: await response.json() }
       } catch (error) {
-        lastError = error;
+        lastError = error
         if (attempt < maxRetries) {
           // Exponential backoff
-          await new Promise(r => setTimeout(r, 1000 * Math.pow(2, attempt)));
+          await new Promise((r) => setTimeout(r, 1000 * Math.pow(2, attempt)))
         }
       }
     }
 
-    throw new Error(`Failed after ${maxRetries} attempts: ${lastError.message}`);
-  }
-});
+    throw new Error(`Failed after ${maxRetries} attempts: ${lastError.message}`)
+  },
+})
 ```
 
 ## Troubleshooting

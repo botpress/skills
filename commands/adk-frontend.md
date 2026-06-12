@@ -1,7 +1,7 @@
 ---
 name: adk-frontend
 description: Build frontend apps that integrate with ADK bots
-argument-hint: "[what to build or question]"
+argument-hint: '[what to build or question]'
 ---
 
 Load the `adk-frontend` and `adk` skills, then help with the frontend immediately.

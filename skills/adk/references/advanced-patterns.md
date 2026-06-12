@@ -16,38 +16,28 @@ Enforce behavioral constraints on autonomous agents to prevent unwanted actions 
 
 ```typescript
 // src/conversations/extensions/guardrails.ts
-import { adk, Autonomous } from "@botpress/runtime";
+import { adk, Autonomous } from '@botpress/runtime'
 
 export const makeGuardrails = (message: any) => {
   // Use zai to determine if knowledge search is needed
-  const isKnowledgeSearchAsync = adk.zai.check(
-    message,
-    `Is this a question that requires knowledge search?`
-  );
+  const isKnowledgeSearchAsync = adk.zai.check(message, `Is this a question that requires knowledge search?`)
 
-  let hasSearched = false;
+  let hasSearched = false
 
-  const onBeforeToolGuard: Autonomous.Hooks["onBeforeTool"] = async ({
-    iteration,
-    tool,
-    input,
-    controller,
-  }) => {
-    if (tool.name === "search_knowledge") {
-      hasSearched = true;
+  const onBeforeToolGuard: Autonomous.Hooks['onBeforeTool'] = async ({ iteration, tool, input, controller }) => {
+    if (tool.name === 'search_knowledge') {
+      hasSearched = true
     }
 
-    const isKnowledgeSearch = await isKnowledgeSearchAsync;
+    const isKnowledgeSearch = await isKnowledgeSearchAsync
 
-    if (tool.name === "Message" && isKnowledgeSearch && !hasSearched) {
-      throw new Error(
-        `Knowledge search is required for this question. Please use "search_knowledge" first.`
-      );
+    if (tool.name === 'Message' && isKnowledgeSearch && !hasSearched) {
+      throw new Error(`Knowledge search is required for this question. Please use "search_knowledge" first.`)
     }
-  };
+  }
 
-  return { onBeforeToolGuard };
-};
+  return { onBeforeToolGuard }
+}
 ```
 
 > **Note:** `adk.zai.check()` is the recommended approach for AI-powered validation. An advanced pattern `adk.zai.learn().check()` exists for cached/reusable checks, but `adk.zai.check()` is simpler and covers most cases. See [zai-agent-reference.md](./zai-agent-reference.md) for all Zai operations and edge cases.
@@ -56,22 +46,22 @@ export const makeGuardrails = (message: any) => {
 
 ```typescript
 // src/conversations/webchat.ts
-import { Conversation } from "@botpress/runtime";
-import { makeGuardrails } from "./extensions/guardrails";
+import { Conversation } from '@botpress/runtime'
+import { makeGuardrails } from './extensions/guardrails'
 
 export default new Conversation({
-  channel: "*",
+  channel: '*',
   handler: async ({ execute, message }) => {
-    const guardrail = makeGuardrails(message);
+    const guardrail = makeGuardrails(message)
 
     await execute({
       instructions: `You are a helpful assistant...`,
       hooks: {
         onBeforeTool: async (props) => guardrail.onBeforeToolGuard(props),
       },
-    });
+    })
   },
-});
+})
 ```
 
 ### Variations
@@ -80,49 +70,36 @@ export default new Conversation({
 
 ```typescript
 export const makeCreditCheckGuardrail = () => {
-  let creditChecked = false;
+  let creditChecked = false
 
-  const onBeforeToolGuard: Autonomous.Hooks["onBeforeTool"] = async ({
-    iteration,
-    tool,
-    input,
-    controller,
-  }) => {
-    if (tool.name === "check_credit") {
-      creditChecked = true;
+  const onBeforeToolGuard: Autonomous.Hooks['onBeforeTool'] = async ({ iteration, tool, input, controller }) => {
+    if (tool.name === 'check_credit') {
+      creditChecked = true
     }
-    if (tool.name === "process_payment" && !creditChecked) {
-      throw new Error("Credit check must be performed before processing payment");
+    if (tool.name === 'process_payment' && !creditChecked) {
+      throw new Error('Credit check must be performed before processing payment')
     }
-  };
+  }
 
-  return { onBeforeToolGuard };
-};
+  return { onBeforeToolGuard }
+}
 ```
 
 **Data Validation Guardrail:**
 
 ```typescript
 export const makeDataValidationGuardrail = () => {
-  const onBeforeToolGuard: Autonomous.Hooks["onBeforeTool"] = async ({
-    iteration,
-    tool,
-    input,
-    controller,
-  }) => {
-    if (tool.name === "send_email") {
-      const hasValidEmail = await adk.zai.check(
-        input,
-        "Does this contain a valid email address?"
-      );
+  const onBeforeToolGuard: Autonomous.Hooks['onBeforeTool'] = async ({ iteration, tool, input, controller }) => {
+    if (tool.name === 'send_email') {
+      const hasValidEmail = await adk.zai.check(input, 'Does this contain a valid email address?')
       if (!hasValidEmail) {
-        throw new Error("Invalid email address provided");
+        throw new Error('Invalid email address provided')
       }
     }
-  };
+  }
 
-  return { onBeforeToolGuard };
-};
+  return { onBeforeToolGuard }
+}
 ```
 
 ### Key Techniques
@@ -149,137 +126,132 @@ Implement privileged access control with temporary authentication for administra
 
 ```typescript
 // src/conversations/extensions/admin-mode.ts
-import { adk, Autonomous, context, user, z } from "@botpress/runtime";
+import { adk, Autonomous, context, user, z } from '@botpress/runtime'
 
 // Define user state schema for admin mode
 export const AdminModeUserSchema: z.ZodRawShape = {
   admin: z
     .object({
-      adminUtil: z.string().nullable().describe("Expiration date of admin status (ISO)."),
-      code: z.string().nullable().describe("The admin access code."),
-      codeValidUntil: z.string().nullable().describe("Expiration date of admin code (ISO)."),
+      adminUtil: z.string().nullable().describe('Expiration date of admin status (ISO).'),
+      code: z.string().nullable().describe('The admin access code.'),
+      codeValidUntil: z.string().nullable().describe('Expiration date of admin code (ISO).'),
     })
     .default({ adminUtil: null, code: null, codeValidUntil: null }),
-};
+}
 
 // Admin-only tool: refresh knowledge bases
 const getIndexKnowledgeBasesTool = () => {
-  const ctx = context.getAll();
+  const ctx = context.getAll()
   return new Autonomous.Tool({
-    name: "refreshKnowledgeBases",
-    description: "Refresh and re-index all knowledge bases.",
-    output: z.string().describe("Confirmation message after refreshing."),
+    name: 'refreshKnowledgeBases',
+    description: 'Refresh and re-index all knowledge bases.',
+    output: z.string().describe('Confirmation message after refreshing.'),
     handler: async () => {
-      context.enterWith(ctx); // Restore context for async operations
-      await Promise.all(adk.project.knowledge.map((kb) => kb.refresh()));
-      return `Started re-indexing: ${adk.project.knowledge.map((kb) => kb.name).join(", ")}`;
+      context.enterWith(ctx) // Restore context for async operations
+      await Promise.all(adk.project.knowledge.map((kb) => kb.refresh()))
+      return `Started re-indexing: ${adk.project.knowledge.map((kb) => kb.name).join(', ')}`
     },
-  });
-};
+  })
+}
 
 // Generate one-time login code
 const getLoginTool = () => {
-  const ctx = context.getAll();
-  user.state ??= {};
+  const ctx = context.getAll()
+  user.state ??= {}
 
-  const CODE_VALIDITY_DURATION_MS = 5 * 60 * 1000; // 5 minutes
+  const CODE_VALIDITY_DURATION_MS = 5 * 60 * 1000 // 5 minutes
 
-  const expectedCode = user.state.admin?.code?.toLowerCase().trim();
+  const expectedCode = user.state.admin?.code?.toLowerCase().trim()
   const codeGenerated =
-    expectedCode &&
-    user.state.admin?.codeValidUntil &&
-    new Date(user.state.admin?.codeValidUntil) > new Date();
+    expectedCode && user.state.admin?.codeValidUntil && new Date(user.state.admin?.codeValidUntil) > new Date()
 
   if (codeGenerated) {
     return new Autonomous.Tool({
-      name: "loginWithCode",
-      description: "Log in as admin using an access code.",
+      name: 'loginWithCode',
+      description: 'Log in as admin using an access code.',
       input: z.string().describe('The admin access code, e.g. "ABC346"'),
-      output: z.boolean().describe("Returns true if login is successful."),
+      output: z.boolean().describe('Returns true if login is successful.'),
       handler: async (code: string) => {
-        context.enterWith(ctx);
-        const providedCode = code.toLowerCase().trim();
+        context.enterWith(ctx)
+        const providedCode = code.toLowerCase().trim()
 
         if (expectedCode && providedCode === expectedCode) {
           user.state.admin = {
             adminUtil: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
             code: null,
             codeValidUntil: null,
-          };
-          return true;
+          }
+          return true
         }
 
-        throw new Autonomous.ThinkSignal("Invalid or expired admin access code");
+        throw new Autonomous.ThinkSignal('Invalid or expired admin access code')
       },
-    });
+    })
   }
 
   return new Autonomous.Tool({
-    name: "generateLoginCode",
-    description: "Generate a one-time access code for admin login.",
+    name: 'generateLoginCode',
+    description: 'Generate a one-time access code for admin login.',
     handler: async () => {
-      context.enterWith(ctx);
-      const generatedCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+      context.enterWith(ctx)
+      const generatedCode = Math.random().toString(36).substring(2, 8).toUpperCase()
 
       user.state.admin = {
         adminUtil: null,
         code: generatedCode,
         codeValidUntil: new Date(Date.now() + CODE_VALIDITY_DURATION_MS).toISOString(),
-      };
+      }
 
-      console.log(`Generated admin login code: ${generatedCode}`);
+      console.log(`Generated admin login code: ${generatedCode}`)
 
       throw new Autonomous.ThinkSignal(
         `An admin login code has been generated and logged in the developer console. Retrieve it from the Botpress dashboard.`
-      );
+      )
     },
-  });
-};
+  })
+}
 
 function isUserAdmin() {
-  return (
-    user.state.admin?.adminUtil &&
-    new Date(user.state.admin.adminUtil) > new Date()
-  );
+  return user.state.admin?.adminUtil && new Date(user.state.admin.adminUtil) > new Date()
 }
 
 export const getAdminModeObject = () =>
   new Autonomous.Object({
-    name: "admin",
+    name: 'admin',
     description: getAdminStatus(), // Dynamic description based on state
     tools: isUserAdmin() ? [getIndexKnowledgeBasesTool()] : [getLoginTool()],
-  });
+  })
 ```
 
 ### Configuration in agent.config.ts
 
 ```typescript
-import { z, defineConfig } from "@botpress/runtime";
-import { AdminModeUserSchema } from "./src/conversations/extensions/admin-mode";
+import { z, defineConfig } from '@botpress/runtime'
+import { AdminModeUserSchema } from './src/conversations/extensions/admin-mode'
 
 export default defineConfig({
-  name: "my-agent",
+  name: 'my-agent',
   user: {
     state: z.object({}).extend(AdminModeUserSchema),
   },
-});
+})
 ```
 
 ### Usage in Conversation
 
 ```typescript
-import { Conversation } from "@botpress/runtime";
-import { getAdminModeObject } from "./extensions/admin-mode";
+import { Conversation } from '@botpress/runtime'
+import { getAdminModeObject } from './extensions/admin-mode'
 
 export default new Conversation({
-  channel: "*",
+  channel: '*',
   handler: async ({ execute }) => {
     await execute({
       instructions: `You are a helpful assistant...`,
       objects: [getAdminModeObject()],
-    });
+    })
   },
-});
+})
 ```
 
 ### Key Techniques
@@ -300,107 +272,102 @@ Comprehensive logging and error tracking for production agents.
 
 ```typescript
 // src/conversations/extensions/logging.ts
-import { Autonomous } from "@botpress/runtime";
+import { Autonomous } from '@botpress/runtime'
 
-export const onTraceLogging: Autonomous.Hooks["onTrace"] = ({ trace, iteration }) => {
-  if (trace.type === "code_execution_exception") {
-    console.error(`Code Execution Error: ${trace.message}`, trace.stackTrace);
+export const onTraceLogging: Autonomous.Hooks['onTrace'] = ({ trace, iteration }) => {
+  if (trace.type === 'code_execution_exception') {
+    console.error(`Code Execution Error: ${trace.message}`, trace.stackTrace)
   }
 
-  if (trace.type === "tool_call" && !trace.success) {
+  if (trace.type === 'tool_call' && !trace.success) {
     console.error(
       `Error during tool call to "${trace.tool_name}" with input "${JSON.stringify(trace.input)}":`,
       trace.error
-    );
+    )
   }
-};
+}
 ```
 
 ### Usage in Conversation
 
 ```typescript
-import { Conversation } from "@botpress/runtime";
-import { onTraceLogging } from "./extensions/logging";
+import { Conversation } from '@botpress/runtime'
+import { onTraceLogging } from './extensions/logging'
 
 export default new Conversation({
-  channel: "*",
+  channel: '*',
   handler: async ({ execute }) => {
     await execute({
       instructions: `You are a helpful assistant...`,
       hooks: {
         onTrace: (props) => onTraceLogging!(props),
       },
-    });
+    })
   },
-});
+})
 ```
 
 ### Advanced: Comprehensive Trace Logging
 
 ```typescript
-export const onTraceLogging: Autonomous.Hooks["onTrace"] = ({ trace, iteration }) => {
+export const onTraceLogging: Autonomous.Hooks['onTrace'] = ({ trace, iteration }) => {
   switch (trace.type) {
-    case "code_execution_exception":
-      console.error(`[CODE ERROR] ${trace.message}`, trace.stackTrace);
-      break;
-    case "tool_call":
+    case 'code_execution_exception':
+      console.error(`[CODE ERROR] ${trace.message}`, trace.stackTrace)
+      break
+    case 'tool_call':
       if (trace.success) {
-        console.log(`[TOOL SUCCESS] ${trace.tool_name}`, trace.output);
+        console.log(`[TOOL SUCCESS] ${trace.tool_name}`, trace.output)
       } else {
-        console.error(`[TOOL ERROR] ${trace.tool_name}`, trace.error);
+        console.error(`[TOOL ERROR] ${trace.tool_name}`, trace.error)
       }
-      break;
-    case "think":
-      console.debug(`[THINK] ${trace.content}`);
-      break;
+      break
+    case 'think':
+      console.debug(`[THINK] ${trace.content}`)
+      break
     default:
-      console.log(`[TRACE] ${trace.type}`, trace);
+      console.log(`[TRACE] ${trace.type}`, trace)
   }
-};
+}
 ```
 
 ### Advanced: Performance Monitoring
 
 ```typescript
 export const makePerformanceMonitor = () => {
-  const startTime = Date.now();
-  const toolMetrics = new Map<string, number[]>();
+  const startTime = Date.now()
+  const toolMetrics = new Map<string, number[]>()
 
-  const onBeforeTool: Autonomous.Hooks["onBeforeTool"] = async ({
-    iteration,
-    tool,
-    input,
-    controller,
-  }) => {
-    (tool as any)._startTime = Date.now();
-  };
+  const onBeforeTool: Autonomous.Hooks['onBeforeTool'] = async ({ iteration, tool, input, controller }) => {
+    ;(tool as any)._startTime = Date.now()
+  }
 
-  const onAfterTool: Autonomous.Hooks["onAfterTool"] = async ({ tool, output }) => {
-    const duration = Date.now() - ((tool as any)._startTime || 0);
-    const metrics = toolMetrics.get(tool.name) || [];
-    metrics.push(duration);
-    toolMetrics.set(tool.name, metrics);
-    console.log(`[PERF] ${tool.name}: ${duration}ms`);
-  };
+  const onAfterTool: Autonomous.Hooks['onAfterTool'] = async ({ tool, output }) => {
+    const duration = Date.now() - ((tool as any)._startTime || 0)
+    const metrics = toolMetrics.get(tool.name) || []
+    metrics.push(duration)
+    toolMetrics.set(tool.name, metrics)
+    console.log(`[PERF] ${tool.name}: ${duration}ms`)
+  }
 
-  const onTrace: Autonomous.Hooks["onTrace"] = ({ trace, iteration }) => {
-    if (trace.type === "end") {
-      console.log(`[PERF] Total conversation: ${Date.now() - startTime}ms`);
-      console.log(`[PERF] Tool metrics:`, Object.fromEntries(toolMetrics));
+  const onTrace: Autonomous.Hooks['onTrace'] = ({ trace, iteration }) => {
+    if (trace.type === 'end') {
+      console.log(`[PERF] Total conversation: ${Date.now() - startTime}ms`)
+      console.log(`[PERF] Tool metrics:`, Object.fromEntries(toolMetrics))
     }
-  };
+  }
 
-  return { onBeforeTool, onAfterTool, onTrace };
-};
+  return { onBeforeTool, onAfterTool, onTrace }
+}
 ```
 
 ### Hook Signatures Reference
 
-| Hook | Parameters | Description |
-|------|-----------|-------------|
+| Hook           | Parameters                               | Description                 |
+| -------------- | ---------------------------------------- | --------------------------- |
 | `onBeforeTool` | `{ iteration, tool, input, controller }` | Fires before each tool call |
-| `onAfterTool` | `{ tool, output }` | Fires after each tool call |
-| `onTrace` | `{ trace, iteration }` | Fires on every trace event |
+| `onAfterTool`  | `{ tool, output }`                       | Fires after each tool call  |
+| `onTrace`      | `{ trace, iteration }`                   | Fires on every trace event  |
 
 ---
 
@@ -410,16 +377,16 @@ Combine multiple extensions into a cohesive agent architecture.
 
 ```typescript
 // src/conversations/webchat.ts
-import { Conversation } from "@botpress/runtime";
-import { WebsiteKB } from "../knowledge/website-docs";
-import { getAdminModeObject } from "./extensions/admin-mode";
-import { makeGuardrails } from "./extensions/guardrails";
-import { onTraceLogging } from "./extensions/logging";
+import { Conversation } from '@botpress/runtime'
+import { WebsiteKB } from '../knowledge/website-docs'
+import { getAdminModeObject } from './extensions/admin-mode'
+import { makeGuardrails } from './extensions/guardrails'
+import { onTraceLogging } from './extensions/logging'
 
 export default new Conversation({
-  channel: "*",
+  channel: '*',
   handler: async ({ execute, message }) => {
-    const guardrail = makeGuardrails(message);
+    const guardrail = makeGuardrails(message)
 
     await execute({
       instructions: `You are a helpful assistant that provides accurate information.`,
@@ -429,9 +396,9 @@ export default new Conversation({
         onBeforeTool: async (props) => guardrail.onBeforeToolGuard(props),
         onTrace: (props) => onTraceLogging!(props),
       },
-    });
+    })
   },
-});
+})
 ```
 
 ### Architecture
@@ -450,15 +417,15 @@ Conversation Handler
 ### Multi-Extension Composition
 
 ```typescript
-import { makeGuardrails } from "./extensions/guardrails";
-import { onTraceLogging } from "./extensions/logging";
-import { makePerformanceMonitor } from "./extensions/performance";
+import { makeGuardrails } from './extensions/guardrails'
+import { onTraceLogging } from './extensions/logging'
+import { makePerformanceMonitor } from './extensions/performance'
 
 export default new Conversation({
-  channel: "*",
+  channel: '*',
   handler: async ({ execute, message }) => {
-    const guardrail = makeGuardrails(message);
-    const perfMonitor = makePerformanceMonitor();
+    const guardrail = makeGuardrails(message)
+    const perfMonitor = makePerformanceMonitor()
 
     await execute({
       instructions: `You are a documentation assistant. Always search before answering.`,
@@ -466,20 +433,20 @@ export default new Conversation({
       objects: [getAdminModeObject()],
       hooks: {
         onBeforeTool: async (props) => {
-          await guardrail.onBeforeToolGuard(props);
-          await perfMonitor.onBeforeTool(props);
+          await guardrail.onBeforeToolGuard(props)
+          await perfMonitor.onBeforeTool(props)
         },
         onAfterTool: async (props) => {
-          await perfMonitor.onAfterTool(props);
+          await perfMonitor.onAfterTool(props)
         },
         onTrace: (props) => {
-          onTraceLogging!(props);
-          perfMonitor.onTrace(props);
+          onTraceLogging!(props)
+          perfMonitor.onTrace(props)
         },
       },
-    });
+    })
   },
-});
+})
 ```
 
 ### Best Practices
@@ -565,16 +532,16 @@ Centralize Zod schemas to ensure consistency across Actions, Tables, Workflows, 
 
 ```typescript
 // src/schemas.ts
-import { z } from "@botpress/runtime";
+import { z } from '@botpress/runtime'
 
-export type User = z.infer<typeof UserSchema>;
+export type User = z.infer<typeof UserSchema>
 export const UserSchema = z.object({
   id: z.string(),
   email: z.string().email(),
   name: z.string().optional(),
-  role: z.enum(["admin", "user", "guest"]).default("user"),
-  createdAt: z.string().describe("ISO 8601 timestamp"),
-});
+  role: z.enum(['admin', 'user', 'guest']).default('user'),
+  createdAt: z.string().describe('ISO 8601 timestamp'),
+})
 ```
 
 ### Reuse Across Components
@@ -582,50 +549,50 @@ export const UserSchema = z.object({
 **In Actions:**
 
 ```typescript
-import { Action } from "@botpress/runtime";
-import { UserSchema } from "../schemas";
+import { Action } from '@botpress/runtime'
+import { UserSchema } from '../schemas'
 
 export const GetUser = new Action({
-  name: "getUser",
+  name: 'getUser',
   input: z.object({ userId: z.string() }),
   output: UserSchema,
   handler: async ({ input }) => {
-    return await fetchUserFromAPI(input.userId);
+    return await fetchUserFromAPI(input.userId)
   },
-});
+})
 ```
 
 **In Tables:**
 
 ```typescript
-import { Table } from "@botpress/runtime";
-import { UserSchema } from "../schemas";
+import { Table } from '@botpress/runtime'
+import { UserSchema } from '../schemas'
 
 export const UsersTable = new Table({
-  name: "UsersTable",
-  description: "Store user information",
+  name: 'UsersTable',
+  description: 'Store user information',
   columns: {
     email: { schema: UserSchema.shape.email, searchable: true },
     name: { schema: UserSchema.shape.name, searchable: true },
   },
-});
+})
 ```
 
 **In Workflows:**
 
 ```typescript
-import { Workflow } from "@botpress/runtime";
-import { UserSchema, ConversationSchema } from "../schemas";
+import { Workflow } from '@botpress/runtime'
+import { UserSchema, ConversationSchema } from '../schemas'
 
 export const ProcessUser = new Workflow({
-  name: "processUser",
+  name: 'processUser',
   input: z.object({ user: UserSchema, conversationId: z.string() }),
   state: z.object({ conversation: ConversationSchema.optional() }),
   handler: async ({ input, state, step }) => {
-    console.log(`Processing user: ${input.user.email}`);
-    return { userId: input.user.id };
+    console.log(`Processing user: ${input.user.email}`)
+    return { userId: input.user.id }
   },
-});
+})
 ```
 
 ### Schema Composition
@@ -636,17 +603,17 @@ export const BaseEntitySchema = z.object({
   id: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),
-});
+})
 
 // Extend
 export const ConversationSchema = BaseEntitySchema.extend({
   userId: z.string(),
-  status: z.enum(["open", "closed", "snoozed"]),
-});
+  status: z.enum(['open', 'closed', 'snoozed']),
+})
 
 // Pick / Omit
-export const UserSummarySchema = UserSchema.pick({ id: true, email: true, name: true });
-export const PublicUserSchema = UserSchema.omit({ metadata: true });
+export const UserSummarySchema = UserSchema.pick({ id: true, email: true, name: true })
+export const PublicUserSchema = UserSchema.omit({ metadata: true })
 ```
 
 ### Best Practices

@@ -69,6 +69,7 @@ adk status --format json
 ```
 
 **What this tells you:**
+
 - Project name and location
 - Every registered primitive with name, file path, and description
 - Integration status — which are configured and which are missing fields
@@ -85,6 +86,7 @@ cat agent.config.ts
 ```
 
 **What this tells you:**
+
 - Model configuration (`defaultModels`)
 - State schemas (`user.state`, `bot.state`, `conversation.state`)
 - Integration versions and inline config
@@ -131,6 +133,7 @@ cat agent.local.json
 The `name` and `description` fields in `agent.config.ts`.
 
 **How to explain:**
+
 - The `name` identifies the bot in the Botpress Cloud dashboard and CLI output.
 - The `description` is optional — it documents the bot's purpose.
 
@@ -139,6 +142,7 @@ The `name` and `description` fields in `agent.config.ts`.
 > This is **customer-support-bot** — a customer support assistant. The name is used as the bot identifier in Botpress Cloud.
 
 **Potential issues:**
+
 - Missing `description` — not critical, but worth adding for documentation.
 - Name with spaces or special characters — should be kebab-case.
 
@@ -148,10 +152,10 @@ The `defaultModels` object controls which AI models power the bot.
 
 **Two model slots:**
 
-| Slot | Purpose | Used By |
-|------|---------|---------|
-| `autonomous` | Agentic reasoning — conversation handling, tool selection, multi-step logic | `execute()` in conversations and workflows |
-| `zai` | Utility AI operations — extraction, classification, summarization | `adk.zai.extract()`, `adk.zai.check()`, `adk.zai.text()`, etc. |
+| Slot         | Purpose                                                                     | Used By                                                        |
+| ------------ | --------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| `autonomous` | Agentic reasoning — conversation handling, tool selection, multi-step logic | `execute()` in conversations and workflows                     |
+| `zai`        | Utility AI operations — extraction, classification, summarization           | `adk.zai.extract()`, `adk.zai.check()`, `adk.zai.text()`, etc. |
 
 **How to explain model choices:**
 
@@ -166,21 +170,23 @@ defaultModels: {
 
 **Common configurations and tradeoffs:**
 
-| Configuration | Tradeoff |
-|---------------|----------|
-| `autonomous: "openai:gpt-4o"` | High quality, higher cost and latency |
-| `autonomous: "openai:gpt-4o-mini"` | Fast and cheap, less capable for complex reasoning |
-| `autonomous: "fast"` | Zai shortcut — fastest/cheapest available model |
-| `autonomous: "best"` | Zai shortcut — highest quality available model |
-| `autonomous: "anthropic:claude-3-5-sonnet"` | Strong reasoning, different provider |
-| `zai: "openai:gpt-4o-mini"` | Good default for utility tasks |
-| Fallback arrays like `["openai:gpt-4o", "anthropic:claude-3-5-sonnet"]` | Automatic fallback if first model is unavailable |
+| Configuration                                                           | Tradeoff                                           |
+| ----------------------------------------------------------------------- | -------------------------------------------------- |
+| `autonomous: "openai:gpt-4o"`                                           | High quality, higher cost and latency              |
+| `autonomous: "openai:gpt-4o-mini"`                                      | Fast and cheap, less capable for complex reasoning |
+| `autonomous: "fast"`                                                    | Zai shortcut — fastest/cheapest available model    |
+| `autonomous: "best"`                                                    | Zai shortcut — highest quality available model     |
+| `autonomous: "anthropic:claude-3-5-sonnet"`                             | Strong reasoning, different provider               |
+| `zai: "openai:gpt-4o-mini"`                                             | Good default for utility tasks                     |
+| Fallback arrays like `["openai:gpt-4o", "anthropic:claude-3-5-sonnet"]` | Automatic fallback if first model is unavailable   |
 
 **If `defaultModels` is not set**, the ADK uses these defaults:
+
 - `zai`: `"openai:gpt-4.1-2025-04-14"`
 - `autonomous`: `"openai:gpt-4.1-mini-2025-04-14"`
 
 **Potential issues:**
+
 - No `defaultModels` set — the bot uses ADK defaults, which may not be optimal.
 - Both slots set to `"fast"` — fine for development, but may underperform in production for complex conversations.
 - Both slots set to `"best"` — high quality but expensive; consider using `"best"` only for `autonomous`.
@@ -197,6 +203,7 @@ adk integrations status     # readiness — explains unconfigured/missing fields
 **How to explain:**
 
 For each installed integration, describe:
+
 1. **What it is** — the platform or service it connects to
 2. **What it provides** — channels (for messaging), actions (for API calls), events (for triggers)
 3. **Whether it's configured** — check `adk integrations status`
@@ -217,6 +224,7 @@ adk integrations info slack
 ```
 
 **Potential issues:**
+
 - Integration with `status: "unconfigured"` or `missingFields` in `adk integrations status` — needs configuration before it works.
 - Integration using hardcoded secrets instead of the ADK secrets API — security risk.
 - Integration with `enabled: false` — installed but not active.
@@ -228,11 +236,11 @@ State schemas define what data the bot persists across interactions.
 
 **Three state scopes:**
 
-| Scope | Persisted Per | Typical Use |
-|-------|--------------|-------------|
-| `user.state` | User | Preferences, profile data, onboarding progress |
-| `bot.state` | Bot (global) | Feature flags, counters, maintenance mode |
-| `conversation.state` | Conversation | Context within a single conversation thread |
+| Scope                | Persisted Per | Typical Use                                    |
+| -------------------- | ------------- | ---------------------------------------------- |
+| `user.state`         | User          | Preferences, profile data, onboarding progress |
+| `bot.state`          | Bot (global)  | Feature flags, counters, maintenance mode      |
+| `conversation.state` | Conversation  | Context within a single conversation thread    |
 
 **How to explain:**
 
@@ -254,18 +262,21 @@ bot: {
 ```
 
 > **User state** tracks per-user data:
+>
 > - `name` (optional string) — The user's name, collected during conversation
 > - `department` (optional string) — The user's department
 > - `role` (optional string) — The user's job role
 > - `age` (number, defaults to 10) — The user's age
 >
 > **Bot state** tracks global data:
+>
 > - `version` (number, defaults to 0) — Bot configuration version
 > - `ticketCounter` (number, defaults to 0) — Running count of tickets created
 >
 > No conversation state is defined — conversation-scoped data is not being tracked.
 
 **Potential issues:**
+
 - No `.default()` on required fields — will fail if state hasn't been initialized.
 - Large state objects — can slow down read/write operations.
 - Sensitive data in state (emails, tokens) — consider whether it needs to be stored.
@@ -277,12 +288,14 @@ Check the `secrets` block in `agent.config.ts` for declared secrets, and look fo
 **How to explain:**
 
 > Your config declares these secrets:
+>
 > - `SLACK_BOT_TOKEN` — Used to authenticate the Slack integration
 > - `LINEAR_API_KEY` — Used to authenticate the Linear integration
 >
 > Secrets are managed via `adk secrets` and injected at runtime. Make sure they're set for both dev and production environments.
 
 **Potential issues:**
+
 - Hardcoded secrets in `agent.config.ts` — should use the ADK secrets API instead.
 - Declared secrets that aren't set — the integration won't work at runtime.
 
@@ -292,21 +305,22 @@ The primitives from `adk status` show what the bot can actually do.
 
 **How to explain each type:**
 
-| Primitive | What It Means |
-|-----------|--------------|
-| **Actions** | Functions callable by the bot or external APIs. Each action has typed input/output. |
-| **Tools** | AI-callable tools — these are what the LLM can invoke during autonomous reasoning. |
-| **Workflows** | Long-running, resumable processes with step-based execution. |
-| **Conversations** | Message handlers — routes incoming messages by channel. |
-| **Triggers** | Event-driven handlers — react to specific events (e.g., new user, webhook). |
-| **Tables** | Structured data storage with optional semantic search. |
-| **Knowledge** | RAG knowledge bases — documents the bot can search and cite. |
+| Primitive         | What It Means                                                                       |
+| ----------------- | ----------------------------------------------------------------------------------- |
+| **Actions**       | Functions callable by the bot or external APIs. Each action has typed input/output. |
+| **Tools**         | AI-callable tools — these are what the LLM can invoke during autonomous reasoning.  |
+| **Workflows**     | Long-running, resumable processes with step-based execution.                        |
+| **Conversations** | Message handlers — routes incoming messages by channel.                             |
+| **Triggers**      | Event-driven handlers — react to specific events (e.g., new user, webhook).         |
+| **Tables**        | Structured data storage with optional semantic search.                              |
+| **Knowledge**     | RAG knowledge bases — documents the bot can search and cite.                        |
 
 **Example explanation from status output:**
 
 > Your bot has **3 actions**, **2 tools**, **2 workflows**, **1 conversation handler**, **no triggers**, **1 table**, and **1 knowledge base**.
 >
 > **What it can do:**
+>
 > - Look up customers, send invoices, and triage tickets (actions)
 > - Search docs and look up CRM records autonomously (tools — the LLM decides when to call these)
 > - Escalate urgent tickets and schedule follow-ups (workflows — long-running processes)
@@ -333,16 +347,19 @@ Combine all sources into a concise summary:
 > It uses **gpt-4o** for conversations and **gpt-4o-mini** for utility AI tasks.
 >
 > **Capabilities:**
+>
 > - Looks up customers, sends invoices, and triages support tickets
 > - Can autonomously search documentation and look up CRM records
 > - Runs escalation and follow-up workflows for ticket management
 > - Stores contacts in a table and uses an FAQ knowledge base for answers
 >
 > **State tracking:**
+>
 > - Tracks user preferences (language, timezone, account tier)
 > - Maintains global counters and feature flags
 >
 > **Issues to address:**
+>
 > - The `browser` integration is missing its `apiKey` configuration
 
 ### Section-Specific Explanation
@@ -353,16 +370,16 @@ When the developer asks about a specific section, read the relevant part of `age
 
 When reviewing the config, check for:
 
-| Check | How to Detect | Severity |
-|-------|--------------|----------|
-| Unconfigured integrations | `status: "unconfigured"` in `adk status` output | High — integration won't work |
-| Hardcoded secrets | String literals in `config` blocks instead of ADK secrets API | High — security risk |
-| Missing default models | No `defaultModels` in `agent.config.ts` | Low — ADK defaults apply |
-| No conversation handler | `conversations.count === 0` in status | High — bot can't respond to messages |
-| No tools registered | `tools.count === 0` in status | Medium — LLM can't take autonomous actions |
-| No knowledge base | `knowledge.count === 0` in status | Low — bot relies only on tools and actions |
-| State without defaults | `z.object({...})` without `.default()` | Medium — may fail on first access |
-| Unused integrations | Integration installed but no conversation handler or action references it | Low — wasted dependency |
+| Check                     | How to Detect                                                             | Severity                                   |
+| ------------------------- | ------------------------------------------------------------------------- | ------------------------------------------ |
+| Unconfigured integrations | `status: "unconfigured"` in `adk status` output                           | High — integration won't work              |
+| Hardcoded secrets         | String literals in `config` blocks instead of ADK secrets API             | High — security risk                       |
+| Missing default models    | No `defaultModels` in `agent.config.ts`                                   | Low — ADK defaults apply                   |
+| No conversation handler   | `conversations.count === 0` in status                                     | High — bot can't respond to messages       |
+| No tools registered       | `tools.count === 0` in status                                             | Medium — LLM can't take autonomous actions |
+| No knowledge base         | `knowledge.count === 0` in status                                         | Low — bot relies only on tools and actions |
+| State without defaults    | `z.object({...})` without `.default()`                                    | Medium — may fail on first access          |
+| Unused integrations       | Integration installed but no conversation handler or action references it | Low — wasted dependency                    |
 
 ### Suggesting Improvements
 

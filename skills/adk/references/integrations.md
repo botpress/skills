@@ -10,33 +10,33 @@ All integration management uses the `adk integrations` subcommand family. Every 
 
 ### Discovery
 
-| Command | Description | Key Flags |
-|---------|-------------|-----------|
-| `adk integrations search <query>` | Search the Hub by keyword | `--interface <name>`, `--format json` |
-| `adk integrations list` | Show installed dependencies | `--target <env>`, `--verbose`, `--format json` |
-| `adk integrations info <name>` | Full integration details (includes Channels, Actions, Events) | `--format json` |
-| `adk integrations status` | Explain unready dependencies | `--target <env>`, `--format json` |
+| Command                           | Description                                                   | Key Flags                                      |
+| --------------------------------- | ------------------------------------------------------------- | ---------------------------------------------- |
+| `adk integrations search <query>` | Search the Hub by keyword                                     | `--interface <name>`, `--format json`          |
+| `adk integrations list`           | Show installed dependencies                                   | `--target <env>`, `--verbose`, `--format json` |
+| `adk integrations info <name>`    | Full integration details (includes Channels, Actions, Events) | `--format json`                                |
+| `adk integrations status`         | Explain unready dependencies                                  | `--target <env>`, `--format json`              |
 
 Use `--format json` for programmatic inspection of config schemas, action shapes, and event payloads. To browse the Hub, use `adk integrations search <query>`.
 
 ### Mutations
 
-| Command | Description | Key Flags |
-|---------|-------------|-----------|
-| `adk integrations add <name>@<version>` | Install an integration | `--alias <name>`, `--target <env>`, `--config key=value` |
-| `adk integrations remove <alias>` | Uninstall an integration | `--target <env>` |
-| `adk integrations upgrade <alias>` | Upgrade to latest (or specific) version | `--to <version>`, `--target <env>` |
-| `adk integrations enable <alias>` | Enable a disabled integration | `--target <env>` |
-| `adk integrations disable <alias>` | Disable without removing | `--target <env>` |
-| `adk integrations configure <alias>` | Set or unset config values | `--set key=value`, `--unset key`, `--target <env>` |
+| Command                                 | Description                             | Key Flags                                                |
+| --------------------------------------- | --------------------------------------- | -------------------------------------------------------- |
+| `adk integrations add <name>@<version>` | Install an integration                  | `--alias <name>`, `--target <env>`, `--config key=value` |
+| `adk integrations remove <alias>`       | Uninstall an integration                | `--target <env>`                                         |
+| `adk integrations upgrade <alias>`      | Upgrade to latest (or specific) version | `--to <version>`, `--target <env>`                       |
+| `adk integrations enable <alias>`       | Enable a disabled integration           | `--target <env>`                                         |
+| `adk integrations disable <alias>`      | Disable without removing                | `--target <env>`                                         |
+| `adk integrations configure <alias>`    | Set or unset config values              | `--set key=value`, `--unset key`, `--target <env>`       |
 
 ### State Management
 
-| Command | Description | Key Flags |
-|---------|-------------|-----------|
-| `adk integrations copy` | Copy integration state between environments | `--from <env>`, `--to <env>`, `--dry-run`, `--yes` |
-| `adk integrations diff` | Show differences between local snapshot and cloud | `--target <env>` |
-| `adk integrations status` | Explain why dependencies aren't ready | `--target <env>` |
+| Command                   | Description                                       | Key Flags                                          |
+| ------------------------- | ------------------------------------------------- | -------------------------------------------------- |
+| `adk integrations copy`   | Copy integration state between environments       | `--from <env>`, `--to <env>`, `--dry-run`, `--yes` |
+| `adk integrations diff`   | Show differences between local snapshot and cloud | `--target <env>`                                   |
+| `adk integrations status` | Explain why dependencies aren't ready             | `--target <env>`                                   |
 
 ## Dependency State
 
@@ -47,6 +47,7 @@ Use `--format json` for programmatic inspection of config schemas, action shapes
 - `.adk/dependencies/migration.json` — marker recording that legacy state was migrated
 
 **Key principles:**
+
 - Snapshots are a generated cache, refreshed from Cloud after every mutation. Never hand-edit them and never commit them as desired state.
 - The `--target` flag controls which environment (dev/prod) a command operates on.
 - To move state between environments, use `adk integrations copy --from dev --to prod` (preview with `--dry-run`, compare with `adk integrations diff`).
@@ -137,6 +138,7 @@ Zero configuration properties. Just enable it.
 Has configuration properties but none are required. Works out of the box.
 
 **Examples:**
+
 - `chat` — optional `encryptionKey`, `webhookUrl`, `webhookSecret`
 - `webchat` — ~38 optional theming/behavior props (`primaryColor`, `fontFamily`, `allowFileUpload`, etc.)
 - `webhook` — optional `secret` and `allowedOrigins`
@@ -169,11 +171,11 @@ Testing mode using a shared Botpress account. The integration provides a sandbox
 
 Inspect `adk integrations info <name> --format json`:
 
-| JSON Key | What It Tells You |
-|----------|-------------------|
-| `configuration.schema` | Default config schema (properties, required fields) |
-| `configuration.identifier` | Whether OAuth/link-based auth is used |
-| `configurations` | Alternative configuration types (if any) |
+| JSON Key                   | What It Tells You                                   |
+| -------------------------- | --------------------------------------------------- |
+| `configuration.schema`     | Default config schema (properties, required fields) |
+| `configuration.identifier` | Whether OAuth/link-based auth is used               |
+| `configurations`           | Alternative configuration types (if any)            |
 
 If `configuration.schema.properties` is empty or all optional → no manual config needed.
 If `configuration.identifier.linkTemplateScript` exists → OAuth.
@@ -232,11 +234,11 @@ Receives external HTTP webhooks. Only fires events when a payload arrives.
 
 ## Name Resolution
 
-| Format | Example | Meaning |
-|--------|---------|---------|
-| Plain name | `slack` | Official/public integration, latest version |
-| `name@version` | `slack@3.0.0` | Specific version |
-| `workspace/name` | `agi/linear` | Private (workspace-scoped) integration |
-| `intver_<ULID>` | `intver_01KM6EB027NRCST3M696XT0GTW` | Exact integration version ID |
+| Format           | Example                             | Meaning                                     |
+| ---------------- | ----------------------------------- | ------------------------------------------- |
+| Plain name       | `slack`                             | Official/public integration, latest version |
+| `name@version`   | `slack@3.0.0`                       | Specific version                            |
+| `workspace/name` | `agi/linear`                        | Private (workspace-scoped) integration      |
+| `intver_<ULID>`  | `intver_01KM6EB027NRCST3M696XT0GTW` | Exact integration version ID                |
 
 Official integrations use just the name. Private integrations are prefixed with the workspace slug and are only visible to workspace members.

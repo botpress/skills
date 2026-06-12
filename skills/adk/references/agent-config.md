@@ -9,27 +9,27 @@ The main configuration file defines your bot's core settings, AI models, depende
 ### Configuration Example
 
 ```typescript
-import { defineConfig, z } from "@botpress/runtime";
+import { defineConfig, z } from '@botpress/runtime'
 
 export default defineConfig({
-  name: "customer-support-bot",
-  description: "Customer support assistant with knowledge base",
+  name: 'customer-support-bot',
+  description: 'Customer support assistant with knowledge base',
 
   // AI Model Configuration
   defaultModels: {
-    autonomous: "openai:gpt-4o",       // For execute() function
-    zai: "openai:gpt-4o-mini",         // For zai operations
+    autonomous: 'openai:gpt-4o', // For execute() function
+    zai: 'openai:gpt-4o-mini', // For zai operations
   },
 
   // User State Schema
   user: {
     state: z.object({
-      preferredLanguage: z.enum(["en", "es", "fr", "de"]).default("en"),
-      timezone: z.string().default("UTC"),
+      preferredLanguage: z.enum(['en', 'es', 'fr', 'de']).default('en'),
+      timezone: z.string().default('UTC'),
       name: z.string().optional(),
       email: z.string().email().optional(),
       notificationsEnabled: z.boolean().default(true),
-      accountTier: z.enum(["free", "pro", "enterprise"]).default("free"),
+      accountTier: z.enum(['free', 'pro', 'enterprise']).default('free'),
       metadata: z.object({}).passthrough().default({}),
     }),
   },
@@ -41,10 +41,12 @@ export default defineConfig({
       maintenanceMode: z.boolean().default(false),
 
       // Feature flags
-      features: z.object({
-        advancedSearch: z.boolean().default(false),
-        multiLanguage: z.boolean().default(true),
-      }).default({}),
+      features: z
+        .object({
+          advancedSearch: z.boolean().default(false),
+          multiLanguage: z.boolean().default(true),
+        })
+        .default({}),
 
       // Analytics
       totalConversations: z.number().default(0),
@@ -54,7 +56,7 @@ export default defineConfig({
 
   // Integrations are NOT configured here — their state lives in Botpress Cloud.
   // Use `adk integrations add/remove/configure` to manage them — see integrations.md
-});
+})
 ```
 
 ### Additional Configuration Fields
@@ -69,7 +71,7 @@ Define a custom configuration schema for bot-level settings accessible via the C
 
 ```typescript
 export default defineConfig({
-  name: "my-bot",
+  name: 'my-bot',
 
   configuration: {
     schema: z.object({
@@ -80,13 +82,13 @@ export default defineConfig({
       }),
     }),
   },
-});
+})
 ```
 
 Access via direct import from `@botpress/runtime`:
 
 ```typescript
-import { configuration } from "@botpress/runtime";
+import { configuration } from '@botpress/runtime'
 
 if (configuration.featureFlags.enableBetaFeatures) {
   // Use beta features
@@ -100,6 +102,7 @@ See **[Context API](./context-api.md)** for details on accessing other runtime v
 **Default Models:**
 
 If you don't specify `defaultModels`, both default to `"auto"`:
+
 - `autonomous`: `"auto"`
 - `zai`: `"auto"`
 
@@ -108,10 +111,10 @@ If you don't specify `defaultModels`, both default to `"auto"`:
 Any `provider:model` string is accepted — run `adk models` to list the models available to your bot. Examples:
 
 ```typescript
-"openai:gpt-4o"
-"openai:gpt-4o-mini"
-"anthropic:claude-3-5-sonnet"
-"google:gemini-1.5-pro"
+'openai:gpt-4o'
+'openai:gpt-4o-mini'
+'anthropic:claude-3-5-sonnet'
+'google:gemini-1.5-pro'
 ```
 
 **Model Fallback Arrays:**
@@ -132,25 +135,25 @@ defaultModels: {
 ### Accessing Configuration
 
 ```typescript
-import { bot, user } from "@botpress/runtime";
+import { bot, user } from '@botpress/runtime'
 
 // In any handler (action, workflow, conversation)
 
 // Access bot state
-const version = bot.state.version;
-const maintenanceMode = bot.state.maintenanceMode;
+const version = bot.state.version
+const maintenanceMode = bot.state.maintenanceMode
 
 // Modify bot state
-bot.state.totalConversations += 1;
-bot.state.features.advancedSearch = true;
+bot.state.totalConversations += 1
+bot.state.features.advancedSearch = true
 
 // Access user state
-const language = user.state.preferredLanguage;
-const tier = user.state.accountTier;
+const language = user.state.preferredLanguage
+const tier = user.state.accountTier
 
 // Modify user state
-user.state.lastActiveDate = new Date();
-user.state.metadata.lastQuery = "product pricing";
+user.state.lastActiveDate = new Date()
+user.state.metadata.lastQuery = 'product pricing'
 ```
 
 ## Dependencies (Integrations, Plugins, Interfaces)
@@ -215,28 +218,28 @@ WEBHOOK_URL=https://api.example.com/webhooks
 ```typescript
 // In configuration
 export default defineConfig({
-  name: process.env.BOT_NAME || "my-bot",
+  name: process.env.BOT_NAME || 'my-bot',
 
   defaultModels: {
-    autonomous: process.env.AI_MODEL || "openai:gpt-4o",
+    autonomous: process.env.AI_MODEL || 'openai:gpt-4o',
   },
-});
+})
 
 // In handlers
 export const myAction = new Action({
   async handler({ input }) {
-    const apiKey = process.env.EXTERNAL_API_KEY;
+    const apiKey = process.env.EXTERNAL_API_KEY
 
     if (!apiKey) {
-      throw new Error("EXTERNAL_API_KEY not configured");
+      throw new Error('EXTERNAL_API_KEY not configured')
     }
 
     // Use the API key
-    const response = await fetch("https://api.example.com", {
+    const response = await fetch('https://api.example.com', {
       headers: { Authorization: `Bearer ${apiKey}` },
-    });
+    })
   },
-});
+})
 ```
 
 ## State Management Patterns
@@ -248,25 +251,25 @@ export const myAction = new Action({
 export const Chat = new Conversation({
   async handler({ message, conversation, execute }) {
     // Collect user info progressively
-    if (!user.state.name && message?.type === "text") {
-      user.state.name = extractName(message.payload.text);
+    if (!user.state.name && message?.type === 'text') {
+      user.state.name = extractName(message.payload.text)
     }
 
     if (!user.state.email) {
       // Ask for email if needed
       await conversation.send({
-        type: "text",
+        type: 'text',
         payload: { text: "What's your email address?" },
-      });
+      })
     }
 
     // Use preferences
-    const language = user.state.preferredLanguage;
+    const language = user.state.preferredLanguage
     await execute({
       instructions: `Respond in ${language}`,
-    });
+    })
   },
-});
+})
 ```
 
 ### Bot State Patterns
@@ -277,31 +280,31 @@ export const Chat = new Conversation({
     // Feature flag checking
     if (bot.state.features.advancedSearch) {
       // Use advanced search
-      const results = await advancedSearch(query);
+      const results = await advancedSearch(query)
     } else {
       // Use basic search
-      const results = await basicSearch(query);
+      const results = await basicSearch(query)
     }
 
     // Maintenance mode
     if (bot.state.maintenanceMode) {
       await conversation.send({
-        type: "text",
+        type: 'text',
         payload: {
-          text: "The bot is currently under maintenance. Please try again later.",
+          text: 'The bot is currently under maintenance. Please try again later.',
         },
-      });
-      return;
+      })
+      return
     }
 
     // Business hours check (example)
-    const supportHours = "9:00 AM to 5:00 PM EST";
+    const supportHours = '9:00 AM to 5:00 PM EST'
     await conversation.send({
-      type: "text",
+      type: 'text',
       payload: { text: `Our support hours are ${supportHours}` },
-    });
+    })
   },
-});
+})
 ```
 
 ## Best Practices
@@ -311,12 +314,12 @@ export const Chat = new Conversation({
 ```typescript
 // ❌ Bad - hardcoded secrets
 config: {
-  apiKey: "sk-abc123def456";
+  apiKey: 'sk-abc123def456'
 }
 
 // ✅ Good - environment variable
 config: {
-  apiKey: process.env.OPENAI_API_KEY;
+  apiKey: process.env.OPENAI_API_KEY
 }
 ```
 
@@ -333,7 +336,7 @@ export default defineConfig({
       age: z.number().int().min(0).max(150),
     }),
   },
-});
+})
 ```
 
 ### 3. Provide Defaults
@@ -342,10 +345,10 @@ export default defineConfig({
 user: {
   state: z.object({
     // Always provide sensible defaults
-    language: z.string().default("en"),
+    language: z.string().default('en'),
     notifications: z.boolean().default(true),
-    theme: z.enum(["light", "dark"]).default("light"),
-  });
+    theme: z.enum(['light', 'dark']).default('light'),
+  })
 }
 ```
 
@@ -365,7 +368,7 @@ bot: {
      * @example { "newUI": true, "betaFeatures": false }
      */
     features: z.record(z.boolean()).default({}),
-  });
+  })
 }
 ```
 
@@ -375,22 +378,22 @@ bot: {
 // Separate configuration by domain
 const userConfig = {
   state: userStateSchema,
-};
+}
 
 const botConfig = {
   state: botStateSchema,
-};
+}
 
 const integrationConfig = {
   slack: slackConfig,
   discord: discordConfig,
-};
+}
 
 export default defineConfig({
   ...baseConfig,
   user: userConfig,
   bot: botConfig,
-});
+})
 ```
 
 ## Project Files

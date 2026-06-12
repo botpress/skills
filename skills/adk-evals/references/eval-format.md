@@ -26,10 +26,10 @@ my-agent/
 import { Eval } from '@botpress/evals'
 
 export default new Eval({
-  name: 'my-eval',              // unique identifier (required)
+  name: 'my-eval', // unique identifier (required)
   description: 'What this tests', // optional
-  type: 'regression',                // 'capability' or 'regression' — optional, for filtering
-  tags: ['tools', 'multi-turn'],     // optional, for filtering
+  type: 'regression', // 'capability' or 'regression' — optional, for filtering
+  tags: ['tools', 'multi-turn'], // optional, for filtering
 
   setup: {
     // Seed state or trigger a workflow before the conversation (optional)
@@ -38,21 +38,27 @@ export default new Eval({
   conversation: [
     {
       user: 'message from user', // or: event, expectSilence
-      assert: { /* per-turn assertions */ },
+      assert: {
+        /* per-turn assertions */
+      },
     },
   ],
 
-  outcome: { /* post-conversation assertions (optional) */ },
+  outcome: {
+    /* post-conversation assertions (optional) */
+  },
 
-  options: { /* per-eval overrides (optional) */ },
+  options: {
+    /* per-eval overrides (optional) */
+  },
 })
 ```
 
 ## Types
 
-| Type | Purpose |
-|------|---------|
-| `capability` | Verify the bot can do something new |
+| Type         | Purpose                                |
+| ------------ | -------------------------------------- |
+| `capability` | Verify the bot can do something new    |
 | `regression` | Verify the bot still does it correctly |
 
 ## Multiple Evals Per File
@@ -190,21 +196,21 @@ assert: {
 
 Used in tool params, state values, and workflow params:
 
-| Operator | Example | Description |
-|----------|---------|-------------|
-| `equals` | `{ equals: 'urgent' }` | Exact match |
-| `contains` | `{ contains: 'HR' }` | Substring |
-| `not_contains` | `{ not_contains: 'test' }` | Excludes substring |
-| `matches` | `{ matches: '\\d+' }` | Regex |
-| `in` | `{ in: ['high', 'urgent'] }` | One of |
-| `exists` | `{ exists: true }` | Property exists |
+| Operator       | Example                      | Description        |
+| -------------- | ---------------------------- | ------------------ |
+| `equals`       | `{ equals: 'urgent' }`       | Exact match        |
+| `contains`     | `{ contains: 'HR' }`         | Substring          |
+| `not_contains` | `{ not_contains: 'test' }`   | Excludes substring |
+| `matches`      | `{ matches: '\\d+' }`        | Regex              |
+| `in`           | `{ in: ['high', 'urgent'] }` | One of             |
+| `exists`       | `{ exists: true }`           | Property exists    |
 
 **Numeric-only operators** (for `timing` and numeric state values):
 
-| Operator | Example | Description |
-|----------|---------|-------------|
-| `gte` | `{ gte: 100 }` | Greater than or equal |
-| `lte` | `{ lte: 5000 }` | Less than or equal |
+| Operator | Example         | Description           |
+| -------- | --------------- | --------------------- |
+| `gte`    | `{ gte: 100 }`  | Greater than or equal |
+| `lte`    | `{ lte: 5000 }` | Less than or equal    |
 
 ---
 
@@ -294,7 +300,7 @@ export default defineConfig({
   evals: {
     idleTimeout: 20000,
     judgePassThreshold: 3,
-    judgeModel: 'fast',     // 'fast', 'best', or a model ref like 'openai:gpt-4o'
+    judgeModel: 'fast', // 'fast', 'best', or a model ref like 'openai:gpt-4o'
   },
 })
 ```
@@ -307,7 +313,9 @@ export default defineConfig({
 
 ```typescript
 // WRONG — every turn needs a trigger
-{ expectSilence: true }
+{
+  expectSilence: true
+}
 ```
 
 ✅ **Correct**

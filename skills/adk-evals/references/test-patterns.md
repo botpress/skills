@@ -19,13 +19,8 @@ export default new Eval({
     {
       user: 'What is the status of order ORD-123?',
       assert: {
-        response: [
-          { contains: 'ORD-123' },
-          { llm_judge: 'Response includes order status information' },
-        ],
-        tools: [
-          { called: 'lookupOrder', params: { orderId: { equals: 'ORD-123' } } },
-        ],
+        response: [{ contains: 'ORD-123' }, { llm_judge: 'Response includes order status information' }],
+        tools: [{ called: 'lookupOrder', params: { orderId: { equals: 'ORD-123' } } }],
       },
     },
   ],
@@ -33,6 +28,7 @@ export default new Eval({
 ```
 
 **What to assert:**
+
 - `tools.called` with expected params — verify the action was invoked correctly
 - `response.contains` — verify the bot surfaced the action's result
 - `state` — if the action writes to state, verify the write
@@ -59,10 +55,13 @@ export default new Eval({
       user: 'Yes, please create a ticket for this',
       assert: {
         tools: [
-          { called: 'createTicket', params: {
+          {
+            called: 'createTicket',
+            params: {
               category: { equals: 'billing' },
               priority: { in: ['normal', 'high'] },
-          }},
+            },
+          },
         ],
         response: [{ contains: 'ticket' }],
       },
@@ -72,6 +71,7 @@ export default new Eval({
 ```
 
 **What to assert:**
+
 - `tools.called` with `params` — verify inputs are correctly extracted from the conversation
 - `tools.not_called` — verify tools are NOT called prematurely or inappropriately
 - `tools.call_order` — verify the correct sequence when multiple tools are involved
@@ -108,23 +108,15 @@ export default new Eval({
     {
       user: 'What happens next?',
       assert: {
-        workflow: [
-          { name: 'onboarding', entered: true },
-        ],
-        response: [
-          { llm_judge: 'Response explains the onboarding next steps' },
-        ],
+        workflow: [{ name: 'onboarding', entered: true }],
+        response: [{ llm_judge: 'Response explains the onboarding next steps' }],
       },
     },
   ],
 
   outcome: {
-    workflow: [
-      { name: 'onboarding', completed: true },
-    ],
-    state: [
-      { path: 'user.onboardingComplete', equals: true },
-    ],
+    workflow: [{ name: 'onboarding', completed: true }],
+    state: [{ path: 'user.onboardingComplete', equals: true }],
   },
 })
 ```
@@ -156,6 +148,7 @@ setup: {
 ```
 
 **What to assert:**
+
 - `workflow.entered` — workflow was triggered
 - `workflow.completed` — workflow ran to completion (use in `outcome`)
 - `state` — final state after the workflow completes
@@ -203,9 +196,7 @@ export default new Eval({
         payload: { amount: 99.99, currency: 'USD', customerId: 'cust-001' },
       },
       assert: {
-        response: [
-          { llm_judge: 'Bot notifies about the failed payment and offers help' },
-        ],
+        response: [{ llm_judge: 'Bot notifies about the failed payment and offers help' }],
         tools: [{ called: 'lookupCustomer' }],
       },
     },
@@ -246,9 +237,7 @@ export default new Eval({
     {
       user: 'I prefer to be contacted by email',
       assert: {
-        state: [
-          { path: 'user.contactPreference', equals: 'email' },
-        ],
+        state: [{ path: 'user.contactPreference', equals: 'email' }],
       },
     },
   ],
@@ -296,13 +285,13 @@ outcome: {
 
 ## Quick Reference: What to Assert Per Primitive
 
-| Primitive | Primary assertions | Secondary assertions |
-|-----------|-------------------|---------------------|
-| Actions | `tools.called` + params | `response`, `state` |
-| Tools | `tools.called/not_called/call_order` | `response` |
-| Workflows | `workflow.entered/completed` | `state`, `outcome` |
-| Conversations | `response` (multi-turn) | `tools`, `state` |
-| State | `state.equals/changed` | `outcome.state` |
+| Primitive     | Primary assertions                   | Secondary assertions |
+| ------------- | ------------------------------------ | -------------------- |
+| Actions       | `tools.called` + params              | `response`, `state`  |
+| Tools         | `tools.called/not_called/call_order` | `response`           |
+| Workflows     | `workflow.entered/completed`         | `state`, `outcome`   |
+| Conversations | `response` (multi-turn)              | `tools`, `state`     |
+| State         | `state.equals/changed`               | `outcome.state`      |
 
 ---
 
@@ -313,11 +302,11 @@ Always test what the bot should NOT do, not just what it should do.
 ```typescript
 conversation: [
   {
-    user: 'Show me all users in the system',  // unauthorized request
+    user: 'Show me all users in the system', // unauthorized request
     assert: {
       tools: [{ not_called: 'listAllUsers' }], // should not call admin tool
       response: [
-        { not_contains: 'user@example.com' },  // should not leak data
+        { not_contains: 'user@example.com' }, // should not leak data
         { llm_judge: 'Response politely declines the request' },
       ],
     },

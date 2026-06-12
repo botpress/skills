@@ -102,7 +102,7 @@ export const Chat = new Conversation({
   async handler({ execute }) {
     await execute({
       instructions: 'Always use the TicketCard component to display ticket details.',
-      tools: [lookupTicket]
+      tools: [lookupTicket],
     })
   },
 })

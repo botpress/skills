@@ -8,11 +8,11 @@ Running `adk dev` in multiple project directories registers each agent with a si
 
 Each agent shows a status indicator:
 
-| Status | Meaning |
-|--------|---------|
+| Status     | Meaning                                   |
+| ---------- | ----------------------------------------- |
 | `starting` | Agent is initializing (building, syncing) |
-| `ready` | Agent is running and accepting requests |
-| `error` | Agent encountered a fatal error |
+| `ready`    | Agent is running and accepting requests   |
+| `error`    | Agent encountered a fatal error           |
 
 If all agents are stopped, the DevConsole exits automatically (unless started in standalone mode via `adk dashboard`).
 
@@ -30,10 +30,10 @@ The Dev Console supports two orthogonal concepts:
 - **Dev target** — uses the local project's dev bot ID and local backend. All pages available.
 - **Prod target** — uses the deployed prod bot data. Hides dev-only pages (Actions, Workflows, Triggers, Evals, Files, Conversations, Traces, Logs).
 
-| Console Mode | Dev Target | Prod Target |
-|-------------|------------|-------------|
-| Local | Local dev bot + all pages | Prod bot data + restricted pages |
-| Cloud | Not available | Prod bot data + restricted pages |
+| Console Mode | Dev Target                | Prod Target                      |
+| ------------ | ------------------------- | -------------------------------- |
+| Local        | Local dev bot + all pages | Prod bot data + restricted pages |
+| Cloud        | Not available             | Prod bot data + restricted pages |
 
 Prod views that need ADK source-shaped definitions (actions, workflows, triggers, tables, knowledge) read **deployed metadata** published by `adk deploy`, not local source files. This is true in both local-prod and cloud-prod modes.
 
@@ -58,12 +58,12 @@ Compact pill in the top navigation center: status dot + agent name + mode pill +
 
 See the [CLI Reference](../../adk/references/cli.md) for full options and examples.
 
-| Command | What it does |
-|---------|-------------|
-| `adk ps` | List running agents and processes |
+| Command         | What it does                      |
+| --------------- | --------------------------------- |
+| `adk ps`        | List running agents and processes |
 | `adk dashboard` | Open Dev Console without an agent |
-| `adk kill` | Stop agents or the Dev Console |
-| `adk status` | Show project health info |
+| `adk kill`      | Stop agents or the Dev Console    |
+| `adk status`    | Show project health info          |
 
 ## Data Isolation
 

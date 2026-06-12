@@ -22,19 +22,19 @@ Activate this skill when users:
 
 ## Available Documentation
 
-| File | Description |
-|------|-------------|
+| File                                                         | Description                                                       |
+| ------------------------------------------------------------ | ----------------------------------------------------------------- |
 | [references/doc-standards.md](./references/doc-standards.md) | Document types, templates, quality checklists, and health metrics |
 
 ## Available Commands
 
-| Command (and suggested subcommand) | Description |
-|---------|-------------|
-| `/adk-document create [topic]` | Create documentation for a feature in the user's bot |
-| `/adk-document review [doc-path]` | Review project docs for accuracy and completeness |
-| `/adk-document update [doc-path] [what-changed]` | Update project docs after code changes |
-| `/adk-document sync [optional-doc-path]` | Check if project docs are in sync with the bot's code |
-| `/adk-document search [search-term]` | Search project documentation for specific topics |
+| Command (and suggested subcommand)               | Description                                           |
+| ------------------------------------------------ | ----------------------------------------------------- |
+| `/adk-document create [topic]`                   | Create documentation for a feature in the user's bot  |
+| `/adk-document review [doc-path]`                | Review project docs for accuracy and completeness     |
+| `/adk-document update [doc-path] [what-changed]` | Update project docs after code changes                |
+| `/adk-document sync [optional-doc-path]`         | Check if project docs are in sync with the bot's code |
+| `/adk-document search [search-term]`             | Search project documentation for specific topics      |
 
 ## Shared Principles
 
@@ -94,16 +94,16 @@ Discover the user's project and the official ADK repo for examples:
 
 ```javascript
 // Find ADK projects in the workspace
-Glob({ pattern: "**/agent.config.ts" })
+Glob({ pattern: '**/agent.config.ts' })
 
 // Find ADK runtime usage in the user's project
-Grep({ pattern: "from ['\"]@botpress/runtime", output_mode: "files_with_matches" })
+Grep({ pattern: 'from [\'"]@botpress/runtime', output_mode: 'files_with_matches' })
 
 // Look for existing project documentation
-Glob({ pattern: "./{docs,guides}/**/*.md" })
+Glob({ pattern: './{docs,guides}/**/*.md' })
 
 // Find official ADK examples if available locally
-Glob({ pattern: "**/adk/examples/**/*.ts" })
+Glob({ pattern: '**/adk/examples/**/*.ts' })
 ```
 
 ## Cross-References

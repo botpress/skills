@@ -1,7 +1,7 @@
 ---
 name: adk-init
 description: Scaffold a new Botpress ADK project
-argument-hint: "[project-name]"
+argument-hint: '[project-name]'
 ---
 
 Help the user initialize a new Botpress ADK project.
@@ -18,7 +18,7 @@ First, load the `adk` skill for full ADK knowledge.
 
 Don't just explain the project structure — ask what they want to build and guide next steps:
 
-*"Your project is ready. What are you building?"*
+_"Your project is ready. What are you building?"_
 
 - **Support agent** → suggest adding a conversation handler, ticket table, and relevant integrations (Slack, Linear, etc.)
 - **Knowledge-base Q&A** → suggest creating a knowledge base in `src/knowledge/` and a search tool

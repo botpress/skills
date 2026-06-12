@@ -9,19 +9,19 @@ For basic conversation setup, channel routing, and handler parameters, see **[co
 Add a `lifecycle` object to any Conversation definition. Durations use `ms`-compatible strings (`"30s"`, `"5m"`, `"1h"`, `"1d"`).
 
 ```typescript
-import { Conversation, z } from "@botpress/runtime";
+import { Conversation, z } from '@botpress/runtime'
 
 export const Chat = new Conversation({
-  channel: "webchat.channel",
+  channel: 'webchat.channel',
 
   lifecycle: {
     nudge: {
-      after: "5m",       // First nudge fires 5 min after last user message
-      interval: "10m",   // Subsequent nudges fire every 10 min
-      max: 3,            // Stop after 3 nudges (omit for unlimited)
+      after: '5m', // First nudge fires 5 min after last user message
+      interval: '10m', // Subsequent nudges fire every 10 min
+      max: 3, // Stop after 3 nudges (omit for unlimited)
     },
     expire: {
-      after: "1h",       // Session expires 1 hour after last user message
+      after: '1h', // Session expires 1 hour after last user message
     },
   },
 
@@ -32,17 +32,17 @@ export const Chat = new Conversation({
   handler: async (props) => {
     // handler receives nudge and expire events alongside regular messages
   },
-});
+})
 ```
 
 ### Configuration Fields
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `nudge.after` | `string` | Yes (if nudge) | Duration of silence before the first nudge fires |
-| `nudge.interval` | `string` | No | Duration between subsequent nudges. Defaults to `nudge.after` |
-| `nudge.max` | `number` | No | Max nudges per session. Must be a positive integer. Omit for unlimited |
-| `expire.after` | `string` | Yes (if expire) | Duration of silence before the session expires |
+| Field            | Type     | Required        | Description                                                            |
+| ---------------- | -------- | --------------- | ---------------------------------------------------------------------- |
+| `nudge.after`    | `string` | Yes (if nudge)  | Duration of silence before the first nudge fires                       |
+| `nudge.interval` | `string` | No              | Duration between subsequent nudges. Defaults to `nudge.after`          |
+| `nudge.max`      | `number` | No              | Max nudges per session. Must be a positive integer. Omit for unlimited |
+| `expire.after`   | `string` | Yes (if expire) | Duration of silence before the session expires                         |
 
 Nudge and expire are independent -- you can configure either or both.
 
@@ -52,35 +52,35 @@ When lifecycle is enabled, the conversation handler receives two additional even
 
 ```typescript
 handler: async ({ type, conversation, state, execute }) => {
-  if (type === "nudge") {
+  if (type === 'nudge') {
     // User has been silent -- send a re-engagement message
     await conversation.send({
-      type: "text",
-      payload: { text: "Still there? Let me know if you need anything." },
-    });
-    return;
+      type: 'text',
+      payload: { text: 'Still there? Let me know if you need anything.' },
+    })
+    return
   }
 
-  if (type === "expire") {
+  if (type === 'expire') {
     // Session is about to be torn down -- send a farewell
     await conversation.send({
-      type: "text",
-      payload: { text: "This session has expired. Send a new message to start fresh." },
-    });
+      type: 'text',
+      payload: { text: 'This session has expired. Send a new message to start fresh.' },
+    })
     // After the handler returns, the runtime automatically:
     //   1. Cancels all active workflows on the conversation
     //   2. Tags the conversation with sessionExpired = "true"
     //   3. Resets conversation state to defaults
     //   4. Clears the transcript
     //   5. Sets lifecycle status to "expired"
-    return;
+    return
   }
 
-  if (type === "message") {
+  if (type === 'message') {
     // Normal message handling
     await execute({
-      instructions: "You are a helpful assistant",
-    });
+      instructions: 'You are a helpful assistant',
+    })
   }
 }
 ```
@@ -88,10 +88,12 @@ handler: async ({ type, conversation, state, execute }) => {
 ### Handler Props by Type
 
 When `type === "nudge"`:
+
 - `event` is typed as `LifecycleNudgeEventType` with payload `{ conversationId, sessionId, scheduledAt }`
 - `message` is `undefined`
 
 When `type === "expire"`:
+
 - `event` is typed as `LifecycleExpireEventType` with payload `{ conversationId, sessionId, scheduledAt }`
 - `message` is `undefined`
 
@@ -103,28 +105,28 @@ Lifecycle-enabled conversations expose a read-only `conversation.session` proper
 
 ```typescript
 handler: async ({ type, conversation }) => {
-  const session = conversation.session;
-  if (!session) return; // undefined when lifecycle is not configured
+  const session = conversation.session
+  if (!session) return // undefined when lifecycle is not configured
 
-  console.log(session.id);             // ULID identifying the current session
-  console.log(session.number);         // Monotonically increasing (1, 2, 3...)
-  console.log(session.status);         // "active" or "expired"
-  console.log(session.startedAt);      // ISO timestamp
-  console.log(session.lastActivityAt); // ISO timestamp of last user message
-  console.log(session.nudgeCount);     // Number of nudges fired this session
+  console.log(session.id) // ULID identifying the current session
+  console.log(session.number) // Monotonically increasing (1, 2, 3...)
+  console.log(session.status) // "active" or "expired"
+  console.log(session.startedAt) // ISO timestamp
+  console.log(session.lastActivityAt) // ISO timestamp of last user message
+  console.log(session.nudgeCount) // Number of nudges fired this session
 }
 ```
 
 ### Session Fields
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `string` | ULID unique to the current session |
-| `number` | `number` | Session counter, increments on each expiration (starts at 1) |
-| `status` | `"active" \| "expired"` | Current session status |
-| `startedAt` | `string` | ISO timestamp when this session began |
-| `lastActivityAt` | `string` | ISO timestamp of the last user message |
-| `nudgeCount` | `number` | Number of nudges delivered in this session |
+| Field            | Type                    | Description                                                  |
+| ---------------- | ----------------------- | ------------------------------------------------------------ |
+| `id`             | `string`                | ULID unique to the current session                           |
+| `number`         | `number`                | Session counter, increments on each expiration (starts at 1) |
+| `status`         | `"active" \| "expired"` | Current session status                                       |
+| `startedAt`      | `string`                | ISO timestamp when this session began                        |
+| `lastActivityAt` | `string`                | ISO timestamp of the last user message                       |
+| `nudgeCount`     | `number`                | Number of nudges delivered in this session                   |
 
 ## How Timers Work
 
@@ -161,6 +163,7 @@ This means every user message resets the clock. Timers always measure silence fr
 ### Session Renewal
 
 When a message arrives on an expired session:
+
 1. A new `sessionId` (ULID) is generated
 2. `sessionNumber` increments
 3. `nudgeCount` resets to 0
@@ -175,15 +178,15 @@ Lifecycle automatically manages these tags without any user configuration:
 
 ### Conversation Tags
 
-| Tag | Description |
-|-----|-------------|
+| Tag              | Description                                                |
+| ---------------- | ---------------------------------------------------------- |
 | `sessionExpired` | Set to `"true"` when a session expires. Cleared on renewal |
 
 ### Message Tags
 
-| Tag | Description |
-|-----|-------------|
-| `sessionId` | ULID of the session this message belongs to |
+| Tag             | Description                                              |
+| --------------- | -------------------------------------------------------- |
+| `sessionId`     | ULID of the session this message belongs to              |
 | `sessionNumber` | Session sequence number at the time the message was sent |
 
 Message tags are applied automatically to both incoming user messages and outgoing bot messages. They enable grouping messages by session.
@@ -204,26 +207,26 @@ Use `conversation.session.nudgeCount` to vary the message urgency:
 
 ```typescript
 handler: async ({ type, conversation }) => {
-  if (type === "nudge") {
-    const count = conversation.session?.nudgeCount ?? 0;
+  if (type === 'nudge') {
+    const count = conversation.session?.nudgeCount ?? 0
 
     if (count === 1) {
       await conversation.send({
-        type: "text",
-        payload: { text: "Just checking in -- do you still need help?" },
-      });
+        type: 'text',
+        payload: { text: 'Just checking in -- do you still need help?' },
+      })
     } else if (count === 2) {
       await conversation.send({
-        type: "text",
+        type: 'text',
         payload: { text: "I'm still here if you need me." },
-      });
+      })
     } else {
       await conversation.send({
-        type: "text",
+        type: 'text',
         payload: { text: "This conversation will expire soon if there's no activity." },
-      });
+      })
     }
-    return;
+    return
   }
   // ... handle messages
 }
@@ -235,17 +238,17 @@ Send a session summary before the session is torn down:
 
 ```typescript
 handler: async ({ type, conversation, state, execute }) => {
-  if (type === "expire") {
+  if (type === 'expire') {
     if (state.topic) {
       await conversation.send({
-        type: "text",
+        type: 'text',
         payload: {
           text: `Session expired. You were working on: ${state.topic}. Send a message to start a new session.`,
         },
-      });
+      })
     }
     // State will be reset after this handler returns
-    return;
+    return
   }
   // ... handle messages
 }
