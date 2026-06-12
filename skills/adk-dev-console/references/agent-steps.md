@@ -37,11 +37,13 @@ A **Turn** is one conversation exchange — from the user's input through the ag
 ### Steps (Autonomous Iterations)
 
 Each **Step** is one iteration of the autonomous agent loop. The agent:
+
 1. Receives context (conversation history, available tools)
 2. Makes an LLM call (the **cognitive request**)
 3. Decides what to do: call a tool, send a message, or stop
 
 Each step shows:
+
 - **Iteration number** (1, 2, 3...)
 - **Exit reason**: "continued" (more work to do), "tool_called", "message_sent", "errored"
 - **Cognitive request** metadata: model, input/output tokens, cost, duration
@@ -51,6 +53,7 @@ Each step shows:
 ### Tool Calls
 
 Displayed as **violet cards** (or green for `search_knowledge`). Each shows:
+
 - Tool name
 - Input (JSON)
 - Output (JSON or markdown for knowledge search results)
@@ -60,6 +63,7 @@ Displayed as **violet cards** (or green for `search_knowledge`). Each shows:
 ### Bot Messages
 
 Displayed as **blue cards**. Each shows:
+
 - Message content (markdown rendered)
 - Duration
 - Long messages are clamped at 300 characters — click to expand
@@ -67,6 +71,7 @@ Displayed as **blue cards**. Each shows:
 ### State Mutations
 
 Displayed as **teal cards**. Each shows:
+
 - State type (bot, user, conversation)
 - Two-column "Before" and "After" view
 - Only changed keys shown by default (toggle for full state)
@@ -75,22 +80,24 @@ Displayed as **teal cards**. Each shows:
 ### Trigger Handlers
 
 When a trigger fires instead of a conversation message, the turn shows an **amber card** with:
+
 - Trigger name
 - Event type that fired it
 - Same iteration/tool/message structure inside
 
 ## Status Indicators
 
-| Visual | Meaning |
-|--------|---------|
-| ✓ Green checkmark | Completed successfully |
-| ✗ Red X | Failed (error message in detail panel) |
-| ⟳ Blue spinner | Currently executing |
-| Shimmer text ("thinking...") | LLM is generating |
+| Visual                       | Meaning                                |
+| ---------------------------- | -------------------------------------- |
+| ✓ Green checkmark            | Completed successfully                 |
+| ✗ Red X                      | Failed (error message in detail panel) |
+| ⟳ Blue spinner               | Currently executing                    |
+| Shimmer text ("thinking...") | LLM is generating                      |
 
 ## AI Metrics
 
 Each iteration's cognitive request shows:
+
 - **Model**: e.g., "claude-3.5-sonnet"
 - **Input tokens**: count + cost
 - **Output tokens**: count + cost
@@ -109,6 +116,7 @@ Turn-level cost is the sum of all iteration costs.
 ## Real-Time Updates
 
 Agent Steps streams data via SSE (Server-Sent Events):
+
 - Running spans show a live timer
 - New spans animate in from the top
 - Auto-scrolls to bottom when new content arrives

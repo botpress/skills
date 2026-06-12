@@ -5,6 +5,7 @@ Understanding how to send messages and events is critical for building conversat
 ## Table of Contents
 
 **Quick Links:**
+
 - [Core Concepts](#core-concepts) - Messages vs Events, Agnostic vs Channel-Specific
 - [Sending Messages in Conversations](#sending-messages-in-conversations) - Using `conversation.send()`
 - [Message Metadata](#message-metadata-chat-integration) - Adding custom data to messages
@@ -23,12 +24,14 @@ Understanding how to send messages and events is critical for building conversat
 ### Messages vs Events
 
 **Messages** are persistent conversation history items that users can see:
+
 - Appear in chat history
 - Survive page reloads
 - Part of conversation context
 - Sent using `conversation.send()` in conversations
 
 **Events** are ephemeral signals that don't persist:
+
 - NOT in conversation history
 - Lost on page reload
 - Used for real-time notifications
@@ -37,10 +40,12 @@ Understanding how to send messages and events is critical for building conversat
 ### Agnostic vs Channel-Specific
 
 **Agnostic Messages** work across multiple channels (defined in `@botpress/sdk`):
+
 - `text`, `image`, `audio`, `video`, `file`, `location`
 - `card`, `carousel`, `choice`, `dropdown`, `bloc`, `markdown`
 
 **Channel-Specific Messages** only work in specific integrations:
+
 - `customComponent` (webchat only)
 - Platform-specific fields (e.g., Slack threads)
 
@@ -51,19 +56,19 @@ Understanding how to send messages and events is critical for building conversat
 In conversation handlers, use `conversation.send()`:
 
 ```typescript
-import { Conversation } from "@botpress/runtime";
+import { Conversation } from '@botpress/runtime'
 
 export const Chat = new Conversation({
-  channel: "chat.channel",
+  channel: 'chat.channel',
 
   async handler({ message, conversation }) {
     // Send a message
     await conversation.send({
-      type: "text",
-      payload: { text: "Hello!" }
-    });
-  }
-});
+      type: 'text',
+      payload: { text: 'Hello!' },
+    })
+  },
+})
 ```
 
 **CRITICAL**: Never use `client.createMessage()` directly in conversations. Always use `conversation.send()`.
@@ -72,15 +77,15 @@ export const Chat = new Conversation({
 // ❌ WRONG - Don't use client directly
 await client.createMessage({
   conversationId: conversation.id,
-  type: "text",
-  payload: { text: "Hello" }
-});
+  type: 'text',
+  payload: { text: 'Hello' },
+})
 
 // ✅ CORRECT - Use conversation.send()
 await conversation.send({
-  type: "text",
-  payload: { text: "Hello" }
-});
+  type: 'text',
+  payload: { text: 'Hello' },
+})
 ```
 
 ### Why Use `conversation.send()`?
@@ -96,27 +101,29 @@ The **chat** integration supports an optional `metadata` field on **all message 
 
 ```typescript
 await conversation.send({
-  type: "text",
+  type: 'text',
   payload: {
-    text: "Your order has been confirmed",
+    text: 'Your order has been confirmed',
     metadata: {
-      orderId: "order_123",
-      customerId: "cust_456",
-      trackingNumber: "TRACK789",
-      internalRef: "ref_abc",
+      orderId: 'order_123',
+      customerId: 'cust_456',
+      trackingNumber: 'TRACK789',
+      internalRef: 'ref_abc',
       // Any custom data you need
-    }
-  }
-});
+    },
+  },
+})
 ```
 
 **Metadata Schema**:
+
 - Type: `Record<string, any>` (key-value pairs)
 - Keys: strings
 - Values: any type (string, number, boolean, object, array)
 - Optional on all message types
 
 **Use Cases**:
+
 - File identifiers for tracking
 - Unique keys for deduplication
 - Custom display properties
@@ -124,6 +131,7 @@ await conversation.send({
 - Frontend state management
 
 **Channel Support**:
+
 - ✅ **chat**: Full metadata support on all message types
 - ❓ **webchat**: Check generated types after adding dependency
 - ❓ **Other channels**: Varies by integration
@@ -136,11 +144,11 @@ Basic text message - works everywhere.
 
 ```typescript
 await conversation.send({
-  type: "text",
+  type: 'text',
   payload: {
-    text: "Hello, world!"
-  }
-});
+    text: 'Hello, world!',
+  },
+})
 ```
 
 ### Markdown
@@ -149,11 +157,11 @@ Formatted text with markdown - **channel support varies**.
 
 ```typescript
 await conversation.send({
-  type: "markdown",
+  type: 'markdown',
   payload: {
-    markdown: "**Bold** _italic_ `code` [link](https://example.com)"
-  }
-});
+    markdown: '**Bold** _italic_ `code` [link](https://example.com)',
+  },
+})
 ```
 
 **Note**: Markdown support depends on the channel. Use `text` for guaranteed cross-channel compatibility.
@@ -164,11 +172,11 @@ Display an image from a URL.
 
 ```typescript
 await conversation.send({
-  type: "image",
+  type: 'image',
   payload: {
-    imageUrl: "https://example.com/image.png"
-  }
-});
+    imageUrl: 'https://example.com/image.png',
+  },
+})
 ```
 
 ### Audio
@@ -177,11 +185,11 @@ Play an audio file.
 
 ```typescript
 await conversation.send({
-  type: "audio",
+  type: 'audio',
   payload: {
-    audioUrl: "https://example.com/audio.mp3"
-  }
-});
+    audioUrl: 'https://example.com/audio.mp3',
+  },
+})
 ```
 
 ### Video
@@ -190,11 +198,11 @@ Display a video player.
 
 ```typescript
 await conversation.send({
-  type: "video",
+  type: 'video',
   payload: {
-    videoUrl: "https://example.com/video.mp4"
-  }
-});
+    videoUrl: 'https://example.com/video.mp4',
+  },
+})
 ```
 
 ### File
@@ -203,16 +211,17 @@ Share a downloadable file with optional metadata.
 
 ```typescript
 await conversation.send({
-  type: "file",
+  type: 'file',
   payload: {
-    fileUrl: "https://example.com/document.pdf",
-    title: "Invoice", // optional
-    metadata: { // optional - see Message Metadata section
-      fileId: "file_123",
-      uniqueKey: "invoice-2024-001"
-    }
-  }
-});
+    fileUrl: 'https://example.com/document.pdf',
+    title: 'Invoice', // optional
+    metadata: {
+      // optional - see Message Metadata section
+      fileId: 'file_123',
+      uniqueKey: 'invoice-2024-001',
+    },
+  },
+})
 ```
 
 ### Location
@@ -221,14 +230,14 @@ Share a geographic location.
 
 ```typescript
 await conversation.send({
-  type: "location",
+  type: 'location',
   payload: {
     latitude: 40.7128,
-    longitude: -74.0060,
-    address: "New York, NY", // optional
-    title: "Meeting Location" // optional
-  }
-});
+    longitude: -74.006,
+    address: 'New York, NY', // optional
+    title: 'Meeting Location', // optional
+  },
+})
 ```
 
 ### Card
@@ -237,28 +246,29 @@ Rich card with image, title, and action buttons.
 
 ```typescript
 await conversation.send({
-  type: "card",
+  type: 'card',
   payload: {
-    title: "Product Name",
-    subtitle: "Product description", // optional
-    imageUrl: "https://example.com/product.jpg", // optional
+    title: 'Product Name',
+    subtitle: 'Product description', // optional
+    imageUrl: 'https://example.com/product.jpg', // optional
     actions: [
       {
-        action: "postback", // or "url" or "say"
-        label: "Buy Now",
-        value: "buy_product_123"
+        action: 'postback', // or "url" or "say"
+        label: 'Buy Now',
+        value: 'buy_product_123',
       },
       {
-        action: "url",
-        label: "Learn More",
-        value: "https://example.com/product"
-      }
-    ]
-  }
-});
+        action: 'url',
+        label: 'Learn More',
+        value: 'https://example.com/product',
+      },
+    ],
+  },
+})
 ```
 
 **Action Types**:
+
 - `postback`: Sends a value back to the bot (triggers new message)
 - `url`: Opens a URL in browser
 - `say`: Makes user "say" text (sends as user message)
@@ -269,28 +279,24 @@ Multiple cards in a scrollable carousel.
 
 ```typescript
 await conversation.send({
-  type: "carousel",
+  type: 'carousel',
   payload: {
     items: [
       {
-        title: "Product 1",
-        subtitle: "Description 1",
-        imageUrl: "https://example.com/product1.jpg",
-        actions: [
-          { action: "postback", label: "Select", value: "product_1" }
-        ]
+        title: 'Product 1',
+        subtitle: 'Description 1',
+        imageUrl: 'https://example.com/product1.jpg',
+        actions: [{ action: 'postback', label: 'Select', value: 'product_1' }],
       },
       {
-        title: "Product 2",
-        subtitle: "Description 2",
-        imageUrl: "https://example.com/product2.jpg",
-        actions: [
-          { action: "postback", label: "Select", value: "product_2" }
-        ]
-      }
-    ]
-  }
-});
+        title: 'Product 2',
+        subtitle: 'Description 2',
+        imageUrl: 'https://example.com/product2.jpg',
+        actions: [{ action: 'postback', label: 'Select', value: 'product_2' }],
+      },
+    ],
+  },
+})
 ```
 
 ### Choice (Buttons)
@@ -299,17 +305,17 @@ Quick reply buttons for user selection.
 
 ```typescript
 await conversation.send({
-  type: "choice",
+  type: 'choice',
   payload: {
-    text: "What would you like to do?",
+    text: 'What would you like to do?',
     options: [
-      { label: "Option 1", value: "opt1" },
-      { label: "Option 2", value: "opt2" },
-      { label: "Option 3", value: "opt3" }
+      { label: 'Option 1', value: 'opt1' },
+      { label: 'Option 2', value: 'opt2' },
+      { label: 'Option 3', value: 'opt3' },
     ],
-    disableFreeText: false // optional - prevent typing
-  }
-});
+    disableFreeText: false, // optional - prevent typing
+  },
+})
 ```
 
 ### Dropdown
@@ -318,17 +324,17 @@ Dropdown/select menu for user selection.
 
 ```typescript
 await conversation.send({
-  type: "dropdown",
+  type: 'dropdown',
   payload: {
-    text: "Select your country:",
+    text: 'Select your country:',
     options: [
-      { label: "United States", value: "us" },
-      { label: "Canada", value: "ca" },
-      { label: "United Kingdom", value: "uk" }
+      { label: 'United States', value: 'us' },
+      { label: 'Canada', value: 'ca' },
+      { label: 'United Kingdom', value: 'uk' },
     ],
-    disableFreeText: true // optional
-  }
-});
+    disableFreeText: true, // optional
+  },
+})
 ```
 
 ### Bloc
@@ -337,27 +343,28 @@ Multiple messages grouped together (composite message).
 
 ```typescript
 await conversation.send({
-  type: "bloc",
+  type: 'bloc',
   payload: {
     items: [
       {
-        type: "text",
-        payload: { text: "Here's your order summary:" }
+        type: 'text',
+        payload: { text: "Here's your order summary:" },
       },
       {
-        type: "image",
-        payload: { imageUrl: "https://example.com/product.jpg" }
+        type: 'image',
+        payload: { imageUrl: 'https://example.com/product.jpg' },
       },
       {
-        type: "text",
-        payload: { text: "Total: $99.99" }
-      }
-    ]
-  }
-});
+        type: 'text',
+        payload: { text: 'Total: $99.99' },
+      },
+    ],
+  },
+})
 ```
 
 **Allowed item types in bloc**:
+
 - `text`, `markdown`, `image`, `audio`, `video`, `file`, `location`
 
 ### Custom Component (Webchat)
@@ -368,12 +375,12 @@ Send a custom React component in webchat conversations using the `customComponen
 import { WelcomeBannerComponent } from '../components'
 
 await conversation.send({
-  type: "customComponent",
+  type: 'customComponent',
   payload: {
     component: WelcomeBannerComponent,
     props: {},
-  }
-});
+  },
+})
 ```
 
 Components are `.bp.tsx` files registered in `src/components/index.ts` with `new CustomComponent()`. See the component registry reference for the full creation flow.
@@ -391,24 +398,24 @@ Messages (including metadata) are available to frontend clients via the webchat 
 ```javascript
 // React to new messages as they arrive
 window.botpressWebChat.onMessage((message) => {
-  console.log('New message:', message);
+  console.log('New message:', message)
 
   if (message.type === 'file') {
-    console.log('File URL:', message.payload.fileUrl);
-    console.log('File title:', message.payload.title);
-    console.log('Metadata:', message.payload.metadata);
+    console.log('File URL:', message.payload.fileUrl)
+    console.log('File title:', message.payload.title)
+    console.log('Metadata:', message.payload.metadata)
 
     // Access custom metadata
-    const { fileId, uniqueKey, customData } = message.payload.metadata || {};
+    const { fileId, uniqueKey, customData } = message.payload.metadata || {}
 
     // Fetch file contents if needed
     fetch(message.payload.fileUrl)
-      .then(response => response.text())
-      .then(content => {
-        console.log('File content:', content);
-      });
+      .then((response) => response.text())
+      .then((content) => {
+        console.log('File content:', content)
+      })
   }
-});
+})
 ```
 
 ### Reconstructing State from Message History
@@ -417,34 +424,33 @@ On page reload, iterate through conversation history to reconstruct application 
 
 ```javascript
 // Get all messages from conversation history
-window.botpressWebChat.getMessages().then(messages => {
+window.botpressWebChat.getMessages().then((messages) => {
   // Filter for file messages with specific metadata
-  const componentFiles = messages.filter(msg =>
-    msg.type === 'file' &&
-    msg.payload.metadata?.fileType === 'component'
-  );
+  const componentFiles = messages.filter((msg) => msg.type === 'file' && msg.payload.metadata?.fileType === 'component')
 
   // Reconstruct state from persisted messages
   componentFiles.forEach(async (msg) => {
-    const { fileUrl, metadata } = msg.payload;
-    const { componentId, stepId } = metadata;
+    const { fileUrl, metadata } = msg.payload
+    const { componentId, stepId } = metadata
 
     // Fetch and restore component
-    const content = await fetch(fileUrl).then(r => r.text());
-    restoreComponent(componentId, stepId, content);
-  });
-});
+    const content = await fetch(fileUrl).then((r) => r.text())
+    restoreComponent(componentId, stepId, content)
+  })
+})
 ```
 
 ### Message Persistence Benefits
 
 Messages (unlike events) are:
+
 - ✅ Persisted in conversation history
 - ✅ Replayed on page reload
 - ✅ Available via `getMessages()` API
 - ✅ Include all metadata
 
 This makes messages ideal for:
+
 - State reconstruction after page reload
 - File tracking and retrieval
 - Workflow progress indicators
@@ -455,25 +461,25 @@ This makes messages ideal for:
 Workflows can't use `conversation.send()` - they must use `client.createMessage()`:
 
 ```typescript
-import { Workflow } from "@botpress/runtime";
+import { Workflow } from '@botpress/runtime'
 
 export const NotifyWorkflow = new Workflow({
-  name: "notify",
+  name: 'notify',
   input: z.object({
     conversationId: z.string(), // REQUIRED for messaging!
-    message: z.string()
+    message: z.string(),
   }),
 
   handler: async ({ input, client, step }) => {
-    await step("send-notification", async () => {
+    await step('send-notification', async () => {
       await client.createMessage({
         conversationId: input.conversationId,
-        type: "text",
-        payload: { text: input.message }
-      });
-    });
-  }
-});
+        type: 'text',
+        payload: { text: input.message },
+      })
+    })
+  },
+})
 ```
 
 **CRITICAL**: Always pass `conversationId` to workflows that need to send messages (see Common Mistakes section for details).
@@ -485,12 +491,14 @@ Events are **NOT messages** - they don't persist in conversation history. Use in
 ### When to Use Events vs Messages
 
 **Use Messages** (persistent) when:
+
 - User needs to see it in history
 - It's part of the conversation flow
 - You want it to survive page reloads
 - Examples: chat responses, confirmations, results
 
 **Use Events** (ephemeral) when:
+
 - Real-time notifications (typing indicators, progress)
 - UI state changes (show/hide widget, config updates)
 - Temporary feedback (loading, processing)
@@ -503,68 +511,71 @@ Some integrations provide actions for special message types and events:
 ```typescript
 // Webchat - Send custom event (ephemeral, not persisted)
 await client.callAction({
-  type: "webchat:customEvent",
+  type: 'webchat:customEvent',
   input: {
     conversationId: conversation.id,
     event: JSON.stringify({
-      type: "notification",
-      message: "Processing..."
-    })
-  }
-});
+      type: 'notification',
+      message: 'Processing...',
+    }),
+  },
+})
 
 // Webchat - Show/hide widget
 await client.callAction({
-  type: "webchat:showWebchat",
-  input: { conversationId: conversation.id }
-});
+  type: 'webchat:showWebchat',
+  input: { conversationId: conversation.id },
+})
 
 await client.callAction({
-  type: "webchat:hideWebchat",
-  input: { conversationId: conversation.id }
-});
+  type: 'webchat:hideWebchat',
+  input: { conversationId: conversation.id },
+})
 
 // Webchat - Update configuration
 await client.callAction({
-  type: "webchat:configWebchat",
+  type: 'webchat:configWebchat',
   input: {
     conversationId: conversation.id,
     config: JSON.stringify({
-      theme: { primaryColor: "#ff0000" }
-    })
-  }
-});
+      theme: { primaryColor: '#ff0000' },
+    }),
+  },
+})
 ```
 
 **Frontend event handling**:
 
 ```javascript
-window.botpressWebChat.onEvent((event) => {
-  if (event.type === 'notification') {
-    showToast(event.message);
-  }
-}, ['TRIGGER']);
+window.botpressWebChat.onEvent(
+  (event) => {
+    if (event.type === 'notification') {
+      showToast(event.message)
+    }
+  },
+  ['TRIGGER']
+)
 ```
 
 ## Channel Compatibility
 
 Not all message types work in all channels:
 
-| Message Type | Chat | Webchat | Slack | WhatsApp | Teams |
-|-------------|------|---------|-------|----------|-------|
-| text | ✅ | ✅ | ✅ | ✅ | ✅ |
-| markdown | ✅ | ✅ | ✅ | ❌ | ✅ |
-| image | ✅ | ✅ | ✅ | ✅ | ✅ |
-| audio | ✅ | ✅ | ❌ | ✅ | ❌ |
-| video | ✅ | ✅ | ❌ | ✅ | ❌ |
-| file | ✅ | ✅ | ✅ | ✅ | ✅ |
-| location | ✅ | ✅ | ❌ | ✅ | ❌ |
-| card | ✅ | ✅ | ✅ | ❌ | ✅ |
-| carousel | ✅ | ✅ | ❌ | ❌ | ❌ |
-| choice | ✅ | ✅ | ✅ | ✅ | ✅ |
-| dropdown | ✅ | ✅ | ❌ | ✅ | ❌ |
-| bloc | ✅ | ✅ | ❌ | ❌ | ❌ |
-| customComponent | ❌ | ✅ (webchat only) | ❌ | ❌ | ❌ |
+| Message Type    | Chat | Webchat           | Slack | WhatsApp | Teams |
+| --------------- | ---- | ----------------- | ----- | -------- | ----- |
+| text            | ✅   | ✅                | ✅    | ✅       | ✅    |
+| markdown        | ✅   | ✅                | ✅    | ❌       | ✅    |
+| image           | ✅   | ✅                | ✅    | ✅       | ✅    |
+| audio           | ✅   | ✅                | ❌    | ✅       | ❌    |
+| video           | ✅   | ✅                | ❌    | ✅       | ❌    |
+| file            | ✅   | ✅                | ✅    | ✅       | ✅    |
+| location        | ✅   | ✅                | ❌    | ✅       | ❌    |
+| card            | ✅   | ✅                | ✅    | ❌       | ✅    |
+| carousel        | ✅   | ✅                | ❌    | ❌       | ❌    |
+| choice          | ✅   | ✅                | ✅    | ✅       | ✅    |
+| dropdown        | ✅   | ✅                | ❌    | ✅       | ❌    |
+| bloc            | ✅   | ✅                | ❌    | ❌       | ❌    |
+| customComponent | ❌   | ✅ (webchat only) | ❌    | ❌       | ❌    |
 
 **Tip**: Use `text` and `image` for maximum compatibility across channels.
 
@@ -576,16 +587,20 @@ Not all message types work in all channels:
 // ❌ WRONG
 export const Chat = new Conversation({
   async handler({ client }) {
-    await client.createMessage({ /* ... */ });
-  }
-});
+    await client.createMessage({
+      /* ... */
+    })
+  },
+})
 
 // ✅ CORRECT
 export const Chat = new Conversation({
   async handler({ conversation }) {
-    await conversation.send({ /* ... */ });
-  }
-});
+    await conversation.send({
+      /* ... */
+    })
+  },
+})
 ```
 
 ### 2. Using client.createEvent() for Messages
@@ -594,15 +609,15 @@ export const Chat = new Conversation({
 // ❌ WRONG - Events don't persist!
 await client.createEvent({
   conversationId: conversation.id,
-  type: "text",
-  payload: { text: "Hello" }
-});
+  type: 'text',
+  payload: { text: 'Hello' },
+})
 
 // ✅ CORRECT - Use messages
 await conversation.send({
-  type: "text",
-  payload: { text: "Hello" }
-});
+  type: 'text',
+  payload: { text: 'Hello' },
+})
 ```
 
 ### 3. Missing conversationId in Workflows
@@ -613,25 +628,25 @@ export const MyWorkflow = new Workflow({
   handler: async ({ input, client }) => {
     await client.createMessage({
       // Where's conversationId? This will fail!
-      type: "text",
-      payload: { text: "Hello" }
-    });
-  }
-});
+      type: 'text',
+      payload: { text: 'Hello' },
+    })
+  },
+})
 
 // ✅ CORRECT - Pass conversationId in input
 export const MyWorkflow = new Workflow({
   input: z.object({
-    conversationId: z.string()
+    conversationId: z.string(),
   }),
   handler: async ({ input, client }) => {
     await client.createMessage({
       conversationId: input.conversationId,
-      type: "text",
-      payload: { text: "Hello" }
-    });
-  }
-});
+      type: 'text',
+      payload: { text: 'Hello' },
+    })
+  },
+})
 ```
 
 ### 4. Using Custom Components in Non-Webchat Channels
@@ -639,25 +654,30 @@ export const MyWorkflow = new Workflow({
 ```typescript
 // ❌ WRONG - customComponent only works in webchat
 export const SlackChat = new Conversation({
-  channel: "slack.dm",
+  channel: 'slack.dm',
   async handler({ conversation }) {
     await conversation.send({
-      type: "customComponent", // Will fail in Slack!
-      payload: { component: TicketCardComponent, props: { /* ... */ } }
-    });
-  }
-});
+      type: 'customComponent', // Will fail in Slack!
+      payload: {
+        component: TicketCardComponent,
+        props: {
+          /* ... */
+        },
+      },
+    })
+  },
+})
 
 // ✅ CORRECT - Use agnostic message types for non-webchat channels
 export const SlackChat = new Conversation({
-  channel: "slack.dm",
+  channel: 'slack.dm',
   async handler({ conversation }) {
     await conversation.send({
-      type: "card", // Works in Slack
-      payload: { title: "Ticket", subtitle: "Details here", actions: [] }
-    });
-  }
-});
+      type: 'card', // Works in Slack
+      payload: { title: 'Ticket', subtitle: 'Details here', actions: [] },
+    })
+  },
+})
 ```
 
 ## Best Practices
@@ -669,13 +689,13 @@ TypeScript will help you with type-safe payloads:
 ```typescript
 // TypeScript knows the payload structure based on type
 await conversation.send({
-  type: "card",
+  type: 'card',
   payload: {
-    title: "Required",
-    subtitle: "Optional",
+    title: 'Required',
+    subtitle: 'Optional',
     // IntelliSense will suggest all valid fields!
-  }
-});
+  },
+})
 ```
 
 ### 2. Graceful Degradation
@@ -683,29 +703,32 @@ await conversation.send({
 When supporting multiple channels:
 
 ```typescript
-import { TicketCardComponent } from "../components";
+import { TicketCardComponent } from '../components'
 
 export const Chat = new Conversation({
   async handler({ conversation }) {
-    if (conversation.channel === "webchat.channel") {
+    if (conversation.channel === 'webchat.channel') {
       // Webchat supports custom components
       await conversation.send({
-        type: "customComponent",
-        payload: { component: TicketCardComponent, props: { ticketId: "TKT-001", title: "VPN issue", priority: "high", status: "open" } }
-      });
+        type: 'customComponent',
+        payload: {
+          component: TicketCardComponent,
+          props: { ticketId: 'TKT-001', title: 'VPN issue', priority: 'high', status: 'open' },
+        },
+      })
     } else {
       // Fall back to card for other channels
       await conversation.send({
-        type: "card",
+        type: 'card',
         payload: {
-          title: "TKT-001: VPN issue",
-          subtitle: "Priority: high · Status: open",
-          actions: []
-        }
-      });
+          title: 'TKT-001: VPN issue',
+          subtitle: 'Priority: high · Status: open',
+          actions: [],
+        },
+      })
     }
-  }
-});
+  },
+})
 ```
 
 ### 3. Error Handling
@@ -715,16 +738,16 @@ Always wrap message sending in try-catch:
 ```typescript
 try {
   await conversation.send({
-    type: "image",
-    payload: { imageUrl: maybeInvalidUrl }
-  });
+    type: 'image',
+    payload: { imageUrl: maybeInvalidUrl },
+  })
 } catch (error) {
-  console.error("Failed to send image:", error);
+  console.error('Failed to send image:', error)
   // Fall back to text
   await conversation.send({
-    type: "text",
-    payload: { text: "Image unavailable" }
-  });
+    type: 'text',
+    payload: { text: 'Image unavailable' },
+  })
 }
 ```
 
@@ -735,21 +758,21 @@ Break complex messages into parts:
 ```typescript
 // Instead of one giant text
 await conversation.send({
-  type: "text",
-  payload: { text: "Title\n\nBody text here\n\nFooter" }
-});
+  type: 'text',
+  payload: { text: 'Title\n\nBody text here\n\nFooter' },
+})
 
 // Use bloc for better structure
 await conversation.send({
-  type: "bloc",
+  type: 'bloc',
   payload: {
     items: [
-      { type: "markdown", payload: { markdown: "**Title**" } },
-      { type: "text", payload: { text: "Body text here" } },
-      { type: "text", payload: { text: "Footer" } }
-    ]
-  }
-});
+      { type: 'markdown', payload: { markdown: '**Title**' } },
+      { type: 'text', payload: { text: 'Body text here' } },
+      { type: 'text', payload: { text: 'Footer' } },
+    ],
+  },
+})
 ```
 
 ## Summary
@@ -761,6 +784,7 @@ await conversation.send({
 **Events**: Use integration actions for ephemeral notifications (don't persist)
 
 **Key Rules**:
+
 1. ✅ Use `conversation.send()` in conversations, `client.createMessage()` in workflows
 2. ✅ Always pass `conversationId` to workflows that send messages
 3. ✅ Use messages for persistent content, events for ephemeral notifications

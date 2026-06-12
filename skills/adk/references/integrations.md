@@ -10,34 +10,34 @@ All integration management uses the `adk integrations` subcommand family. Every 
 
 ### Discovery
 
-| Command | Description | Key Flags |
-|---------|-------------|-----------|
-| `adk integrations search <query>` | Search by keyword | `--format json`, `--limit <n>` (default: 20) |
-| `adk integrations list --available` | Browse all Hub integrations | `--format json`, `--limit <n>` (default: 50) |
-| `adk integrations list` | Show installed dependencies | `--format json`, `--verbose` |
-| `adk integrations info <name>` | Full integration details | `--actions`, `--channels`, `--events`, `--full`, `--format json` |
+| Command                             | Description                 | Key Flags                                                        |
+| ----------------------------------- | --------------------------- | ---------------------------------------------------------------- |
+| `adk integrations search <query>`   | Search by keyword           | `--format json`, `--limit <n>` (default: 20)                     |
+| `adk integrations list --available` | Browse all Hub integrations | `--format json`, `--limit <n>` (default: 50)                     |
+| `adk integrations list`             | Show installed dependencies | `--format json`, `--verbose`                                     |
+| `adk integrations info <name>`      | Full integration details    | `--actions`, `--channels`, `--events`, `--full`, `--format json` |
 
 Use `--format json` for programmatic inspection of config schemas, action shapes, and event payloads.
 
 ### Mutations
 
-| Command | Description | Key Flags |
-|---------|-------------|-----------|
-| `adk integrations add <name>@<version>` | Install an integration | `--alias <name>`, `--target <env>`, `--config key=value` |
-| `adk integrations remove <alias>` | Uninstall an integration | `--target <env>` |
-| `adk integrations upgrade <alias>` | Upgrade to latest (or specific) version | `--to <version>`, `--target <env>` |
-| `adk integrations enable <alias>` | Enable a disabled integration | `--target <env>` |
-| `adk integrations disable <alias>` | Disable without removing | `--target <env>` |
-| `adk integrations configure <alias>` | Set or unset config values | `--set key=value`, `--unset key`, `--target <env>` |
+| Command                                 | Description                             | Key Flags                                                |
+| --------------------------------------- | --------------------------------------- | -------------------------------------------------------- |
+| `adk integrations add <name>@<version>` | Install an integration                  | `--alias <name>`, `--target <env>`, `--config key=value` |
+| `adk integrations remove <alias>`       | Uninstall an integration                | `--target <env>`                                         |
+| `adk integrations upgrade <alias>`      | Upgrade to latest (or specific) version | `--to <version>`, `--target <env>`                       |
+| `adk integrations enable <alias>`       | Enable a disabled integration           | `--target <env>`                                         |
+| `adk integrations disable <alias>`      | Disable without removing                | `--target <env>`                                         |
+| `adk integrations configure <alias>`    | Set or unset config values              | `--set key=value`, `--unset key`, `--target <env>`       |
 
 ### State Management
 
-| Command | Description | Key Flags |
-|---------|-------------|-----------|
-| `adk integrations pull-lock` | Pull cloud state into lock file | `--target <env>`, `--dry-run` |
-| `adk integrations push-lock` | Push lock file to cloud | `--target <env>`, `--dry-run`, `--yes` |
-| `adk integrations copy` | Copy integration state between environments | `--from <env>`, `--to <env>` |
-| `adk integrations diff` | Show differences between lock file and cloud | `--target <env>` |
+| Command                      | Description                                  | Key Flags                              |
+| ---------------------------- | -------------------------------------------- | -------------------------------------- |
+| `adk integrations pull-lock` | Pull cloud state into lock file              | `--target <env>`, `--dry-run`          |
+| `adk integrations push-lock` | Push lock file to cloud                      | `--target <env>`, `--dry-run`, `--yes` |
+| `adk integrations copy`      | Copy integration state between environments  | `--from <env>`, `--to <env>`           |
+| `adk integrations diff`      | Show differences between lock file and cloud | `--target <env>`                       |
 
 ## Lock File System
 
@@ -72,6 +72,7 @@ Integration state lives in per-environment lock files at the project root:
 ```
 
 **Key principles:**
+
 - Cloud is the source of truth. The lock file is a local reflection refreshed after every mutation.
 - Never edit lock files by hand — use `adk integrations` commands.
 - The `--target` flag controls which environment (dev/prod) a command operates on.
@@ -161,6 +162,7 @@ Zero configuration properties. Just enable it.
 Has configuration properties but none are required. Works out of the box.
 
 **Examples:**
+
 - `chat` — optional `encryptionKey`, `webhookUrl`, `webhookSecret`
 - `webchat` — ~38 optional theming/behavior props (`primaryColor`, `fontFamily`, `allowFileUpload`, etc.)
 - `webhook` — optional `secret` and `allowedOrigins`
@@ -193,11 +195,11 @@ Testing mode using a shared Botpress account. The integration provides a sandbox
 
 Inspect `adk integrations info <name> --format json`:
 
-| JSON Key | What It Tells You |
-|----------|-------------------|
-| `configuration.schema` | Default config schema (properties, required fields) |
-| `configuration.identifier` | Whether OAuth/link-based auth is used |
-| `configurations` | Alternative configuration types (if any) |
+| JSON Key                   | What It Tells You                                   |
+| -------------------------- | --------------------------------------------------- |
+| `configuration.schema`     | Default config schema (properties, required fields) |
+| `configuration.identifier` | Whether OAuth/link-based auth is used               |
+| `configurations`           | Alternative configuration types (if any)            |
 
 If `configuration.schema.properties` is empty or all optional → no manual config needed.
 If `configuration.identifier.linkTemplateScript` exists → OAuth.
@@ -256,11 +258,11 @@ Receives external HTTP webhooks. Only fires events when a payload arrives.
 
 ## Name Resolution
 
-| Format | Example | Meaning |
-|--------|---------|---------|
-| Plain name | `slack` | Official/public integration, latest version |
-| `name@version` | `slack@3.0.0` | Specific version |
-| `workspace/name` | `agi/linear` | Private (workspace-scoped) integration |
-| `intver_<ULID>` | `intver_01KM6EB027NRCST3M696XT0GTW` | Exact integration version ID |
+| Format           | Example                             | Meaning                                     |
+| ---------------- | ----------------------------------- | ------------------------------------------- |
+| Plain name       | `slack`                             | Official/public integration, latest version |
+| `name@version`   | `slack@3.0.0`                       | Specific version                            |
+| `workspace/name` | `agi/linear`                        | Private (workspace-scoped) integration      |
+| `intver_<ULID>`  | `intver_01KM6EB027NRCST3M696XT0GTW` | Exact integration version ID                |
 
 Official integrations use just the name. Private integrations are prefixed with the workspace slug and are only visible to workspace members.

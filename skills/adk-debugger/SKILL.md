@@ -26,6 +26,7 @@ Use this skill when the developer asks about:
 - **Post-fix verification** — confirming a fix worked, writing regression evals
 
 **Trigger questions:**
+
 - "My bot isn't responding"
 - "The wrong tool was called"
 - "My workflow is stuck"
@@ -49,14 +50,14 @@ Use this skill when the developer asks about:
 
 ## Available Documentation
 
-| File | Contents |
-|------|----------|
-| `references/traces-and-logs.md` | CLI debugging tools, log querying, trace structure, span types, `onTrace` hooks, reproduction with `adk chat` |
-| `references/common-failures.md` | Runtime failure patterns — validation, bot not responding, tool errors, workflow stuck, integration failures, build errors, config confusion |
-| `references/llm-debugging.md` | LLM behavior issues — wrong tool, hallucinated params, refusals, token limits, looping, reading model reasoning |
-| `references/debug-workflow.md` | The systematic 8-step debug loop: validate → reproduce → logs → traces → classify → fix → verify → prevent |
-| `references/trace-summarization.md` | How to fetch, walk, and summarize traces as free-form natural-language narratives — adapting depth to context |
-| `references/conversation-analysis.md` | How to summarize and explain full conversations — listing conversations, timeline analysis, correlating with traces, common patterns |
+| File                                  | Contents                                                                                                                                     |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `references/traces-and-logs.md`       | CLI debugging tools, log querying, trace structure, span types, `onTrace` hooks, reproduction with `adk chat`                                |
+| `references/common-failures.md`       | Runtime failure patterns — validation, bot not responding, tool errors, workflow stuck, integration failures, build errors, config confusion |
+| `references/llm-debugging.md`         | LLM behavior issues — wrong tool, hallucinated params, refusals, token limits, looping, reading model reasoning                              |
+| `references/debug-workflow.md`        | The systematic 8-step debug loop: validate → reproduce → logs → traces → classify → fix → verify → prevent                                   |
+| `references/trace-summarization.md`   | How to fetch, walk, and summarize traces as free-form natural-language narratives — adapting depth to context                                |
+| `references/conversation-analysis.md` | How to summarize and explain full conversations — listing conversations, timeline analysis, correlating with traces, common patterns         |
 
 ## How to Answer
 
@@ -95,12 +96,12 @@ adk conversations show <id> --include-llm --format json  # timeline with LLM rea
 
 ### Span Types
 
-| Type | What It Shows |
-|------|--------------|
-| `think` | LLM reasoning — why it chose an action |
-| `tool_call` | Tool invocation — name, input, output, success/error |
-| `code_execution_exception` | Runtime error — message and stack trace |
-| `end` | Conversation turn completed |
+| Type                       | What It Shows                                        |
+| -------------------------- | ---------------------------------------------------- |
+| `think`                    | LLM reasoning — why it chose an action               |
+| `tool_call`                | Tool invocation — name, input, output, success/error |
+| `code_execution_exception` | Runtime error — message and stack trace              |
+| `end`                      | Conversation turn completed                          |
 
 ---
 
@@ -177,8 +178,8 @@ adk logs --format json  # 50 entries of everything
 // CORRECT — structured, automated trace analysis
 hooks: {
   onTrace: ({ trace }) => {
-    if (trace.type === "tool_call" && !trace.success) {
-      console.error(`[TOOL ERROR] ${trace.tool_name}`, trace.error);
+    if (trace.type === 'tool_call' && !trace.success) {
+      console.error(`[TOOL ERROR] ${trace.tool_name}`, trace.error)
     }
   }
 }
@@ -189,7 +190,7 @@ hooks: {
 ```typescript
 // WRONG — console.log in handlers misses the structured trace data
 handler: async (input) => {
-  console.log("tool called");  // not useful for debugging
+  console.log('tool called') // not useful for debugging
 }
 ```
 
@@ -217,17 +218,20 @@ export default new Eval({
 ## Example Questions
 
 **Basic:**
+
 - "My bot isn't responding — how do I figure out why?"
 - "How do I check for errors in my ADK project?"
 - "What's the difference between agent.json and agent.local.json?"
 
 **Intermediate:**
+
 - "The bot called createTicket instead of lookupTicket — how do I fix this?"
 - "My workflow starts but the second step never runs"
 - "How do I see what the LLM was thinking when it made a decision?"
 - "Integration actions are failing with auth errors"
 
 **Advanced:**
+
 - "How do I set up onTrace hooks for automated error detection?"
 - "The model loops on the same tool call — how do I add a guardrail?"
 - "How do I monitor tool call performance with timing metrics?"

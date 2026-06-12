@@ -10,15 +10,16 @@ Common patterns to follow and mistakes to avoid when building with the ADK.
 
 ```typescript
 // ❌ WRONG - Never import from these
-import { z } from "zod";
-import { Action } from "@botpress/sdk";
-import { Workflow } from "@botpress/cli";
+import { z } from 'zod'
+import { Action } from '@botpress/sdk'
+import { Workflow } from '@botpress/cli'
 
 // ✅ CORRECT - Always import from @botpress/runtime
-import { z, Action, Workflow, Conversation } from "@botpress/runtime";
+import { z, Action, Workflow, Conversation } from '@botpress/runtime'
 ```
 
 **Why this matters:**
+
 - `z` from `@botpress/runtime` is Botpress's internal fork of Zod (based on Zod 3.x)
 - Importing from `zod` directly can cause compatibility issues
 - ADK primitives (Action, Tool, Workflow, etc.) must come from `@botpress/runtime`
@@ -30,10 +31,10 @@ Botpress uses Zod 3.x internally. If adding `zod` to your project dependencies (
 
 ```typescript
 // ❌ AVOID - Dynamic imports can cause issues
-const { myAction } = await import("./actions/myAction");
+const { myAction } = await import('./actions/myAction')
 
 // ✅ PREFER - Static imports
-import { myAction } from "./actions/myAction";
+import { myAction } from './actions/myAction'
 ```
 
 ### Handler Syntax
@@ -46,16 +47,16 @@ Action handlers receive a props object with `input` and `client`. Both arrow fun
 // ✅ CORRECT - Method syntax
 export const myAction = new Action({
   async handler({ input }) {
-    return { data: input.userId };
+    return { data: input.userId }
   },
-});
+})
 
 // ✅ ALSO CORRECT - Arrow function syntax
 export const myAction = new Action({
   handler: async ({ input }) => {
-    return { data: input.userId };
+    return { data: input.userId }
   },
-});
+})
 ```
 
 #### Tool Handlers
@@ -64,9 +65,9 @@ export const myAction = new Action({
 // ✅ Tools use arrow functions
 export const myTool = new Autonomous.Tool({
   handler: async ({ query, limit }) => {
-    return searchResults;
+    return searchResults
   },
-});
+})
 ```
 
 ### State Management Mistakes
@@ -80,17 +81,17 @@ Conversations receive `state` as a destructured handler parameter. Do **not** us
 export const Chat = new Conversation({
   state: z.object({ count: z.number().default(0) }),
   async handler({ message }) {
-    this.state.count += 1; // ❌ Wrong!
+    this.state.count += 1 // ❌ Wrong!
   },
-});
+})
 
 // ✅ CORRECT - Use the state parameter
 export const Chat = new Conversation({
   state: z.object({ count: z.number().default(0) }),
   handler: async ({ message, state }) => {
-    state.count += 1; // ✅ Destructured from handler props
+    state.count += 1 // ✅ Destructured from handler props
   },
-});
+})
 ```
 
 #### State Reference vs Value
@@ -98,31 +99,32 @@ export const Chat = new Conversation({
 ```typescript
 // ❌ WRONG - Passing state reference to async function
 handler: async ({ step, state }) => {
-  const results = await processItems(state.items);
+  const results = await processItems(state.items)
   // state.items may have changed while processItems was running
-  state.items.push("new-item"); // processItems might see this!
+  state.items.push('new-item') // processItems might see this!
 }
 
 // ✅ CORRECT - Pass a copy of the value
 handler: async ({ step, state }) => {
-  const itemsCopy = [...state.items];
-  const results = await processItems(itemsCopy);
-  state.items.push("new-item"); // safe, doesn't affect processItems
+  const itemsCopy = [...state.items]
+  const results = await processItems(itemsCopy)
+  state.items.push('new-item') // safe, doesn't affect processItems
 }
 
 // ✅ CORRECT - Extract values before async operation
 handler: async ({ step, state }) => {
-  const currentCount = state.count;            // Primitive - safe
-  const currentItems = [...state.items];       // Array - needs spread
-  const currentConfig = { ...state.config };   // Object - needs spread
+  const currentCount = state.count // Primitive - safe
+  const currentItems = [...state.items] // Array - needs spread
+  const currentConfig = { ...state.config } // Object - needs spread
 
-  await step("process", async () => {
-    return await processData(currentCount, currentItems, currentConfig);
-  });
+  await step('process', async () => {
+    return await processData(currentCount, currentItems, currentConfig)
+  })
 }
 ```
 
 **Rules of thumb:**
+
 - **Primitives** (string, number, boolean): Can pass directly
 - **Arrays**: Use spread `[...state.items]` or `Array.from()`
 - **Objects**: Use spread `{ ...state.config }` or `structuredClone()`
@@ -136,35 +138,35 @@ handler: async ({ step, state }) => {
 // ❌ WRONG - Dynamic step names break resume
 for (let i = 0; i < items.length; i++) {
   await step(`process-${i}`, async () => {
-    await processItem(items[i]);
-  });
+    await processItem(items[i])
+  })
 }
 
 // ✅ CORRECT - Single step with loop
-await step("process-all", async () => {
+await step('process-all', async () => {
   for (const item of items) {
-    await processItem(item);
+    await processItem(item)
   }
-});
+})
 
 // ✅ CORRECT - Or use step.map
-await step.map("process-items", items, async (item) => {
-  return processItem(item);
-});
+await step.map('process-items', items, async (item) => {
+  return processItem(item)
+})
 ```
 
 #### Missing Await on Steps
 
 ```typescript
 // ❌ WRONG - Missing await
-const result = step("fetch", async () => {
-  return fetchData();
-});
+const result = step('fetch', async () => {
+  return fetchData()
+})
 
 // ✅ CORRECT - Always await steps
-const result = await step("fetch", async () => {
-  return fetchData();
-});
+const result = await step('fetch', async () => {
+  return fetchData()
+})
 ```
 
 ### Table Column Mistakes
@@ -192,15 +194,15 @@ columns: {
 // ❌ WRONG - Missing conversationId prevents communication
 await MyWorkflow.start({
   userId: user.id,
-  data: "some data",
-});
+  data: 'some data',
+})
 
 // ✅ CORRECT - Include conversationId for messaging
 await MyWorkflow.start({
   conversationId: conversation.id,
   userId: user.id,
-  data: "some data",
-});
+  data: 'some data',
+})
 ```
 
 ---
@@ -213,18 +215,15 @@ Request data from user during workflow execution:
 
 ```typescript
 export const MyWorkflow = new Workflow({
-  name: "interactive",
+  name: 'interactive',
   requests: {
     topic: z.object({ topic: z.string() }),
   },
   handler: async ({ step, input }) => {
-    const { topic } = await step.request(
-      "topic",
-      "What is the topic of the question?"
-    );
-    console.log(`Topic identified: ${topic}`);
+    const { topic } = await step.request('topic', 'What is the topic of the question?')
+    console.log(`Topic identified: ${topic}`)
   },
-});
+})
 ```
 
 ### RAG with Citations
@@ -232,38 +231,38 @@ export const MyWorkflow = new Workflow({
 Use citations to track sources for AI-generated responses:
 
 ```typescript
-import { Autonomous, context } from "@botpress/runtime";
+import { Autonomous, context } from '@botpress/runtime'
 
 const SearchTool = new Autonomous.Tool({
-  name: "search",
+  name: 'search',
   input: z.string(),
   output: z.string(),
   handler: async (query) => {
-    const client = context.get("client");
-    const citations = context.get("citations");
+    const client = context.get('client')
+    const citations = context.get('citations')
 
     const { passages } = await client.searchFiles({
       query,
-      tags: { type: "knowledge", kb: ["myKB"] },
-    });
+      tags: { type: 'knowledge', kb: ['myKB'] },
+    })
 
-    const message = ["Here are the search results:"];
-    const { tag: example } = citations.registerSource({});
+    const message = ['Here are the search results:']
+    const { tag: example } = citations.registerSource({})
 
     for (const p of passages) {
-      const { tag } = citations.registerSource({ file: p.file.key });
-      message.push(`<${tag} file="${p.file.key}">`);
-      message.push(`**${p.file.tags.title}**`);
-      message.push(p.content);
-      message.push(`</${tag}>`);
+      const { tag } = citations.registerSource({ file: p.file.key })
+      message.push(`<${tag} file="${p.file.key}">`)
+      message.push(`**${p.file.tags.title}**`)
+      message.push(p.content)
+      message.push(`</${tag}>`)
     }
 
     throw new Autonomous.ThinkSignal(
       `When answering, MUST add inline citations (eg: "The price is $10${example} ...")`,
-      message.join("\n")
-    );
+      message.join('\n')
+    )
   },
-});
+})
 ```
 
 ### Context Access Patterns
@@ -273,19 +272,19 @@ The context API provides access to runtime services within handlers.
 #### Basic Context Usage
 
 ```typescript
-import { context } from "@botpress/runtime";
+import { context } from '@botpress/runtime'
 
 export const myAction = new Action({
   handler: async ({ input }) => {
-    const client = context.get("client");
-    const cognitive = context.get("cognitive");
-    const logger = context.get("logger");
+    const client = context.get('client')
+    const cognitive = context.get('cognitive')
+    const logger = context.get('logger')
 
-    const { passages } = await client.searchFiles({ query: input.query });
-    logger.info("Search completed", { resultCount: passages.length });
-    return { results: passages };
+    const { passages } = await client.searchFiles({ query: input.query })
+    logger.info('Search completed', { resultCount: passages.length })
+    return { results: passages }
   },
-});
+})
 ```
 
 #### Optional Context Keys
@@ -293,21 +292,22 @@ export const myAction = new Action({
 ```typescript
 export const myAction = new Action({
   handler: async ({ input }) => {
-    const user = context.get("user", { optional: true });
-    const conversation = context.get("conversation", { optional: true });
+    const user = context.get('user', { optional: true })
+    const conversation = context.get('conversation', { optional: true })
 
     if (user && conversation) {
-      console.log(`User ${user.id} in conversation ${conversation.id}`);
+      console.log(`User ${user.id} in conversation ${conversation.id}`)
     } else {
-      console.log("Processing without user context");
+      console.log('Processing without user context')
     }
   },
-});
+})
 ```
 
 #### Common Context Keys
 
 **Always Available:**
+
 - `client` — Botpress API client
 - `cognitive` — AI model client
 - `logger` — Structured logger
@@ -316,6 +316,7 @@ export const myAction = new Action({
 - `runtime` — Runtime environment info
 
 **Conditionally Available:**
+
 - `user` — Current user (in conversation handlers)
 - `conversation` — Current conversation (in conversation handlers, not to be used within a conversation object: use the `conversation` parameter instead)
 - `message` — Incoming message (when triggered by message)
@@ -325,13 +326,13 @@ export const myAction = new Action({
 
 #### Context in Different Handler Types
 
-| Handler | Key context keys |
-|---------|-----------------|
-| **Actions** | `client`, `cognitive`, `logger`, `botId`, `configuration` |
-| **Tools** | `client`, `cognitive`, `citations`, `logger`, `user`?, `conversation`? |
-| **Workflows** | `client`, `workflow`, `workflowControlContext`, `logger` |
-| **Conversations** | `client`, `user`, `conversation`, `message`, `event`?, `logger` |
-| **Triggers** | `client`, `event`, `logger` |
+| Handler           | Key context keys                                                       |
+| ----------------- | ---------------------------------------------------------------------- |
+| **Actions**       | `client`, `cognitive`, `logger`, `botId`, `configuration`              |
+| **Tools**         | `client`, `cognitive`, `citations`, `logger`, `user`?, `conversation`? |
+| **Workflows**     | `client`, `workflow`, `workflowControlContext`, `logger`               |
+| **Conversations** | `client`, `user`, `conversation`, `message`, `event`?, `logger`        |
+| **Triggers**      | `client`, `event`, `logger`                                            |
 
 ---
 
@@ -372,19 +373,19 @@ src/knowledge/policies/privacy.md
 
 ```typescript
 // Actions
-export const fetchUser = new Action({ name: "fetchUser" });
+export const fetchUser = new Action({ name: 'fetchUser' })
 
 // Workflows
-export const OnboardingWorkflow = new Workflow({ name: "onboarding" });
+export const OnboardingWorkflow = new Workflow({ name: 'onboarding' })
 
 // Tables
-export const UsersTable = new Table({ name: "users" });
+export const UsersTable = new Table({ name: 'users' })
 
 // Conversations
-export const Chat = new Conversation({ channel: "chat.channel" });
+export const Chat = new Conversation({ channel: 'chat.channel' })
 
 // Triggers - use default export
-export default new Trigger({ name: "userEvents" });
+export default new Trigger({ name: 'userEvents' })
 ```
 
 ---
@@ -433,12 +434,12 @@ grep -r "from \"@botpress/sdk\"" src/
 ```typescript
 // In conversations - use state parameter
 handler: async ({ state }) => {
-  console.log("Conversation state:", JSON.stringify(state, null, 2));
+  console.log('Conversation state:', JSON.stringify(state, null, 2))
 }
 
 // In workflows - use state parameter
 handler: async ({ state }) => {
-  console.log("Workflow state:", JSON.stringify(state, null, 2));
+  console.log('Workflow state:', JSON.stringify(state, null, 2))
 }
 ```
 
@@ -446,14 +447,14 @@ handler: async ({ state }) => {
 
 ```typescript
 handler: async ({ step }) => {
-  console.log("Starting workflow");
+  console.log('Starting workflow')
 
-  const result = await step("step1", async () => {
-    console.log("Executing step1");
-    return "data";
-  });
+  const result = await step('step1', async () => {
+    console.log('Executing step1')
+    return 'data'
+  })
 
-  console.log("Step1 result:", result);
+  console.log('Step1 result:', result)
 }
 ```
 

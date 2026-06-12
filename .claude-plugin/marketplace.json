@@ -17,16 +17,7 @@
       "homepage": "https://github.com/botpress/skills",
       "repository": "https://github.com/botpress/skills",
       "license": "MIT",
-      "keywords": [
-        "botpress",
-        "adk",
-        "agent",
-        "integration",
-        "ai",
-        "evals",
-        "debugging",
-        "frontend"
-      ],
+      "keywords": ["botpress", "adk", "agent", "integration", "ai", "evals", "debugging", "frontend"],
       "category": "development",
       "strict": false
     }

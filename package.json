@@ -1,0 +1,9 @@
+{
+  "name": "@botpress/adk-skills",
+  "private": true,
+  "scripts": {
+    "format": "bunx oxfmt@0.41.0 --write .",
+    "format:check": "bunx oxfmt@0.41.0 --check ."
+  },
+  "packageManager": "bun@1.3.14"
+}

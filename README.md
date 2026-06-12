@@ -125,18 +125,18 @@ Systematic debugging for ADK agents. Teaches the AI assistant how to read traces
 
 Commands are thin Claude Code slash commands that load skills. They are the quick entry point - type `/adk-debug` instead of describing what you need.
 
-| Command | What it does |
-|---------|-------------|
-| `/adk-init` | Scaffold a new ADK project |
-| `/adk-debug` | Debug bot issues using traces, logs, and the debug loop |
-| `/adk-eval` | Write, run, or debug evals |
-| `/adk-frontend` | Build frontend apps that integrate with ADK bots |
-| `/adk-integration` | Discover, add, and configure integrations |
-| `/adk-doc-create` | Create documentation for a feature in your bot |
-| `/adk-doc-review` | Review project docs for accuracy and completeness |
-| `/adk-doc-update` | Update project docs after code changes |
-| `/adk-doc-sync` | Check if project docs are in sync with your bot's code |
-| `/adk-doc-search` | Search your project documentation |
+| Command            | What it does                                            |
+| ------------------ | ------------------------------------------------------- |
+| `/adk-init`        | Scaffold a new ADK project                              |
+| `/adk-debug`       | Debug bot issues using traces, logs, and the debug loop |
+| `/adk-eval`        | Write, run, or debug evals                              |
+| `/adk-frontend`    | Build frontend apps that integrate with ADK bots        |
+| `/adk-integration` | Discover, add, and configure integrations               |
+| `/adk-doc-create`  | Create documentation for a feature in your bot          |
+| `/adk-doc-review`  | Review project docs for accuracy and completeness       |
+| `/adk-doc-update`  | Update project docs after code changes                  |
+| `/adk-doc-sync`    | Check if project docs are in sync with your bot's code  |
+| `/adk-doc-search`  | Search your project documentation                       |
 
 ### Installing commands
 

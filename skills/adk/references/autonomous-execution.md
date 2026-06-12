@@ -156,11 +156,11 @@ if (result.is(Approved)) {
 
 Three exits are built into the runtime. Do not redefine them.
 
-| Exit | When Available | Action Name | Purpose |
-|------|----------------|-------------|---------|
-| **ListenExit** | Chat mode (conversation handlers) | `listen` | Pauses execution, returns control to the user. Auto-added when `execute()` runs in a conversation. |
-| **ThinkExit** | Always | `think` | LLM pauses to reflect. Triggers another iteration (does not end execution). |
-| **DefaultExit** | Worker mode, when no custom exits provided | `done` | Returns `{ success: true, result? }` or `{ success: false, error }`. |
+| Exit            | When Available                             | Action Name | Purpose                                                                                            |
+| --------------- | ------------------------------------------ | ----------- | -------------------------------------------------------------------------------------------------- |
+| **ListenExit**  | Chat mode (conversation handlers)          | `listen`    | Pauses execution, returns control to the user. Auto-added when `execute()` runs in a conversation. |
+| **ThinkExit**   | Always                                     | `think`     | LLM pauses to reflect. Triggers another iteration (does not end execution).                        |
+| **DefaultExit** | Worker mode, when no custom exits provided | `done`      | Returns `{ success: true, result? }` or `{ success: false, error }`.                               |
 
 ```typescript
 import { Autonomous } from '@botpress/runtime'
@@ -238,9 +238,9 @@ The LLM sees this as:
 
 ```typescript
 export namespace user {
-  const name: Writable<string> = "John Doe"
+  const name: Writable<string> = 'John Doe'
   const email: Writable<string | null> = null
-  const id: Readonly<string> = "user_123"
+  const id: Readonly<string> = 'user_123'
 }
 ```
 
@@ -260,11 +260,11 @@ new Autonomous.Object({
 
 ```typescript
 type ObjectProperty = {
-  name: string          // Valid TypeScript identifier.
-  value: any            // Current value.
-  type?: ZuiType        // Zod schema for validation on write.
-  description?: string  // Helps the LLM understand the property.
-  writable?: boolean    // Default: false. If true, LLM can assign new values.
+  name: string // Valid TypeScript identifier.
+  value: any // Current value.
+  type?: ZuiType // Zod schema for validation on write.
+  description?: string // Helps the LLM understand the property.
+  writable?: boolean // Default: false. If true, LLM can assign new values.
 }
 ```
 
@@ -362,19 +362,13 @@ type Hooks = {
   ) => Promise<void | Partial<Iteration>> | void | Partial<Iteration>
 
   /** BLOCKING. Called after each iteration. Good for logging and cleanup. */
-  onIterationEnd?: (
-    iteration: Iteration,
-    controller: IterationController
-  ) => void | Promise<void>
+  onIterationEnd?: (iteration: Iteration, controller: IterationController) => void | Promise<void>
 
   /** BLOCKING. Called when an exit is reached. Throw to reject the exit. */
   onExit?: <T = unknown>(result: ExitResult<T>) => Promise<void> | void
 
   /** BLOCKING, MUTATION. Called after LLM generates code, before execution. */
-  onBeforeExecution?: (
-    iteration: Iteration,
-    controller: AbortController
-  ) => Promise<{ code?: string } | void>
+  onBeforeExecution?: (iteration: Iteration, controller: AbortController) => Promise<{ code?: string } | void>
 
   /** BLOCKING, MUTATION. Called before any tool executes. Can modify input. */
   onBeforeTool?: (event: {
@@ -397,11 +391,11 @@ type Hooks = {
 
 ### Hook Categories
 
-| Category | Hooks | Behavior |
-|----------|-------|----------|
-| **Non-blocking** | `onTrace` | Fire-and-forget. Cannot delay execution. |
-| **Blocking, mutation** | `onIterationStart`, `onBeforeTool`, `onAfterTool`, `onBeforeExecution` | Block until resolved. Can return modified values. |
-| **Blocking, non-mutation** | `onIterationEnd`, `onExit` | Block until resolved. Cannot change tool I/O or code. |
+| Category                   | Hooks                                                                  | Behavior                                              |
+| -------------------------- | ---------------------------------------------------------------------- | ----------------------------------------------------- |
+| **Non-blocking**           | `onTrace`                                                              | Fire-and-forget. Cannot delay execution.              |
+| **Blocking, mutation**     | `onIterationStart`, `onBeforeTool`, `onAfterTool`, `onBeforeExecution` | Block until resolved. Can return modified values.     |
+| **Blocking, non-mutation** | `onIterationEnd`, `onExit`                                             | Block until resolved. Cannot change tool I/O or code. |
 
 ### Common Hook Patterns
 
@@ -490,18 +484,18 @@ hooks: {
 const result = await execute({ instructions: '...' })
 
 // Status checks
-result.isSuccess()     // Completed with an exit
-result.isError()       // Failed (aborted, iterations exhausted)
+result.isSuccess() // Completed with an exit
+result.isError() // Failed (aborted, iterations exhausted)
 result.isInterrupted() // Paused with a snapshot (SnapshotSignal)
 
 // Exit type-narrowing
-result.is(MyExit)      // true if exited via MyExit, narrows result.output type
+result.is(MyExit) // true if exited via MyExit, narrows result.output type
 
 // Access execution data
-result.iteration       // Last iteration (or null)
-result.iterations      // All iterations
-result.output          // Exit data (if success), null otherwise
-result.context         // Full execution context
+result.iteration // Last iteration (or null)
+result.iterations // All iterations
+result.output // Exit data (if success), null otherwise
+result.context // Full execution context
 ```
 
 ### Success Result
@@ -551,18 +545,18 @@ if (result.isInterrupted()) {
 ```typescript
 await execute({
   instructions: '...',
-  model: 'openai:gpt-4o',              // Single model
+  model: 'openai:gpt-4o', // Single model
 })
 
 await execute({
   instructions: '...',
-  model: ['openai:gpt-4o', 'anthropic:claude-3-5-sonnet'],  // Fallback chain
+  model: ['openai:gpt-4o', 'anthropic:claude-3-5-sonnet'], // Fallback chain
 })
 
 // Dynamic model per iteration
 await execute({
   instructions: '...',
-  model: (ctx) => ctx.iteration > 2 ? 'openai:gpt-4o' : 'openai:gpt-4o-mini',
+  model: (ctx) => (ctx.iteration > 2 ? 'openai:gpt-4o' : 'openai:gpt-4o-mini'),
 })
 ```
 
@@ -573,7 +567,7 @@ If `model` is omitted, the `defaultModels.autonomous` value from `agent.config.t
 ```typescript
 await execute({
   instructions: '...',
-  temperature: 0.1,  // Low = deterministic. Default: 0.7. Range: 0-2.
+  temperature: 0.1, // Low = deterministic. Default: 0.7. Range: 0-2.
 })
 ```
 
@@ -582,12 +576,12 @@ await execute({
 ```typescript
 await execute({
   instructions: '...',
-  reasoningEffort: 'high',  // 'none' | 'low' | 'medium' | 'high' | 'dynamic'
+  reasoningEffort: 'high', // 'none' | 'low' | 'medium' | 'high' | 'dynamic'
 })
 ```
 
 - `'none'` disables reasoning for models with optional reasoning.
-- `'dynamic'` lets the provider decide. 
+- `'dynamic'` lets the provider decide.
 - Omitting this field disables reasoning for optional-reasoning models.
 
 ### Iteration Limit
@@ -595,7 +589,7 @@ await execute({
 ```typescript
 await execute({
   instructions: '...',
-  iterations: 20,  // Default: 10. Clamped to 1-100.
+  iterations: 20, // Default: 10. Clamped to 1-100.
 })
 ```
 
@@ -644,13 +638,13 @@ This pattern applies to `instructions`, `tools`, `objects`, `exits`, `temperatur
 
 `execute()` behaves differently depending on where it runs:
 
-| Aspect | Chat Mode (Conversations) | Worker Mode (Workflows, Actions) |
-|--------|--------------------------|----------------------------------|
-| Transcript | LLM sees conversation history | No transcript |
-| ListenExit | Auto-added | Not available |
-| DefaultExit | Not auto-added when exits provided | Auto-added when no exits provided |
-| Components | Can yield UI components | No component rendering |
-| Typical pattern | Open-ended conversation | Task completion with structured exit |
+| Aspect          | Chat Mode (Conversations)          | Worker Mode (Workflows, Actions)     |
+| --------------- | ---------------------------------- | ------------------------------------ |
+| Transcript      | LLM sees conversation history      | No transcript                        |
+| ListenExit      | Auto-added                         | Not available                        |
+| DefaultExit     | Not auto-added when exits provided | Auto-added when no exits provided    |
+| Components      | Can yield UI components            | No component rendering               |
+| Typical pattern | Open-ended conversation            | Task completion with structured exit |
 
 In conversation handlers, `execute()` is provided as a parameter and runs in chat mode by default:
 

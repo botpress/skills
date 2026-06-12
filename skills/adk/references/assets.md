@@ -22,15 +22,15 @@ Assets are static files (images, documents, media) that ship with your agent. Pl
 
 Images, documents, media, and more — MIME type is auto-detected from the extension:
 
-| Category   | Extensions                                     |
-| ---------- | ---------------------------------------------- |
-| Images     | `.png`, `.jpg`, `.jpeg`, `.gif`, `.svg`, `.webp` |
-| Documents  | `.pdf`, `.txt`, `.md`, `.html`                 |
-| Styles     | `.css`                                         |
-| Data       | `.js`, `.json`, `.xml`                         |
-| Video      | `.mp4`, `.webm`                                |
-| Audio      | `.mp3`, `.wav`, `.ogg`                         |
-| Archives   | `.zip`                                         |
+| Category  | Extensions                                       |
+| --------- | ------------------------------------------------ |
+| Images    | `.png`, `.jpg`, `.jpeg`, `.gif`, `.svg`, `.webp` |
+| Documents | `.pdf`, `.txt`, `.md`, `.html`                   |
+| Styles    | `.css`                                           |
+| Data      | `.js`, `.json`, `.xml`                           |
+| Video     | `.mp4`, `.webm`                                  |
+| Audio     | `.mp3`, `.wav`, `.ogg`                           |
+| Archives  | `.zip`                                           |
 
 Unrecognized extensions default to `application/octet-stream`.
 
@@ -61,28 +61,28 @@ The global `assets` object is available in any action, tool, workflow, or conver
 `assets.get()` is async and throws an `Error` if the path does not match any known asset.
 
 ```typescript
-const logo = await assets.get("logo.png");
-console.log(logo.url); // CDN URL
-console.log(logo.mime); // "image/png"
-console.log(logo.size); // bytes
+const logo = await assets.get('logo.png')
+console.log(logo.url) // CDN URL
+console.log(logo.mime) // "image/png"
+console.log(logo.size) // bytes
 ```
 
 ### List All Assets
 
 ```typescript
-const all = assets.list();
+const all = assets.list()
 for (const asset of all) {
-  console.log(`${asset.path}: ${asset.url}`);
+  console.log(`${asset.path}: ${asset.url}`)
 }
 ```
 
 ### Check Sync Status
 
 ```typescript
-const status = assets.getSyncStatus();
+const status = assets.getSyncStatus()
 if (!status.synced) {
-  console.warn("Unsynced assets:", status.neverSynced);
-  console.warn("Stale assets:", status.stale);
+  console.warn('Unsynced assets:', status.neverSynced)
+  console.warn('Stale assets:', status.stale)
 }
 ```
 
@@ -141,11 +141,11 @@ Assets are also synced automatically during `adk deploy`.
 
 ### Sync States
 
-| State          | Meaning                                       |
-| -------------- | --------------------------------------------- |
-| **Up to date** | Local and remote hashes match                 |
-| **Stale**      | Local file changed since last sync            |
-| **Never synced** | File exists locally but was never uploaded  |
+| State            | Meaning                                    |
+| ---------------- | ------------------------------------------ |
+| **Up to date**   | Local and remote hashes match              |
+| **Stale**        | Local file changed since last sync         |
+| **Never synced** | File exists locally but was never uploaded |
 
 The runtime emits a console warning the first time you access a stale or never-synced asset.
 
@@ -154,58 +154,55 @@ The runtime emits a console warning the first time you access a stale or never-s
 ### Send an Image in a Conversation
 
 ```typescript
-import { Conversation } from "@botpress/runtime";
+import { Conversation } from '@botpress/runtime'
 
 export default new Conversation({
-  channel: "webchat",
+  channel: 'webchat',
   async handler({ conversation }) {
-    const logo = await assets.get("logo.png");
+    const logo = await assets.get('logo.png')
     await conversation.send({
-      type: "image",
+      type: 'image',
       payload: { imageUrl: logo.url },
-    });
+    })
   },
-});
+})
 ```
 
 ### Use an Asset URL in a Tool Response
 
 ```typescript
-import { Autonomous } from "@botpress/runtime";
+import { Autonomous } from '@botpress/runtime'
 
 export const getBranding = new Autonomous.Tool({
-  description: "Returns branding assets",
+  description: 'Returns branding assets',
   handler: async () => {
-    const logo = await assets.get("logo.png");
-    const header = await assets.get("images/header.webp");
+    const logo = await assets.get('logo.png')
+    const header = await assets.get('images/header.webp')
     return {
       logoUrl: logo.url,
       headerUrl: header.url,
-    };
+    }
   },
-});
+})
 ```
 
 ### Check Asset Health in an Action
 
 ```typescript
-import { Action, z } from "@botpress/runtime";
+import { Action, z } from '@botpress/runtime'
 
 export const checkAssets = new Action({
-  name: "checkAssets",
+  name: 'checkAssets',
   input: {},
   output: { synced: z.boolean(), issues: z.array(z.string()) },
   async handler() {
-    const status = assets.getSyncStatus();
+    const status = assets.getSyncStatus()
     return {
       synced: status.synced,
-      issues: [
-        ...status.neverSynced.map((p) => `Never synced: ${p}`),
-        ...status.stale.map((p) => `Stale: ${p}`),
-      ],
-    };
+      issues: [...status.neverSynced.map((p) => `Never synced: ${p}`), ...status.stale.map((p) => `Stale: ${p}`)],
+    }
   },
-});
+})
 ```
 
 ## Common Mistakes
@@ -228,10 +225,10 @@ Assets with placeholder URLs will not be accessible at runtime. Always run `adk 
 
 ```typescript
 // ❌ Wrong
-await assets.get("/assets/logo.png");
-await assets.get("assets/logo.png");
+await assets.get('/assets/logo.png')
+await assets.get('assets/logo.png')
 
 // ✅ Correct — use the path relative to assets/
-await assets.get("logo.png");
-await assets.get("images/header.webp");
+await assets.get('logo.png')
+await assets.get('images/header.webp')
 ```

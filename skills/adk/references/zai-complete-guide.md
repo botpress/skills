@@ -15,18 +15,18 @@ npm install @botpress/zai @botpress/client @bpinternal/zui
 #### Basic Setup
 
 ```typescript
-import { Client } from "@botpress/client";
-import { Zai } from "@botpress/zai";
-import { z } from "@bpinternal/zui";
+import { Client } from '@botpress/client'
+import { Zai } from '@botpress/zai'
+import { z } from '@bpinternal/zui'
 
 // Initialize Botpress client
 const client = new Client({
-  botId: "YOUR_BOT_ID",
-  token: "YOUR_TOKEN",
-});
+  botId: 'YOUR_BOT_ID',
+  token: 'YOUR_TOKEN',
+})
 
 // Create ZAI instance
-const zai = new Zai({ client });
+const zai = new Zai({ client })
 ```
 
 #### Configuration Options
@@ -34,16 +34,16 @@ const zai = new Zai({ client });
 ```typescript
 const zai = new Zai({
   client, // Required: Botpress client or Cognitive instance
-  modelId: "best", // Model selection: 'best' | 'fast' | specific model ID
-  userId: "user-123", // Optional: Track usage per user
-  namespace: "my-app", // Default: 'zai'
+  modelId: 'best', // Model selection: 'best' | 'fast' | specific model ID
+  userId: 'user-123', // Optional: Track usage per user
+  namespace: 'my-app', // Default: 'zai'
   activeLearning: {
     // Enable learning from examples
     enable: true,
-    tableName: "AILearningTable",
-    taskId: "sentiment-analysis",
+    tableName: 'AILearningTable',
+    taskId: 'sentiment-analysis',
   },
-});
+})
 ```
 
 ### 2. Core Operations
@@ -56,13 +56,13 @@ Extract structured data from any input using Zod schemas. Located in `/packages/
 
 ```typescript
 const person = await zai.extract(
-  "John Doe is 30 years old and lives in New York",
+  'John Doe is 30 years old and lives in New York',
   z.object({
     name: z.string(),
     age: z.number(),
     location: z.string(),
-  }),
-);
+  })
+)
 // Result: { name: 'John Doe', age: 30, location: 'New York' }
 ```
 
@@ -76,19 +76,19 @@ const products = await zai.extract(
       name: z.string(),
       price: z.number(),
       inStock: z.boolean(),
-    }),
-  ),
-);
+    })
+  )
+)
 ```
 
 **Advanced Options:**
 
 ```typescript
 const data = await zai.extract(input, schema, {
-  instructions: "Focus on technical specifications", // Guide extraction
+  instructions: 'Focus on technical specifications', // Guide extraction
   chunkLength: 8000, // Max tokens per chunk (default: 16000)
   strict: false, // Allow partial matches
-});
+})
 ```
 
 **Large Document Handling:**
@@ -105,15 +105,15 @@ Verify conditions with natural language. Located in `/packages/zai/src/operation
 **Simple Check:**
 
 ```typescript
-const isSpam = await zai.check("Win FREE iPhone!!!", "is spam");
+const isSpam = await zai.check('Win FREE iPhone!!!', 'is spam')
 // Result: true
 ```
 
 **Detailed Results:**
 
 ```typescript
-const result = await zai.check(email, "contains personal information");
-const { value, explanation } = await result.full();
+const result = await zai.check(email, 'contains personal information')
+const { value, explanation } = await result.full()
 // value: true
 // explanation: "The email contains names, addresses, and phone numbers"
 ```
@@ -121,12 +121,12 @@ const { value, explanation } = await result.full();
 **With Examples:**
 
 ```typescript
-const isValid = await zai.check(code, "is valid JavaScript", {
+const isValid = await zai.check(code, 'is valid JavaScript', {
   examples: [
-    { input: "const x = 1", check: true, reason: "Valid const declaration" },
-    { input: "const = 1", check: false, reason: "Missing variable name" },
+    { input: 'const x = 1', check: true, reason: 'Valid const declaration' },
+    { input: 'const = 1', check: false, reason: 'Missing variable name' },
   ],
-});
+})
 ```
 
 #### 2.3 Label - Multi-Label Classification
@@ -135,19 +135,19 @@ Apply multiple labels simultaneously. Located in `/packages/zai/src/operations/l
 
 ```typescript
 const labels = await zai.label(customerReview, {
-  positive: "expresses positive sentiment",
-  technical: "mentions technical specifications",
-  verified: "from a verified purchaser",
-  urgent: "requires immediate attention",
-});
+  positive: 'expresses positive sentiment',
+  technical: 'mentions technical specifications',
+  verified: 'from a verified purchaser',
+  urgent: 'requires immediate attention',
+})
 // Result: { positive: true, technical: true, verified: false, urgent: false }
 ```
 
 Each label gets its own explanation:
 
 ```typescript
-const result = await zai.label(text, criteria);
-const detailed = await result.full();
+const result = await zai.label(text, criteria)
+const detailed = await result.full()
 // detailed.positive = { value: true, explanation: "User says 'excellent product'" }
 ```
 
@@ -158,16 +158,13 @@ Transform text according to instructions. Located in `/packages/zai/src/operatio
 **Translation:**
 
 ```typescript
-const french = await zai.rewrite(englishText, "translate to French");
+const french = await zai.rewrite(englishText, 'translate to French')
 ```
 
 **Tone Adjustment:**
 
 ```typescript
-const professional = await zai.rewrite(
-  "hey whats up? need that report asap!!",
-  "make it professional and polite",
-);
+const professional = await zai.rewrite('hey whats up? need that report asap!!', 'make it professional and polite')
 // "Good morning, I hope this message finds you well.
 //  Could you please provide the report at your earliest convenience?"
 ```
@@ -175,8 +172,8 @@ const professional = await zai.rewrite(
 **Format Conversion:**
 
 ```typescript
-const markdown = await zai.rewrite(htmlContent, "convert to Markdown format");
-const json = await zai.rewrite(csvData, "convert to JSON array");
+const markdown = await zai.rewrite(htmlContent, 'convert to Markdown format')
+const json = await zai.rewrite(csvData, 'convert to JSON array')
 ```
 
 #### 2.5 Filter - Array Filtering
@@ -185,15 +182,12 @@ Filter arrays using natural language conditions. Located in `/packages/zai/src/o
 
 ```typescript
 const companies = [
-  { name: "Apple", industry: "Tech", revenue: 365 },
-  { name: "Ford", industry: "Auto", revenue: 156 },
-  { name: "Google", industry: "Tech", revenue: 282 },
-];
+  { name: 'Apple', industry: 'Tech', revenue: 365 },
+  { name: 'Ford', industry: 'Auto', revenue: 156 },
+  { name: 'Google', industry: 'Tech', revenue: 282 },
+]
 
-const techGiants = await zai.filter(
-  companies,
-  "are technology companies with revenue over 200 billion",
-);
+const techGiants = await zai.filter(companies, 'are technology companies with revenue over 200 billion')
 // Result: [Apple, Google]
 ```
 
@@ -207,8 +201,8 @@ const eligibleUsers = await zai.filter(
   - Account created more than 30 days ago
   - No recent violations
   - Located in North America
-`,
-);
+`
+)
 ```
 
 #### 2.6 Text - Content Generation
@@ -216,11 +210,11 @@ const eligibleUsers = await zai.filter(
 Generate text from prompts. Located in `/packages/zai/src/operations/text.ts`.
 
 ```typescript
-const blogPost = await zai.text("Write about the future of AI in healthcare", {
+const blogPost = await zai.text('Write about the future of AI in healthcare', {
   length: 1000, // Target length in tokens
   temperature: 0.7, // Creativity (0-1)
-  stopSequences: ["---"], // Optional stop markers
-});
+  stopSequences: ['---'], // Optional stop markers
+})
 ```
 
 **Structured Generation:**
@@ -232,7 +226,7 @@ const outline = await zai.text(`
   - Level: Beginner
   - Duration: 8 weeks
   - Format: Online
-`);
+`)
 ```
 
 #### 2.7 Summarize - Document Summarization
@@ -242,7 +236,7 @@ Create intelligent summaries. Located in `/packages/zai/src/operations/summarize
 **Basic Summary:**
 
 ```typescript
-const summary = await zai.summarize(longArticle);
+const summary = await zai.summarize(longArticle)
 ```
 
 **Custom Summaries:**
@@ -250,9 +244,9 @@ const summary = await zai.summarize(longArticle);
 ```typescript
 const technicalSummary = await zai.summarize(researchPaper, {
   length: 500, // Max tokens
-  prompt: "Focus on methodology and results",
+  prompt: 'Focus on methodology and results',
   bulletPoints: true, // Format as bullet points
-});
+})
 ```
 
 **Handling Large Documents:**
@@ -261,8 +255,8 @@ const technicalSummary = await zai.summarize(researchPaper, {
 // ZAI automatically handles documents of any size
 const bookSummary = await zai.summarize(entireBook, {
   length: 2000,
-  prompt: "Summarize each chapter separately, then provide overall themes",
-});
+  prompt: 'Summarize each chapter separately, then provide overall themes',
+})
 ```
 
 #### 2.8 Answer - Question Answering with Citations
@@ -273,15 +267,15 @@ Answer questions from documents with citations and intelligent edge case handlin
 
 ```typescript
 const documents = [
-  "Botpress was founded in 2016.",
-  "The company is based in Quebec, Canada.",
-  "Botpress provides an AI agent platform.",
-];
+  'Botpress was founded in 2016.',
+  'The company is based in Quebec, Canada.',
+  'Botpress provides an AI agent platform.',
+]
 
-const result = await zai.answer(documents, "When was Botpress founded?");
-if (result.type === "answer") {
-  console.log(result.answer); // "Botpress was founded in 2016."
-  console.log(result.citations); // Citations with source references
+const result = await zai.answer(documents, 'When was Botpress founded?')
+if (result.type === 'answer') {
+  console.log(result.answer) // "Botpress was founded in 2016."
+  console.log(result.citations) // Citations with source references
 }
 ```
 
@@ -290,36 +284,36 @@ if (result.type === "answer") {
 The answer operation returns different types based on the situation:
 
 ```typescript
-const result = await zai.answer(documents, question);
+const result = await zai.answer(documents, question)
 
 switch (result.type) {
-  case "answer":
+  case 'answer':
     // Has answer with citations
-    console.log(result.answer);
-    console.log(result.citations); // [{ offset, item, snippet }]
-    break;
+    console.log(result.answer)
+    console.log(result.citations) // [{ offset, item, snippet }]
+    break
 
-  case "ambiguous":
+  case 'ambiguous':
     // Multiple interpretations exist
-    console.log(result.ambiguity); // Why it's ambiguous
-    console.log(result.follow_up); // Clarifying question
-    console.log(result.answers); // Possible answers
-    break;
+    console.log(result.ambiguity) // Why it's ambiguous
+    console.log(result.follow_up) // Clarifying question
+    console.log(result.answers) // Possible answers
+    break
 
-  case "out_of_topic":
+  case 'out_of_topic':
     // Question unrelated to documents
-    console.log(result.reason);
-    break;
+    console.log(result.reason)
+    break
 
-  case "invalid_question":
+  case 'invalid_question':
     // Malformed or unclear question
-    console.log(result.reason);
-    break;
+    console.log(result.reason)
+    break
 
-  case "missing_knowledge":
+  case 'missing_knowledge':
     // Insufficient information to answer
-    console.log(result.reason);
-    break;
+    console.log(result.reason)
+    break
 }
 ```
 
@@ -336,12 +330,12 @@ const result = await zai.answer(documents, "What is the pricing?", {
 **Tracking Citations:**
 
 ```typescript
-if (result.type === "answer") {
+if (result.type === 'answer') {
   result.citations.forEach((citation) => {
-    console.log(`At position ${citation.offset}:`);
-    console.log(`  Cited: "${citation.snippet}"`);
-    console.log(`  From document:`, citation.item);
-  });
+    console.log(`At position ${citation.offset}:`)
+    console.log(`  Cited: "${citation.snippet}"`)
+    console.log(`  From document:`, citation.item)
+  })
 }
 ```
 
@@ -354,8 +348,8 @@ Rate array items on a 1-5 scale based on criteria. Located in `/packages/zai/src
 ```typescript
 const emails = [
   /* array of emails */
-];
-const urgencyScores = await zai.rate(emails, "urgency level");
+]
+const urgencyScores = await zai.rate(emails, 'urgency level')
 // Result: [4, 2, 5, 1, 3]  // Numbers 1-5
 ```
 
@@ -364,12 +358,12 @@ const urgencyScores = await zai.rate(emails, "urgency level");
 ```typescript
 const products = [
   /* array of products */
-];
+]
 const ratings = await zai.rate(products, {
-  quality: "product build quality",
-  value: "price to performance ratio",
-  design: "aesthetic appeal",
-});
+  quality: 'product build quality',
+  value: 'price to performance ratio',
+  design: 'aesthetic appeal',
+})
 // Result: [
 //   { quality: 5, value: 4, design: 5, total: 14 },
 //   { quality: 3, value: 5, design: 4, total: 12 },
@@ -383,7 +377,7 @@ const ratings = await zai.rate(products, {
 const rated = await zai.rate(items, instructions, {
   tokensPerItem: 250, // Max tokens per item
   maxItemsPerChunk: 50, // Items per batch
-});
+})
 ```
 
 #### 2.10 Sort - Natural Language Sorting
@@ -393,17 +387,14 @@ Sort arrays based on natural language instructions. Located in `/packages/zai/sr
 **Basic Sorting:**
 
 ```typescript
-const sorted = await zai.sort(tickets, "from least urgent to most urgent");
-const byPrice = await zai.sort(products, "by price, cheapest first");
+const sorted = await zai.sort(tickets, 'from least urgent to most urgent')
+const byPrice = await zai.sort(products, 'by price, cheapest first')
 ```
 
 **Priority-Based Sorting:**
 
 ```typescript
-const prioritized = await zai.sort(
-  emails,
-  "prioritize: open old items highest",
-);
+const prioritized = await zai.sort(emails, 'prioritize: open old items highest')
 // First item = highest priority, last = lowest priority
 ```
 
@@ -417,8 +408,8 @@ const sorted = await zai.sort(
   1. Completeness (complete applications first)
   2. Submission date (newer first)
   3. Applicant experience (more experienced first)
-`,
-);
+`
+)
 ```
 
 **With Options:**
@@ -426,7 +417,7 @@ const sorted = await zai.sort(
 ```typescript
 const sorted = await zai.sort(items, instructions, {
   tokensPerItem: 250, // Max tokens per item
-});
+})
 ```
 
 #### 2.11 Group - Array Grouping
@@ -437,8 +428,8 @@ Group array elements based on natural language criteria. Located in `/packages/z
 
 ```typescript
 const groups = await zai.group(tickets, {
-  instructions: "group by issue type and priority",
-});
+  instructions: 'group by issue type and priority',
+})
 // Result: [
 //   { id: 'bugs', label: 'Bug Reports', elements: [...] },
 //   { id: 'features', label: 'Feature Requests', elements: [...] },
@@ -450,26 +441,26 @@ const groups = await zai.group(tickets, {
 
 ```typescript
 const groups = await zai.group(emails, {
-  instructions: "categorize emails",
+  instructions: 'categorize emails',
   initialGroups: [
-    { id: "urgent", label: "Urgent" },
-    { id: "spam", label: "Spam" },
-    { id: "normal", label: "Normal" },
+    { id: 'urgent', label: 'Urgent' },
+    { id: 'spam', label: 'Spam' },
+    { id: 'normal', label: 'Normal' },
   ],
-});
+})
 ```
 
 **Access Results:**
 
 ```typescript
 // As groups array
-const groups = await zai.group(items, options);
+const groups = await zai.group(items, options)
 for (const group of groups) {
-  console.log(`${group.label}: ${group.elements.length} items`);
+  console.log(`${group.label}: ${group.elements.length} items`)
 }
 
 // As dictionary (using .result())
-const { output } = await zai.group(items, options).result();
+const { output } = await zai.group(items, options).result()
 // output is Record<string, T[]>
 ```
 
@@ -493,13 +484,13 @@ Patch code files using natural language instructions with efficient micropatch p
 ```typescript
 const files = [
   {
-    path: "src/hello.ts",
-    name: "hello.ts",
+    path: 'src/hello.ts',
+    name: 'hello.ts',
     content: 'console.log("Hello World")',
   },
-];
+]
 
-const patched = await zai.patch(files, 'change message to "Hi World"');
+const patched = await zai.patch(files, 'change message to "Hi World"')
 // Result: [{
 //   path: 'src/hello.ts',
 //   name: 'hello.ts',
@@ -512,40 +503,37 @@ const patched = await zai.patch(files, 'change message to "Hi World"');
 
 ```typescript
 const files = [
-  { path: "package.json", name: "package.json", content: "..." },
-  { path: "config.json", name: "config.json", content: "..." },
-];
+  { path: 'package.json', name: 'package.json', content: '...' },
+  { path: 'config.json', name: 'config.json', content: '...' },
+]
 
-const patched = await zai.patch(
-  files,
-  "update version to 2.0.0 in all config files",
-);
+const patched = await zai.patch(files, 'update version to 2.0.0 in all config files')
 ```
 
 **Common Use Cases:**
 
 ```typescript
 // Add documentation
-await zai.patch(files, "add JSDoc comments to all exported functions");
+await zai.patch(files, 'add JSDoc comments to all exported functions')
 
 // Remove code
-await zai.patch(files, "remove all debug code");
+await zai.patch(files, 'remove all debug code')
 
 // Refactoring
-await zai.patch(files, "convert to async/await and add error handling");
+await zai.patch(files, 'convert to async/await and add error handling')
 
 // Type annotations
-await zai.patch(files, "add TypeScript types to all function parameters");
+await zai.patch(files, 'add TypeScript types to all function parameters')
 ```
 
 **Inspect Applied Patches:**
 
 ```typescript
-const patched = await zai.patch(files, instructions);
+const patched = await zai.patch(files, instructions)
 for (const file of patched) {
   if (file.patch) {
-    console.log(`Patches for ${file.path}:`);
-    console.log(file.patch); // Micropatch operations
+    console.log(`Patches for ${file.path}:`)
+    console.log(file.patch) // Micropatch operations
   }
 }
 ```
@@ -555,7 +543,7 @@ for (const file of patched) {
 ```typescript
 const patched = await zai.patch(files, instructions, {
   maxTokensPerChunk: 16000, // Max tokens per processing chunk
-});
+})
 ```
 
 ### 3. Advanced Features
@@ -567,14 +555,12 @@ Enable learning from examples to improve accuracy over time. Implementation in `
 **How It Works:**
 
 1. **Example Storage**: When enabled, ZAI stores successful operations as examples with:
-
    - A unique hash key based on input, instructions, task type, and task ID
    - The input and output data
    - Metadata (tokens, cost, latency, model used)
    - A status field (`'pending'` by default)
 
 2. **Example Retrieval**: On subsequent operations, ZAI:
-
    - Generates the same hash key for identical inputs
    - Checks for exact matches (returns immediately if found - no LLM call!)
    - Searches for similar examples using Botpress Tables API (first 1024 chars)
@@ -585,12 +571,12 @@ Enable learning from examples to improve accuracy over time. Implementation in `
 ```typescript
 const Key = fastHash(
   JSON.stringify({
-    taskType: "zai.extract",
-    taskId: "product-extraction",
+    taskType: 'zai.extract',
+    taskId: 'product-extraction',
     input: inputAsString,
-    instructions: "Extract product details",
-  }),
-);
+    instructions: 'Extract product details',
+  })
+)
 ```
 
 **Configuration:**
@@ -601,14 +587,14 @@ const zai = new Zai({
   client,
   activeLearning: {
     enable: true,
-    tableName: "MyLearningTable", // Must end with "Table"
-    taskId: "my-task", // Namespaced as 'zai/my-task'
+    tableName: 'MyLearningTable', // Must end with "Table"
+    taskId: 'my-task', // Namespaced as 'zai/my-task'
   },
-});
+})
 
 // Enable for specific task using .learn()
-const sentimentZai = zai.learn("sentiment-analysis");
-const result = await sentimentZai.check(text, "is positive");
+const sentimentZai = zai.learn('sentiment-analysis')
+const result = await sentimentZai.check(text, 'is positive')
 ```
 
 **Important Notes:**
@@ -624,7 +610,7 @@ Creates a new ZAI instance with active learning enabled for a specific task:
 
 ```typescript
 // Enable for specific task
-const sentimentZai = zai.learn("sentiment-analysis");
+const sentimentZai = zai.learn('sentiment-analysis')
 
 // What actually happens:
 // 1. Enables active learning with the given taskId
@@ -667,12 +653,12 @@ const sentimentZai = zai.learn("sentiment-analysis");
 
 ```typescript
 // Isolate learning contexts
-const productSpamZai = zai.learn("spam-detection-products");
-const commentSpamZai = zai.learn("spam-detection-comments");
+const productSpamZai = zai.learn('spam-detection-products')
+const commentSpamZai = zai.learn('spam-detection-comments')
 
 // Each maintains separate example sets
-const isProductSpam = await productSpamZai.check(productDesc, "is spam");
-const isCommentSpam = await commentSpamZai.check(userComment, "is spam");
+const isProductSpam = await productSpamZai.check(productDesc, 'is spam')
+const isCommentSpam = await commentSpamZai.check(userComment, 'is spam')
 ```
 
 #### 3.2 Progress Tracking
@@ -680,36 +666,36 @@ const isCommentSpam = await commentSpamZai.check(userComment, "is spam");
 Monitor long-running operations. Implementation in `/packages/zai/src/response.ts`.
 
 ```typescript
-const response = zai.summarize(veryLongDocument);
+const response = zai.summarize(veryLongDocument)
 
 // Track progress
-response.on("progress", (progress) => {
-  console.log(`Processing: ${progress.percent}% complete`);
-  console.log(`Chunks: ${progress.completed}/${progress.total}`);
-});
+response.on('progress', (progress) => {
+  console.log(`Processing: ${progress.percent}% complete`)
+  console.log(`Chunks: ${progress.completed}/${progress.total}`)
+})
 
-const summary = await response;
+const summary = await response
 ```
 
 **Additional Event Methods:**
 
 ```typescript
 // One-time event listener
-response.once("complete", (result) => {
-  console.log("Operation finished:", result);
-});
+response.once('complete', (result) => {
+  console.log('Operation finished:', result)
+})
 
 // Remove event listener
-const handler = (progress) => console.log(progress);
-response.on("progress", handler);
-response.off("progress", handler);
+const handler = (progress) => console.log(progress)
+response.on('progress', handler)
+response.off('progress', handler)
 
 // Connect AbortSignal for external cancellation control
-const controller = new AbortController();
-response.bindSignal(controller.signal);
+const controller = new AbortController()
+response.bindSignal(controller.signal)
 
 // Cancel from external controller
-setTimeout(() => controller.abort(), 5000);
+setTimeout(() => controller.abort(), 5000)
 ```
 
 #### 3.3 Usage Monitoring
@@ -717,8 +703,8 @@ setTimeout(() => controller.abort(), 5000);
 Track tokens, costs, and performance. Implementation in `/packages/zai/src/context.ts:175-196`.
 
 ```typescript
-const result = await zai.extract(text, schema);
-const usage = await result.usage();
+const result = await zai.extract(text, schema)
+const usage = await result.usage()
 
 console.log({
   tokens: {
@@ -734,7 +720,7 @@ console.log({
   requests: usage.requests.requests,
   cached: usage.requests.cached,
   latency: usage.elapsedTime, // Milliseconds
-});
+})
 ```
 
 #### 3.4 Method Chaining
@@ -743,15 +729,12 @@ Create specialized instances with different configurations:
 
 ```typescript
 // Create temperature variant
-const creativeZai = zai.with({ temperature: 0.9 });
+const creativeZai = zai.with({ temperature: 0.9 })
 
 // Chain multiple configurations
-const preciseExtractor = zai
-  .with({ modelId: "gpt-4-turbo" })
-  .with({ temperature: 0.1 })
-  .learn("invoice-extraction");
+const preciseExtractor = zai.with({ modelId: 'gpt-4-turbo' }).with({ temperature: 0.1 }).learn('invoice-extraction')
 
-const invoice = await preciseExtractor.extract(document, invoiceSchema);
+const invoice = await preciseExtractor.extract(document, invoiceSchema)
 ```
 
 #### 3.5 Abort Operations
@@ -759,16 +742,16 @@ const invoice = await preciseExtractor.extract(document, invoiceSchema);
 Cancel long-running operations:
 
 ```typescript
-const response = zai.summarize(massiveDocument);
+const response = zai.summarize(massiveDocument)
 
 // Abort after 5 seconds
-setTimeout(() => response.abort(), 5000);
+setTimeout(() => response.abort(), 5000)
 
 try {
-  const summary = await response;
+  const summary = await response
 } catch (error) {
-  if (error.name === "AbortError") {
-    console.log("Operation cancelled");
+  if (error.name === 'AbortError') {
+    console.log('Operation cancelled')
   }
 }
 ```
@@ -779,17 +762,17 @@ try {
 
 ```typescript
 try {
-  const result = await zai.extract(text, schema);
+  const result = await zai.extract(text, schema)
 } catch (error) {
   if (error instanceof JsonParsingError) {
     // Schema validation failed
-    console.error("Invalid JSON:", error.message);
-  } else if (error.name === "AbortError") {
+    console.error('Invalid JSON:', error.message)
+  } else if (error.name === 'AbortError') {
     // Operation was cancelled
-    console.log("Operation aborted");
-  } else if (error.code === "RATE_LIMIT") {
+    console.log('Operation aborted')
+  } else if (error.code === 'RATE_LIMIT') {
     // API rate limit hit
-    await delay(error.retryAfter);
+    await delay(error.retryAfter)
   }
 }
 ```
@@ -800,10 +783,10 @@ ZAI includes built-in retry logic with exponential backoff. You can also wrap ZA
 
 ```typescript
 // Example from /packages/llmz/examples/utils/zai.ts:3-33
-import { withRetry } from "./utils/zai";
+import { withRetry } from './utils/zai'
 
-const reliableZai = withRetry(zai);
-const result = await reliableZai.extract(text, schema); // Retries up to 10 times
+const reliableZai = withRetry(zai)
+const result = await reliableZai.extract(text, schema) // Retries up to 10 times
 ```
 
 ### 5. Integration Patterns
@@ -812,19 +795,19 @@ const result = await reliableZai.extract(text, schema); // Retries up to 10 time
 
 ```typescript
 // In Botpress action or hook
-import { Zai } from "@botpress/zai";
+import { Zai } from '@botpress/zai'
 
 export const analyzeSentiment = async ({ client, input }) => {
-  const zai = new Zai({ client });
+  const zai = new Zai({ client })
 
   const sentiment = await zai.label(input.message, {
-    positive: "expresses positive sentiment",
-    negative: "expresses negative sentiment",
-    neutral: "is neutral in tone",
-  });
+    positive: 'expresses positive sentiment',
+    negative: 'expresses negative sentiment',
+    neutral: 'is neutral in tone',
+  })
 
-  return { sentiment };
-};
+  return { sentiment }
+}
 ```
 
 #### 5.2 With LLMz Framework
@@ -832,31 +815,31 @@ export const analyzeSentiment = async ({ client, input }) => {
 Example from `/packages/llmz/examples/07_chat_guardrails/index.ts:33-46`:
 
 ```typescript
-import { execute, ThinkSignal } from "llmz";
-import { Zai } from "@botpress/zai";
+import { execute, ThinkSignal } from 'llmz'
+import { Zai } from '@botpress/zai'
 
-const zai = new Zai({ client });
+const zai = new Zai({ client })
 
 // Use ZAI for content moderation
 const guardrails = {
-  violence: "is free of violence",
-  hate: "is free of hate speech",
-  pii: "does not contain personal data",
-};
+  violence: 'is free of violence',
+  hate: 'is free of hate speech',
+  pii: 'does not contain personal data',
+}
 
 await execute({
   async onBeforeExecution(iteration) {
-    const checks = await zai.label(iteration.code, guardrails);
+    const checks = await zai.label(iteration.code, guardrails)
 
     const violations = Object.entries(checks)
       .filter(([_, result]) => !result.value)
-      .map(([rule, result]) => `${rule}: ${result.explanation}`);
+      .map(([rule, result]) => `${rule}: ${result.explanation}`)
 
     if (violations.length > 0) {
-      throw new ThinkSignal(`Fix violations: ${violations.join(", ")}`);
+      throw new ThinkSignal(`Fix violations: ${violations.join(', ')}`)
     }
   },
-});
+})
 ```
 
 #### 5.3 Batch Processing
@@ -867,7 +850,7 @@ async function processBatch(documents: string[]) {
   const results = await Promise.all(
     documents.map(async (doc, i) => {
       // Stagger requests to avoid rate limits
-      await delay(i * 100);
+      await delay(i * 100)
 
       return zai.extract(
         doc,
@@ -875,12 +858,12 @@ async function processBatch(documents: string[]) {
           title: z.string(),
           category: z.string(),
           summary: z.string(),
-        }),
-      );
-    }),
-  );
+        })
+      )
+    })
+  )
 
-  return results;
+  return results
 }
 ```
 
@@ -941,15 +924,15 @@ packages/zai/
 
 ```typescript
 export class Zai {
-  protected client: Cognitive; // LLM client
-  protected Model: ModelId; // Selected model
-  protected namespace: string; // Operation namespace
-  protected adapter: Adapter; // Storage adapter
-  protected activeLearning: ActiveLearning;
+  protected client: Cognitive // LLM client
+  protected Model: ModelId // Selected model
+  protected namespace: string // Operation namespace
+  protected adapter: Adapter // Storage adapter
+  protected activeLearning: ActiveLearning
 
-  constructor(config: ZaiConfig);
-  with(options: Partial<ZaiConfig>): Zai;
-  learn(taskId: string): Zai;
+  constructor(config: ZaiConfig)
+  with(options: Partial<ZaiConfig>): Zai
+  learn(taskId: string): Zai
 }
 ```
 
@@ -957,12 +940,12 @@ export class Zai {
 
 ```typescript
 export class ZaiContext {
-  private _client: Cognitive;
-  public controller: AbortController;
+  private _client: Cognitive
+  public controller: AbortController
 
-  async generateContent<Out>(props): Promise<{ meta; output; text; extracted }>;
-  get usage(): Usage;
-  on<K>(type: K, listener: Function): this;
+  async generateContent<Out>(props): Promise<{ meta; output; text; extracted }>
+  get usage(): Usage
+  on<K>(type: K, listener: Function): this
 }
 ```
 
@@ -988,8 +971,8 @@ systemPrompt: `
 Extract the following information from the input:
 ${schemaTypescript}
 ====
-${instructions.map((x) => `• ${x}`).join("\n")}
-`.trim();
+${instructions.map((x) => `• ${x}`).join('\n')}
+`.trim()
 ```
 
 Operations include:
@@ -1005,16 +988,14 @@ For large documents (`/packages/zai/src/operations/extract.ts:112-149`):
 ```typescript
 if (tokenizer.count(inputAsString) > options.chunkLength) {
   // 1. Split into chunks
-  const tokens = tokenizer.split(inputAsString);
-  const chunks = chunk(tokens, options.chunkLength);
+  const tokens = tokenizer.split(inputAsString)
+  const chunks = chunk(tokens, options.chunkLength)
 
   // 2. Process in parallel
-  const all = await Promise.allSettled(
-    chunks.map((chunk) => extract(chunk, schema, options, ctx)),
-  );
+  const all = await Promise.allSettled(chunks.map((chunk) => extract(chunk, schema, options, ctx)))
 
   // 3. Merge results recursively
-  return extract(mergePrompt, originalSchema, options, ctx);
+  return extract(mergePrompt, originalSchema, options, ctx)
 }
 ```
 
@@ -1026,8 +1007,8 @@ if (tokenizer.count(inputAsString) > options.chunkLength) {
 
 ```typescript
 export interface Adapter {
-  saveExample(example: Example): Promise<void>;
-  getExamples<I, O>(params: GetExamplesParams): Promise<Example<I, O>[]>;
+  saveExample(example: Example): Promise<void>
+  getExamples<I, O>(params: GetExamplesParams): Promise<Example<I, O>[]>
 }
 ```
 
@@ -1066,8 +1047,8 @@ if (taskId && ctx.adapter && !ctx.controller.signal.aborted) {
     input: inputAsString,
     output: final,
     metadata: { cost, latency, model, tokens },
-    status: "pending", // Default - requires approval
-  });
+    status: 'pending', // Default - requires approval
+  })
 }
 ```
 
@@ -1081,9 +1062,9 @@ const { rows } = await this._client.findTableRows({
   filter: {
     taskType,
     taskId,
-    status: "approved", // Only approved examples used!
+    status: 'approved', // Only approved examples used!
   },
-});
+})
 ```
 
 #### 3.3 Example Matching
@@ -1162,16 +1143,16 @@ For extract operations (`/packages/zai/src/operations/extract.ts:323-339`):
 
 ```typescript
 try {
-  const json = x.slice(0, x.indexOf(END)).trim();
-  const repairedJson = jsonrepair(json); // Fix common JSON errors
-  const parsedJson = JSON5.parse(repairedJson); // Flexible parsing
-  const safe = schema.safeParse(parsedJson); // Validate
+  const json = x.slice(0, x.indexOf(END)).trim()
+  const repairedJson = jsonrepair(json) // Fix common JSON errors
+  const parsedJson = JSON5.parse(repairedJson) // Flexible parsing
+  const safe = schema.safeParse(parsedJson) // Validate
 
-  if (safe.success) return safe.data;
-  if (options.strict) throw new JsonParsingError(x, safe.error);
-  return parsedJson; // Non-strict mode
+  if (safe.success) return safe.data
+  if (options.strict) throw new JsonParsingError(x, safe.error)
+  return parsedJson // Non-strict mode
 } catch (error) {
-  throw new JsonParsingError(x, error);
+  throw new JsonParsingError(x, error)
 }
 ```
 
@@ -1183,12 +1164,12 @@ Models configured at initialization (`/packages/zai/src/zai.ts:50-68`):
 
 ```typescript
 modelId: z.custom<ModelId | string>((value) => {
-  if (typeof value !== "string") return false;
-  if (value !== "best" && value !== "fast" && !value.includes(":")) {
-    return false;
+  if (typeof value !== 'string') return false
+  if (value !== 'best' && value !== 'fast' && !value.includes(':')) {
+    return false
   }
-  return true;
-}).default("best");
+  return true
+}).default('best')
 ```
 
 Options:
@@ -1227,7 +1208,7 @@ Used for:
 ```typescript
 const result = await zai.extract(hugeDocument, schema, {
   chunkLength: 4000, // Smaller chunks
-});
+})
 ```
 
 #### 2. Schema Validation Failures
@@ -1238,8 +1219,8 @@ const result = await zai.extract(hugeDocument, schema, {
 ```typescript
 const result = await zai.extract(input, schema, {
   strict: false, // Allow partial matches
-  instructions: "If age is missing, use -1",
-});
+  instructions: 'If age is missing, use -1',
+})
 ```
 
 #### 3. Rate Limiting
@@ -1250,8 +1231,8 @@ const result = await zai.extract(input, schema, {
 ```typescript
 // Stagger requests
 for (const [i, doc] of documents.entries()) {
-  await delay(i * 200); // 200ms between requests
-  await zai.summarize(doc);
+  await delay(i * 200) // 200ms between requests
+  await zai.summarize(doc)
 }
 ```
 
@@ -1262,11 +1243,9 @@ for (const [i, doc] of documents.entries()) {
 
 ```typescript
 // Split manually before processing
-const chunks = splitIntoChunks(document, 10000);
-const summaries = await Promise.all(
-  chunks.map((chunk) => zai.summarize(chunk)),
-);
-const final = await zai.summarize(summaries.join("\n"));
+const chunks = splitIntoChunks(document, 10000)
+const summaries = await Promise.all(chunks.map((chunk) => zai.summarize(chunk)))
+const final = await zai.summarize(summaries.join('\n'))
 ```
 
 ### Performance Tuning
@@ -1292,10 +1271,10 @@ const zai = new Zai({
   client,
   activeLearning: {
     enable: true,
-    tableName: "ProductExtractionTable",
-    taskId: "product-catalog",
+    tableName: 'ProductExtractionTable',
+    taskId: 'product-catalog',
   },
-});
+})
 ```
 
 Benefits:

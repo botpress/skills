@@ -5,19 +5,19 @@ Access runtime services like the Botpress client and citations manager within yo
 ## Quick Start
 
 ```typescript
-import { context } from "@botpress/runtime";
+import { context } from '@botpress/runtime'
 
 // Get Botpress client
-const client = context.get("client");
+const client = context.get('client')
 
 // Get citations manager
-const citations = context.get("citations");
+const citations = context.get('citations')
 
 // Use services
 const { passages } = await client.searchFiles({
-  query: "search term",
+  query: 'search term',
   withContext: true,
-});
+})
 ```
 
 ## Overview
@@ -25,6 +25,7 @@ const { passages } = await client.searchFiles({
 The `context` API provides access to runtime services within your ADK handlers (actions, tools, workflows, conversations, triggers). The ADK automatically sets up context for you - you just need to call `context.get()` to access services.
 
 **Available in:**
+
 - Action handlers
 - Tool handlers
 - Workflow handlers
@@ -40,27 +41,27 @@ These are the context keys you'll commonly use as an ADK developer:
 The Botpress API client for your bot. Use this to interact with Botpress services like files, tables, messages, etc.
 
 ```typescript
-const client = context.get("client");
+const client = context.get('client')
 
 // Search files/knowledge base
 const { passages } = await client.searchFiles({
-  query: "search query",
-  tags: { type: "knowledge" },
-  withContext: true
-});
+  query: 'search query',
+  tags: { type: 'knowledge' },
+  withContext: true,
+})
 
 // Create message
 await client.createMessage({
   conversationId,
-  type: "text",
-  payload: { text: "Hello!" }
-});
+  type: 'text',
+  payload: { text: 'Hello!' },
+})
 
 // Query tables (low-level client API)
 const { rows } = await client.tables.findMany({
-  table: "users",
-  filter: { email: { eq: "user@example.com" } }
-});
+  table: 'users',
+  filter: { email: { eq: 'user@example.com' } },
+})
 ```
 
 > **Note:** For table operations, prefer using the direct Table class methods (e.g., `UsersTable.findRows()`) over `client.tables.*`. The Table class provides better type safety and a cleaner API. See [Tables documentation](./tables.md) for details.
@@ -72,17 +73,17 @@ const { rows } = await client.tables.findMany({
 Citation manager for tracking sources in AI responses. Essential for RAG implementations.
 
 ```typescript
-const citations = context.get("citations");
+const citations = context.get('citations')
 
 // Register a source
 const { tag } = citations.registerSource({
-  url: "https://docs.example.com/page",
-  title: "Documentation Page",
-  favicon: "https://docs.example.com/favicon.ico"
-});
+  url: 'https://docs.example.com/page',
+  title: 'Documentation Page',
+  favicon: 'https://docs.example.com/favicon.ico',
+})
 
 // Use in response
-const response = `According to the documentation${tag}, the answer is...`;
+const response = `According to the documentation${tag}, the answer is...`
 ```
 
 **Type:** `CitationsManager`
@@ -98,12 +99,12 @@ These keys may or may not be available depending on the handler context. Always 
 Current user object (available in conversation handlers).
 
 ```typescript
-const user = context.get("user", { optional: true });
+const user = context.get('user', { optional: true })
 
 if (user) {
-  console.log(user.id);
-  console.log(user.name);
-  console.log(user.tags);
+  console.log(user.id)
+  console.log(user.name)
+  console.log(user.tags)
 }
 ```
 
@@ -117,11 +118,11 @@ Current conversation object. Available optionally in Actions, Tools, and Trigger
 
 ```typescript
 // In Actions, Tools, or Triggers — use context.get() with { optional: true }
-const conversation = context.get("conversation", { optional: true });
+const conversation = context.get('conversation', { optional: true })
 
 if (conversation) {
-  console.log(conversation.id);
-  console.log(conversation.tags);
+  console.log(conversation.id)
+  console.log(conversation.tags)
 }
 
 // In Conversation handlers — use the handler parameter directly
@@ -135,10 +136,10 @@ if (conversation) {
 Incoming message (when triggered by a message event).
 
 ```typescript
-const message = context.get("message", { optional: true });
+const message = context.get('message', { optional: true })
 
-if (message?.type === "text") {
-  console.log(message.payload.text);
+if (message?.type === 'text') {
+  console.log(message.payload.text)
 }
 ```
 
@@ -149,11 +150,11 @@ if (message?.type === "text") {
 Incoming event (available in trigger handlers).
 
 ```typescript
-const event = context.get("event", { optional: true });
+const event = context.get('event', { optional: true })
 
 if (event) {
-  console.log(`Event type: ${event.type}`);
-  console.log(event.payload);
+  console.log(`Event type: ${event.type}`)
+  console.log(event.payload)
 }
 ```
 
@@ -166,11 +167,11 @@ See **[Triggers](./triggers.md)** for event handling examples.
 Current workflow instance (available in workflow handlers).
 
 ```typescript
-const workflow = context.get("workflow", { optional: true });
+const workflow = context.get('workflow', { optional: true })
 
 if (workflow) {
-  console.log(`Workflow ID: ${workflow.id}`);
-  console.log(`Conversation ID: ${workflow.conversationId}`);
+  console.log(`Workflow ID: ${workflow.id}`)
+  console.log(`Conversation ID: ${workflow.conversationId}`)
 }
 ```
 
@@ -183,12 +184,12 @@ See **[Workflows](./workflows.md)** for workflow context examples.
 Workflow control operations (available in workflow handlers).
 
 ```typescript
-const control = context.get("workflowControlContext", { optional: true });
+const control = context.get('workflowControlContext', { optional: true })
 
 if (control) {
   // Access workflow controls
-  await control.ack();
-  control.complete({ result: "success" });
+  await control.ack()
+  control.complete({ result: 'success' })
 }
 ```
 
@@ -199,12 +200,12 @@ if (control) {
 Chat instance for accessing conversation transcripts (available in conversation handlers).
 
 ```typescript
-const chat = context.get("chat", { optional: true });
+const chat = context.get('chat', { optional: true })
 
 if (chat) {
   // Fetch conversation transcript
-  const transcript = await chat.fetchTranscript();
-  console.log(`Messages: ${transcript.length}`);
+  const transcript = await chat.fetchTranscript()
+  console.log(`Messages: ${transcript.length}`)
 }
 ```
 
@@ -221,12 +222,12 @@ These are available but less frequently needed:
 AI model client for direct LLM operations. Most of the time you'll use `execute()` instead.
 
 ```typescript
-const cognitive = context.get("cognitive");
+const cognitive = context.get('cognitive')
 
 const response = await cognitive.generateText({
-  model: "openai:gpt-4o",
-  messages: [{ role: "user", content: "Hello" }]
-});
+  model: 'openai:gpt-4o',
+  messages: [{ role: 'user', content: 'Hello' }],
+})
 ```
 
 **Type:** `Cognitive`
@@ -238,11 +239,11 @@ const response = await cognitive.generateText({
 Structured logger for the current bot.
 
 ```typescript
-const logger = context.get("logger");
+const logger = context.get('logger')
 
-logger.info("Processing request");
-logger.error("Failed to process", { error });
-logger.debug("Debug info", { data });
+logger.info('Processing request')
+logger.error('Failed to process', { error })
+logger.debug('Debug info', { data })
 ```
 
 **Type:** `BotLogger`
@@ -252,8 +253,8 @@ logger.debug("Debug info", { data });
 Current bot identifier.
 
 ```typescript
-const botId = context.get("botId");
-console.log(`Running in bot: ${botId}`);
+const botId = context.get('botId')
+console.log(`Running in bot: ${botId}`)
 ```
 
 **Type:** `string`
@@ -273,16 +274,16 @@ context.get<T extends keyof BotContext>(
 
 ```typescript
 // Will throw if not available (use for keys that should always exist)
-const client = context.get("client");
-const citations = context.get("citations");
+const client = context.get('client')
+const citations = context.get('citations')
 ```
 
 ### Optional Keys
 
 ```typescript
 // Returns null if not available (use for conditional keys)
-const user = context.get("user", { optional: true });
-const conversation = context.get("conversation", { optional: true });
+const user = context.get('user', { optional: true })
+const conversation = context.get('conversation', { optional: true })
 
 if (user && conversation) {
   // Both available
@@ -298,20 +299,20 @@ if (user && conversation) {
 ```typescript
 export const myAction = new Action({
   async handler({ input }) {
-    const client = context.get("client");
-    const user = context.get("user", { optional: true });
+    const client = context.get('client')
+    const user = context.get('user', { optional: true })
 
     if (user) {
       // Personalized response
-      console.log(`Processing for user ${user.id}`);
+      console.log(`Processing for user ${user.id}`)
     } else {
       // Generic response
-      console.log("Processing without user context");
+      console.log('Processing without user context')
     }
 
-    return await client.doSomething();
-  }
-});
+    return await client.doSomething()
+  },
+})
 ```
 
 ### Using Context Across Handler Types
@@ -320,9 +321,9 @@ The `context.get()` syntax is identical across all handler types (Actions, Tools
 
 ```typescript
 // Same pattern everywhere
-const client = context.get("client");
-const citations = context.get("citations");
-const user = context.get("user", { optional: true });
+const client = context.get('client')
+const citations = context.get('citations')
+const user = context.get('user', { optional: true })
 ```
 
 See individual documentation for handler-specific examples: **[Actions](./actions.md)**, **[Tools](./tools.md)**, **[Workflows](./workflows.md)**, **[Conversations](./conversations.md)**.
@@ -334,16 +335,16 @@ See individual documentation for handler-specific examples: **[Actions](./action
 ```typescript
 // ❌ WRONG - Will throw if key doesn't exist
 try {
-  const user = context.get("user");
+  const user = context.get('user')
 } catch (error) {
   // Hard to handle gracefully
 }
 
 // ✅ CORRECT - Use optional for conditional keys
-const user = context.get("user", { optional: true });
+const user = context.get('user', { optional: true })
 if (!user) {
-  console.log("No user context available");
-  return defaultResponse;
+  console.log('No user context available')
+  return defaultResponse
 }
 ```
 
@@ -353,8 +354,8 @@ Keys like `client`, `citations` should always be available. If they're not, it's
 
 ```typescript
 // These should never throw in normal operation
-const client = context.get("client");
-const citations = context.get("citations");
+const client = context.get('client')
+const citations = context.get('citations')
 ```
 
 ## Best Practices
@@ -362,12 +363,13 @@ const citations = context.get("citations");
 ### 1. Know Which Keys Are Always Available
 
 **Always available:**
+
 - `client` - Botpress API client
 - `citations` - Citation manager
 - `cognitive` - AI model client
 - `logger` - Structured logger
 - `botId` - Current bot ID
-**Conditionally available (use `{ optional: true }`):**
+  **Conditionally available (use `{ optional: true }`):**
 - `user` - Only in conversation context
 - `conversation` - Only in conversation context
 - `message` - Only when triggered by message
@@ -382,30 +384,30 @@ const citations = context.get("citations");
 // ✅ GOOD - Get context when needed
 export const myAction = new Action({
   async handler({ input }) {
-    const client = context.get("client");  // Get when you need it
-    const result = await client.searchFiles({ query: input.query });
-    return result;
-  }
-});
+    const client = context.get('client') // Get when you need it
+    const result = await client.searchFiles({ query: input.query })
+    return result
+  },
+})
 
 // ❌ BAD - Don't store context globally
-let globalClient;  // Don't do this!
+let globalClient // Don't do this!
 
 export const badAction = new Action({
   async handler({ input }) {
-    globalClient = context.get("client");  // Context might change
-  }
-});
+    globalClient = context.get('client') // Context might change
+  },
+})
 ```
 
 ### 3. Use TypeScript's Type Safety
 
 ```typescript
 // TypeScript knows the types
-const client = context.get("client");
+const client = context.get('client')
 // client is typed as BotSpecificClient<TBot>
 
-const user = context.get("user", { optional: true });
+const user = context.get('user', { optional: true })
 // user is typed as User | null
 ```
 
@@ -414,10 +416,10 @@ const user = context.get("user", { optional: true });
 For `bot`, `user`, and `adk`, you can use direct imports instead of `context.get()`:
 
 ```typescript
-import { bot, user, adk } from "@botpress/runtime";
+import { bot, user, adk } from '@botpress/runtime'
 
-bot.state.version;           // Instead of context.get("bot").state
-user.state.preferredLanguage; // Instead of context.get("user").state
+bot.state.version // Instead of context.get("bot").state
+user.state.preferredLanguage // Instead of context.get("user").state
 ```
 
 See **[Actions](./actions.md)** for comparison of both approaches.
@@ -428,26 +430,28 @@ See **[Actions](./actions.md)** for comparison of both approaches.
 
 ```typescript
 // Error: Context key "user" not found
-const user = context.get("user");
+const user = context.get('user')
 ```
 
 **Solution:** Use `{ optional: true }` for conditional keys:
+
 ```typescript
-const user = context.get("user", { optional: true });
+const user = context.get('user', { optional: true })
 ```
 
 ### "Cannot read property of undefined"
 
 ```typescript
 // Error: Cannot read property 'id' of undefined
-const userId = context.get("user", { optional: true }).id;
+const userId = context.get('user', { optional: true }).id
 ```
 
 **Solution:** Check if key exists before accessing properties:
+
 ```typescript
-const user = context.get("user", { optional: true });
+const user = context.get('user', { optional: true })
 if (user) {
-  const userId = user.id;
+  const userId = user.id
 }
 ```
 

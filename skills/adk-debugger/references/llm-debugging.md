@@ -159,17 +159,17 @@ Look for repeated `tool_call` spans with the same `tool_name` in sequence.
   ```typescript
   // Create per-conversation to avoid leaking state across turns
   const makeLoopGuard = () => {
-    const seen = new Set<string>();
-    const onBeforeTool: Autonomous.Hooks["onBeforeTool"] = async ({ tool, input, controller }) => {
-      const key = `${tool.name}:${JSON.stringify(input)}`;
+    const seen = new Set<string>()
+    const onBeforeTool: Autonomous.Hooks['onBeforeTool'] = async ({ tool, input, controller }) => {
+      const key = `${tool.name}:${JSON.stringify(input)}`
       if (seen.has(key)) {
-        controller.abort("Already called this tool with these parameters");
-        return;
+        controller.abort('Already called this tool with these parameters')
+        return
       }
-      seen.add(key);
-    };
-    return { onBeforeTool };
-  };
+      seen.add(key)
+    }
+    return { onBeforeTool }
+  }
   ```
 
 - **Set `maxIterations`:** Limit how many tool calls the agent can make per turn
@@ -192,11 +192,11 @@ adk traces --format json
 **Via `onTrace` hook in code:**
 
 ```typescript
-const onTrace: Autonomous.Hooks["onTrace"] = ({ trace }) => {
-  if (trace.type === "think") {
-    console.debug(`[MODEL REASONING] ${trace.content}`);
+const onTrace: Autonomous.Hooks['onTrace'] = ({ trace }) => {
+  if (trace.type === 'think') {
+    console.debug(`[MODEL REASONING] ${trace.content}`)
   }
-};
+}
 ```
 
 **What to look for:**

@@ -5,6 +5,7 @@ Tools are functions that AI models can call during conversations to perform acti
 ## Overview
 
 Tools enable you to:
+
 - Give AI capabilities like searching, creating records, sending messages
 - Perform actions autonomously based on conversation context
 - Access external APIs and integrations
@@ -22,68 +23,69 @@ Tools enable you to:
 ## Basic Tool Structure
 
 ```typescript
-import { Autonomous, z } from "@botpress/runtime";
+import { Autonomous, z } from '@botpress/runtime'
 
 // Option 1: Named export (recommended)
 export const searchDocs = new Autonomous.Tool({
-  name: "searchDocs",
-  description: "Search documentation for answers to user questions",
+  name: 'searchDocs',
+  description: 'Search documentation for answers to user questions',
 
   input: z.object({
-    query: z.string().describe("The search query"),
-    maxResults: z.number().default(5).describe("Maximum results to return")
+    query: z.string().describe('The search query'),
+    maxResults: z.number().default(5).describe('Maximum results to return'),
   }),
 
   output: z.string(),
 
   handler: async ({ query, maxResults }) => {
-    const results = await searchDocumentation(query, maxResults);
-    return results.join("\n\n");
+    const results = await searchDocumentation(query, maxResults)
+    return results.join('\n\n')
   },
-});
+})
 
 // Option 2: Default export (also valid)
 export default new Autonomous.Tool({
-  name: "searchDocs",
+  name: 'searchDocs',
   // ... same configuration
-});
+})
 ```
 
 **Why use `export const`?**
+
 - Enables direct imports: `import { searchDocs } from "./tools/searchDocs"`
 - Can pass directly to `execute()`: `tools: [searchDocs]`
 - Better for tool composition and reusability
 
 ## Tool Properties
 
-| Property | Type | Required | Description |
-|----------|------|----------|-------------|
-| **name** | `string` | Yes | Unique TypeScript-compatible identifier |
-| **description** | `string` | Recommended | Helps AI understand when and how to use the tool |
-| **input** | `z.ZodType` | No | Zod schema for input validation (defaults to `z.any()`) |
-| **output** | `z.ZodType` | No | Zod schema for output validation (defaults to `z.any()`) |
-| **handler** | `function` | Yes | Async function implementing tool logic |
-| **aliases** | `string[]` | No | Alternative names the AI can use to call this tool |
-| **metadata** | `Record<string, any>` | No | Custom information for tool categorization |
-| **staticInputValues** | `object` | No | Pre-set parameter values |
-| **retry** | `function` | No | Custom retry logic for failures |
+| Property              | Type                  | Required    | Description                                              |
+| --------------------- | --------------------- | ----------- | -------------------------------------------------------- |
+| **name**              | `string`              | Yes         | Unique TypeScript-compatible identifier                  |
+| **description**       | `string`              | Recommended | Helps AI understand when and how to use the tool         |
+| **input**             | `z.ZodType`           | No          | Zod schema for input validation (defaults to `z.any()`)  |
+| **output**            | `z.ZodType`           | No          | Zod schema for output validation (defaults to `z.any()`) |
+| **handler**           | `function`            | Yes         | Async function implementing tool logic                   |
+| **aliases**           | `string[]`            | No          | Alternative names the AI can use to call this tool       |
+| **metadata**          | `Record<string, any>` | No          | Custom information for tool categorization               |
+| **staticInputValues** | `object`              | No          | Pre-set parameter values                                 |
+| **retry**             | `function`            | No          | Custom retry logic for failures                          |
 
 ## Tool Handler Syntax
 
 Tools receive input directly (not wrapped in `{ input }`) and can use global runtime proxies such as `user`, `bot`, `adk`, and `actions`. For optional per-request values like `conversation` or `message`, use the Context API.
 
 ```typescript
-import { Autonomous, z, user, adk, context } from "@botpress/runtime";
+import { Autonomous, z, user, adk, context } from '@botpress/runtime'
 
 // ✅ Tools can destructure input parameters directly
 export default new Autonomous.Tool({
-  name: "createCharacter",
-  description: "Create a new character with name and race",
+  name: 'createCharacter',
+  description: 'Create a new character with name and race',
 
   input: z.object({
-    name: z.string().describe("Character name"),
-    race: z.enum(["human", "elf", "dwarf"]),
-    background: z.enum(["warrior", "ranger"]).optional()
+    name: z.string().describe('Character name'),
+    race: z.enum(['human', 'elf', 'dwarf']),
+    background: z.enum(['warrior', 'ranger']).optional(),
   }),
 
   output: z.string(),
@@ -91,97 +93,98 @@ export default new Autonomous.Tool({
   // Handler destructures input directly
   handler: async ({ name, race, background }) => {
     // Direct access to user state
-    user.state.characterName = name;
-    user.state.race = race;
-    user.state.background = background;
+    user.state.characterName = name
+    user.state.race = race
+    user.state.background = background
 
     // Use ADK utilities
     const stats = await adk.zai.extract(
       `Create character stats for ${name} the ${race}`,
       z.object({
         courage: z.number().min(0).max(100),
-        wisdom: z.number().min(0).max(100)
+        wisdom: z.number().min(0).max(100),
       })
-    );
+    )
 
-    user.state.courage = stats.courage;
-    user.state.wisdom = stats.wisdom;
+    user.state.courage = stats.courage
+    user.state.wisdom = stats.wisdom
 
-    return `Created ${name} the ${race}!`;
-  }
-});
+    return `Created ${name} the ${race}!`
+  },
+})
 
 // ✅ Can also receive input as single parameter
 export const simpleSearch = new Autonomous.Tool({
-  name: "search",
-  description: "Search knowledge bases",
-  input: z.string().describe("The query to search for").min(1).max(1024),
+  name: 'search',
+  description: 'Search knowledge bases',
+  input: z.string().describe('The query to search for').min(1).max(1024),
   output: z.string(),
 
   handler: async (query) => {
-    const results = await performSearch(query);
-    return results;
-  }
-});
+    const results = await performSearch(query)
+    return results
+  },
+})
 
 // ✅ Method syntax with context parameter
 export const anotherTool = new Autonomous.Tool({
-  name: "anotherTool",
+  name: 'anotherTool',
   input: z.object({ param: z.string() }),
   output: z.string(),
 
   async handler(input, ctx) {
     // ctx.callId - unique identifier for this execution
-    console.log(`Processing call: ${ctx.callId}`);
-    return `Processed ${input.param}`;
-  }
-});
+    console.log(`Processing call: ${ctx.callId}`)
+    return `Processed ${input.param}`
+  },
+})
 ```
 
 **Key Differences from Actions:**
 
-| Feature | Actions | Tools |
-|---------|---------|-------|
-| Input parameter | `{ input, client }` wrapper | Direct input or destructuring |
-| Context access | Via imports or context API | Via imports (automatically available) |
-| Typical use | Internal functions, any context | AI-callable, conversation context |
-| Handler signature | `handler({ input, client })` | `handler(input, ctx?)` or `handler({ ...fields }, ctx?)` |
+| Feature           | Actions                         | Tools                                                    |
+| ----------------- | ------------------------------- | -------------------------------------------------------- |
+| Input parameter   | `{ input, client }` wrapper     | Direct input or destructuring                            |
+| Context access    | Via imports or context API      | Via imports (automatically available)                    |
+| Typical use       | Internal functions, any context | AI-callable, conversation context                        |
+| Handler signature | `handler({ input, client })`    | `handler(input, ctx?)` or `handler({ ...fields }, ctx?)` |
 
 ## Accessing Context in Tools
 
 Tools can use global runtime proxies directly, but conversation-specific values should be loaded through `context.get(...)`:
 
 ```typescript
-import { Autonomous, z, user, bot, adk, actions, context } from "@botpress/runtime";
+import { Autonomous, z, user, bot, adk, actions, context } from '@botpress/runtime'
 
 export default new Autonomous.Tool({
-  name: "upgradeUser",
-  description: "Upgrade user to pro tier",
+  name: 'upgradeUser',
+  description: 'Upgrade user to pro tier',
   input: z.object({}),
   output: z.string(),
 
   handler: async (input) => {
     // Direct access to context
-    const userName = user.state.name;
-    const currentTier = user.tags.tier;
-    const conversation = context.get("conversation", { optional: true });
+    const userName = user.state.name
+    const currentTier = user.tags.tier
+    const conversation = context.get('conversation', { optional: true })
 
     // Update user state and tags
-    user.tags.tier = "pro";
-    bot.state.totalUpgrades += 1;
+    user.tags.tier = 'pro'
+    bot.state.totalUpgrades += 1
 
     // Call integration actions
     await actions.slack.sendMessage({
-      channel: "upgrades",
-      text: `${userName} upgraded from ${currentTier} to pro`
-    });
+      channel: 'upgrades',
+      text: `${userName} upgraded from ${currentTier} to pro`,
+    })
 
-    return `Upgraded ${userName} to pro tier`;
-  }
-});
+    return `Upgraded ${userName} to pro tier`
+  },
+})
 ```
 
 **Commonly used in tools:**
+
 - `user` - Current user (`.state`, `.tags`)
 - `bot` - Bot object (always available)
 - `adk` - ADK utilities (`adk.zai.extract()`, etc.)
@@ -196,44 +199,41 @@ For complete context access details including `client`, `citations`, availabilit
 `ThinkSignal` allows tools to return results with additional instructions for the AI. When thrown, it provides context that guides how the AI should use the information.
 
 ```typescript
-import { Autonomous, z } from "@botpress/runtime";
+import { Autonomous, z } from '@botpress/runtime'
 
 export default new Autonomous.Tool({
-  name: "searchKnowledge",
-  description: "Search the knowledge base",
-  input: z.string().describe("Search query"),
+  name: 'searchKnowledge',
+  description: 'Search the knowledge base',
+  input: z.string().describe('Search query'),
   output: z.string(),
 
   handler: async (query) => {
-    const results = await knowledgeBase.search(query);
+    const results = await knowledgeBase.search(query)
 
     // Handle no results case
     if (!results.length) {
       throw new Autonomous.ThinkSignal(
-        "No results found",
-        "No results were found. Try rephrasing or ask something else. Do NOT make up an answer."
-      );
+        'No results found',
+        'No results were found. Try rephrasing or ask something else. Do NOT make up an answer.'
+      )
     }
 
     // Format results for AI consumption
-    const formatted = results
-      .map((r, i) => `[${i + 1}] ${r.title}\n${r.content}`)
-      .join("\n\n");
+    const formatted = results.map((r, i) => `[${i + 1}] ${r.title}\n${r.content}`).join('\n\n')
 
     // Return results with instructions for the AI
-    throw new Autonomous.ThinkSignal(
-      "Search complete - use these results to answer",
-      formatted
-    );
-  }
-});
+    throw new Autonomous.ThinkSignal('Search complete - use these results to answer', formatted)
+  },
+})
 ```
 
 **ThinkSignal parameters:**
+
 - **First argument**: Brief status message for logs
 - **Second argument**: Detailed content/instructions for the AI
 
 **When to use ThinkSignal:**
+
 - Providing search results with guidance
 - Handling edge cases (no results, errors)
 - Guiding AI behavior based on outcomes
@@ -247,11 +247,13 @@ Provide alternative names for the tool:
 
 ```typescript
 export default new Autonomous.Tool({
-  name: "searchDocumentation",
-  aliases: ["search_docs", "findDocs", "lookupDocs"],
-  description: "Search documentation",
-  handler: async (query) => { /* ... */ }
-});
+  name: 'searchDocumentation',
+  aliases: ['search_docs', 'findDocs', 'lookupDocs'],
+  description: 'Search documentation',
+  handler: async (query) => {
+    /* ... */
+  },
+})
 ```
 
 ### Static Input Values
@@ -260,18 +262,20 @@ Pre-set parameter values for specialized tool variants:
 
 ```typescript
 const baseSearchTool = new Autonomous.Tool({
-  name: "search",
+  name: 'search',
   input: z.object({
     query: z.string(),
-    category: z.string()
+    category: z.string(),
   }),
-  handler: async ({ query, category }) => { /* ... */ }
-});
+  handler: async ({ query, category }) => {
+    /* ... */
+  },
+})
 
 // Create specialized version with pre-set category
 const productSearchTool = baseSearchTool.with({
-  staticInputValues: { category: "products" }
-});
+  staticInputValues: { category: 'products' },
+})
 ```
 
 ### Custom Retry Logic
@@ -280,24 +284,24 @@ Handle failures with custom retry behavior:
 
 ```typescript
 export default new Autonomous.Tool({
-  name: "externalAPI",
-  description: "Call external API",
+  name: 'externalAPI',
+  description: 'Call external API',
   input: z.object({ endpoint: z.string() }),
   output: z.any(),
 
   retry: async ({ input, attempt, error }) => {
     if (attempt < 3 && error?.code === 'RATE_LIMIT') {
-      await new Promise(r => setTimeout(r, 1000 * attempt));
-      return true; // Retry
+      await new Promise((r) => setTimeout(r, 1000 * attempt))
+      return true // Retry
     }
-    return false; // Don't retry
+    return false // Don't retry
   },
 
   handler: async ({ endpoint }) => {
-    const response = await fetch(endpoint);
-    return await response.json();
-  }
-});
+    const response = await fetch(endpoint)
+    return await response.json()
+  },
+})
 ```
 
 ## Autonomous Namespace
@@ -307,8 +311,8 @@ The `Autonomous` namespace provides types and utilities for AI-powered autonomou
 ### Autonomous.Tool
 
 ```typescript
-export const Tool = LlmzTool;
-export type Tool = InstanceType<typeof Tool>;
+export const Tool = LlmzTool
+export type Tool = InstanceType<typeof Tool>
 ```
 
 ### Autonomous.Model Type
@@ -316,28 +320,29 @@ export type Tool = InstanceType<typeof Tool>;
 Type for specifying AI models:
 
 ```typescript
-import { defineConfig } from "@botpress/runtime";
+import { defineConfig } from '@botpress/runtime'
 
 export default defineConfig({
-  name: "my-agent",
+  name: 'my-agent',
   defaultModels: {
-    autonomous: "openai:gpt-4o",
-    zai: "openai:gpt-4o-mini"
-  }
-});
+    autonomous: 'openai:gpt-4o',
+    zai: 'openai:gpt-4o-mini',
+  },
+})
 
 // With fallback chain
 export default defineConfig({
   defaultModels: {
-    autonomous: ["openai:gpt-4o", "anthropic:claude-3-5-sonnet"],
-    zai: "openai:gpt-4o-mini"
-  }
-});
+    autonomous: ['openai:gpt-4o', 'anthropic:claude-3-5-sonnet'],
+    zai: 'openai:gpt-4o-mini',
+  },
+})
 ```
 
 **Model format:** `"provider:model-name"`
 
 **Common providers:**
+
 - `openai:gpt-4o`, `openai:gpt-4o-mini`
 - `anthropic:claude-3-5-sonnet`
 - `cerebras:gpt-oss-120b`
@@ -349,72 +354,66 @@ Advanced hooks for controlling AI execution behavior:
 ```typescript
 export type Hooks = {
   onBeforeTool?: (event: {
-    iteration: Iteration;
-    tool: Autonomous.Tool;
-    input: any;
-    controller: AbortController;
-  }) => Promise<{ input?: any; } | void>;
+    iteration: Iteration
+    tool: Autonomous.Tool
+    input: any
+    controller: AbortController
+  }) => Promise<{ input?: any } | void>
 
   onAfterTool?: (event: {
-    iteration: Iteration;
-    tool: Autonomous.Tool;
-    input: any;
-    output: any;
-    controller: AbortController;
-  }) => Promise<{ output?: any; } | void>;
-
-  onBeforeExecution?: (
-    iteration: Iteration,
+    iteration: Iteration
+    tool: Autonomous.Tool
+    input: any
+    output: any
     controller: AbortController
-  ) => Promise<{ code?: string; } | void>;
+  }) => Promise<{ output?: any } | void>
 
-  onExit?: <T = unknown>(result: ExitResult<T>) => Promise<void> | void;
+  onBeforeExecution?: (iteration: Iteration, controller: AbortController) => Promise<{ code?: string } | void>
 
-  onTrace?: (props: { trace: Trace; iteration: number }) => void;
+  onExit?: <T = unknown>(result: ExitResult<T>) => Promise<void> | void
 
-  onIterationEnd?: (
-    iteration: Iteration,
-    controller: IterationController
-  ) => void | Promise<void>;
-};
+  onTrace?: (props: { trace: Trace; iteration: number }) => void
+
+  onIterationEnd?: (iteration: Iteration, controller: IterationController) => void | Promise<void>
+}
 ```
 
 **Example - Logging tool calls:**
 
 ```typescript
 await execute({
-  instructions: "Help the user",
+  instructions: 'Help the user',
   tools: [searchTool, createTicketTool],
   hooks: {
     onBeforeTool: async ({ tool, input }) => {
-      console.log(`Calling tool: ${tool.name}`, input);
+      console.log(`Calling tool: ${tool.name}`, input)
     },
     onAfterTool: async ({ tool, output }) => {
-      console.log(`Tool ${tool.name} returned:`, output);
-    }
-  }
-});
+      console.log(`Tool ${tool.name} returned:`, output)
+    },
+  },
+})
 ```
 
 **Example - Modifying tool inputs:**
 
 ```typescript
 await execute({
-  instructions: "Search for information",
+  instructions: 'Search for information',
   tools: [searchTool],
   hooks: {
     onBeforeTool: async ({ tool, input }) => {
-      if (tool.name === "search") {
+      if (tool.name === 'search') {
         return {
           input: {
             ...input,
-            query: `${input.query} site:docs.example.com`
-          }
-        };
+            query: `${input.query} site:docs.example.com`,
+          },
+        }
       }
-    }
-  }
-});
+    },
+  },
+})
 ```
 
 ### Autonomous.Exit - Structured AI Exits
@@ -422,45 +421,47 @@ await execute({
 Exits provide type-safe, structured ways for AI to return different outcomes:
 
 ```typescript
-import { Autonomous, z } from "@botpress/runtime";
+import { Autonomous, z } from '@botpress/runtime'
 
 const SearchExit = new Autonomous.Exit({
-  name: "search_complete",
-  description: "Search completed successfully",
+  name: 'search_complete',
+  description: 'Search completed successfully',
   schema: z.object({
     results: z.array(z.string()),
-    count: z.number()
-  })
-});
+    count: z.number(),
+  }),
+})
 
 const NoResultsExit = new Autonomous.Exit({
-  name: "no_results",
-  description: "No results found for the query"
-});
+  name: 'no_results',
+  description: 'No results found for the query',
+})
 
 // Use exits in execute()
 const result = await execute({
-  instructions: "Search and return appropriate exit",
-  exits: [SearchExit, NoResultsExit]
-});
+  instructions: 'Search and return appropriate exit',
+  exits: [SearchExit, NoResultsExit],
+})
 
 // Type-safe handling
 if (result.is(SearchExit)) {
-  console.log(`Found ${result.output.count} results`);
+  console.log(`Found ${result.output.count} results`)
 } else if (result.is(NoResultsExit)) {
-  console.log("No results found");
+  console.log('No results found')
 }
 ```
 
 ### Other Autonomous Exports
 
 **Signal Classes:**
+
 ```typescript
-export const ThinkSignal = _ThinkSignal;
-export const SnapshotSignal = _SnapshotSignal;
+export const ThinkSignal = _ThinkSignal
+export const SnapshotSignal = _SnapshotSignal
 ```
 
 **Type Exports:**
+
 ```typescript
 export type Iteration = InstanceType<typeof LlmzIteration>;
 export type ExecuteResult = Awaited<ReturnType<Execute>>;
@@ -483,37 +484,28 @@ export type IterationController = /* controller interface */;
 
 ```typescript
 export default new Autonomous.Tool({
-  name: "createSupportTicket",
-  description: "Create a support ticket for user issues or requests",
+  name: 'createSupportTicket',
+  description: 'Create a support ticket for user issues or requests',
 
   input: z.object({
-    title: z.string()
-      .min(5)
-      .max(100)
-      .describe("Brief ticket title"),
-    description: z.string()
-      .min(10)
-      .max(2000)
-      .describe("Detailed issue description"),
-    priority: z.enum(["low", "medium", "high", "urgent"])
-      .default("medium")
-      .describe("Ticket priority level"),
-    category: z.enum(["bug", "feature", "question", "other"])
-      .describe("Issue category")
+    title: z.string().min(5).max(100).describe('Brief ticket title'),
+    description: z.string().min(10).max(2000).describe('Detailed issue description'),
+    priority: z.enum(['low', 'medium', 'high', 'urgent']).default('medium').describe('Ticket priority level'),
+    category: z.enum(['bug', 'feature', 'question', 'other']).describe('Issue category'),
   }),
 
   output: z.object({
     ticketId: z.string(),
-    url: z.string()
+    url: z.string(),
   }),
 
   handler: async ({ title, description, priority, category }) => {
     // Validate user has permission
-    if (user.tags.tier === "free" && priority === "urgent") {
+    if (user.tags.tier === 'free' && priority === 'urgent') {
       throw new ThinkSignal(
-        "Priority upgrade needed",
-        "Urgent priority is only available for premium users. Would you like to upgrade?"
-      );
+        'Priority upgrade needed',
+        'Urgent priority is only available for premium users. Would you like to upgrade?'
+      )
     }
 
     // Create ticket with context
@@ -523,20 +515,20 @@ export default new Autonomous.Tool({
       priority,
       metadata: {
         userId: user.id,
-        conversationId: conversation?.id
-      }
-    });
+        conversationId: conversation?.id,
+      },
+    })
 
     // Update user state
-    user.state.lastTicketId = ticket.id;
-    user.state.lastTicketCreated = new Date().toISOString();
+    user.state.lastTicketId = ticket.id
+    user.state.lastTicketCreated = new Date().toISOString()
 
     return {
       ticketId: ticket.id,
-      url: `https://support.example.com/ticket/${ticket.id}`
-    };
-  }
-});
+      url: `https://support.example.com/ticket/${ticket.id}`,
+    }
+  },
+})
 ```
 
 ## Troubleshooting

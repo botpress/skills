@@ -5,6 +5,7 @@ Complete reference for every method on the `step` object inside workflow handler
 > **Prerequisites:** See [workflows.md](./workflows.md) for workflow basics — creating workflows, input/output/state schemas, request/notification definitions, instance management, and scheduling. This file covers only the step execution surface.
 
 ## Table of Contents
+
 - [step() — Named Steps](#step--named-steps)
 - [step.request() — Pause for Conversation Data](#steprequest--pause-for-conversation-data)
 - [step.notify() — Send Typed Notifications](#stepnotify--send-typed-notifications)
@@ -40,11 +41,11 @@ step<T>(
 
 ### Parameters
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `name` | `string` | required | Unique identifier within the workflow. Must be stable across executions. |
-| `run` | `({ attempt }) => T \| Promise<T>` | required | Function to execute. Receives current attempt number (0-indexed). |
-| `options.maxAttempts` | `number` | `5` | Maximum retry attempts before the step fails permanently. |
+| Parameter             | Type                               | Default  | Description                                                              |
+| --------------------- | ---------------------------------- | -------- | ------------------------------------------------------------------------ |
+| `name`                | `string`                           | required | Unique identifier within the workflow. Must be stable across executions. |
+| `run`                 | `({ attempt }) => T \| Promise<T>` | required | Function to execute. Receives current attempt number (0-indexed).        |
+| `options.maxAttempts` | `number`                           | `5`      | Maximum retry attempts before the step fails permanently.                |
 
 ### Behavior
 
@@ -62,10 +63,14 @@ const user = await step('fetch-user', async () => {
 })
 
 // Step with retry awareness
-const result = await step('call-api', async ({ attempt }) => {
-  console.log(`Attempt ${attempt}`)
-  return await externalApi.call(input.data)
-}, { maxAttempts: 3 })
+const result = await step(
+  'call-api',
+  async ({ attempt }) => {
+    console.log(`Attempt ${attempt}`)
+    return await externalApi.call(input.data)
+  },
+  { maxAttempts: 3 }
+)
 
 // Nested steps — each sub-step is independently retried and cached
 const processed = await step('process', async () => {
@@ -97,10 +102,10 @@ step.request(
 
 ### Parameters
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `request` | `string` | required | Name of a request type defined in the workflow's `requests` schema. |
-| `message` | `string` | required | Prompt message sent to the conversation as context. |
+| Parameter  | Type     | Default                            | Description                                                                   |
+| ---------- | -------- | ---------------------------------- | ----------------------------------------------------------------------------- |
+| `request`  | `string` | required                           | Name of a request type defined in the workflow's `requests` schema.           |
+| `message`  | `string` | required                           | Prompt message sent to the conversation as context.                           |
 | `stepName` | `string` | defaults to the value of `request` | Custom step name. Required when the same request type is used multiple times. |
 
 ### Behavior
@@ -162,17 +167,10 @@ export const SoftwareRequestWorkflow = new Workflow({
       'collect-justification'
     )
 
-    const manager = await step.request(
-      'text_input',
-      "Who is your manager?",
-      'collect-manager'
-    )
+    const manager = await step.request('text_input', 'Who is your manager?', 'collect-manager')
 
     // Different request type — step name defaults to 'confirmation'
-    const confirmed = await step.request(
-      'confirmation',
-      `Submit request for ${software}?`
-    )
+    const confirmed = await step.request('confirmation', `Submit request for ${software}?`)
 
     if (!confirmed) {
       return { status: 'cancelled', summary: 'Cancelled by user.' }
@@ -191,6 +189,7 @@ export const SoftwareRequestWorkflow = new Workflow({
 ### Step Name Resolution Rules
 
 When `workflow.provide(request, data)` is called without an explicit step name:
+
 1. If exactly one pending step matches the request type, it resolves automatically.
 2. If multiple pending steps match, it throws — you must pass the step name explicitly.
 3. If no pending step matches, it throws.
@@ -215,11 +214,11 @@ step.notify(
 
 ### Parameters
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `notification` | `string` | required | Name of a notification defined in the workflow's `notifications` schema. |
-| `payload` | `object` | required | Payload validated against the notification's Zod schema. |
-| `stepName` | `string` | defaults to the value of `notification` | Custom step name. Required when emitting the same notification multiple times. |
+| Parameter      | Type     | Default                                 | Description                                                                    |
+| -------------- | -------- | --------------------------------------- | ------------------------------------------------------------------------------ |
+| `notification` | `string` | required                                | Name of a notification defined in the workflow's `notifications` schema.       |
+| `payload`      | `object` | required                                | Payload validated against the notification's Zod schema.                       |
+| `stepName`     | `string` | defaults to the value of `notification` | Custom step name. Required when emitting the same notification multiple times. |
 
 ### Behavior
 
@@ -247,24 +246,41 @@ export const TicketReviewWorkflow = new Workflow({
     }),
   },
   async handler({ input, step }) {
-    await step.notify('progress', {
-      phase: 'scanning', reviewed: 0, total: 0,
-      message: `Scanning tickets for ${input.department}...`,
-    }, 'progress-start')
+    await step.notify(
+      'progress',
+      {
+        phase: 'scanning',
+        reviewed: 0,
+        total: 0,
+        message: `Scanning tickets for ${input.department}...`,
+      },
+      'progress-start'
+    )
 
-    const tickets = await step('fetch-tickets', async () => { /* ... */ })
+    const tickets = await step('fetch-tickets', async () => {
+      /* ... */
+    })
 
-    await step.forEach('review-tickets', tickets, async (ticket, { i }) => {
-      // Process ticket...
+    await step.forEach(
+      'review-tickets',
+      tickets,
+      async (ticket, { i }) => {
+        // Process ticket...
 
-      // Each notification needs a unique step name
-      await step.notify('progress', {
-        phase: i + 1 >= tickets.length ? 'complete' : 'reviewing',
-        reviewed: i + 1,
-        total: tickets.length,
-        message: `Reviewed ${i + 1} of ${tickets.length}...`,
-      }, `progress-ticket-${i}`)
-    }, { concurrency: 1 })
+        // Each notification needs a unique step name
+        await step.notify(
+          'progress',
+          {
+            phase: i + 1 >= tickets.length ? 'complete' : 'reviewing',
+            reviewed: i + 1,
+            total: tickets.length,
+            message: `Reviewed ${i + 1} of ${tickets.length}...`,
+          },
+          `progress-ticket-${i}`
+        )
+      },
+      { concurrency: 1 }
+    )
 
     return { reviewed: tickets.length, escalated: 0, summary: '...' }
   },
@@ -309,10 +325,12 @@ step.sleepUntil(name: string, date: Date | string): Promise<void>
 ### Behavior
 
 **step.sleep():**
+
 - For delays >= 10 seconds (or when remaining execution time is insufficient): schedules a `WorkflowContinueEvent` with the specified delay, sets status to `listening`, and aborts. The workflow resumes automatically when the timer fires.
 - For delays < 10 seconds with sufficient execution time: uses an in-memory `setTimeout`. The workflow stays active.
 
 **step.sleepUntil():**
+
 - Computes `ms = targetDate - now - 10s buffer` and delegates to `step.sleep()`.
 - If the date is in the past (or within the 10s buffer), returns immediately.
 
@@ -348,13 +366,13 @@ step.map<T, U>(
 
 ### Parameters
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `name` | `string` | required | Name for the map operation. |
-| `items` | `T[]` | required | Array of items to process. |
-| `run` | `(item, { i }) => Promise<U>` | required | Processing function per item. Receives the item and its index. |
-| `opts.maxAttempts` | `number` | `5` | Max retries per item. |
-| `opts.concurrency` | `number` | `1` | Max parallel item executions. |
+| Parameter          | Type                          | Default  | Description                                                    |
+| ------------------ | ----------------------------- | -------- | -------------------------------------------------------------- |
+| `name`             | `string`                      | required | Name for the map operation.                                    |
+| `items`            | `T[]`                         | required | Array of items to process.                                     |
+| `run`              | `(item, { i }) => Promise<U>` | required | Processing function per item. Receives the item and its index. |
+| `opts.maxAttempts` | `number`                      | `5`      | Max retries per item.                                          |
+| `opts.concurrency` | `number`                      | `1`      | Max parallel item executions.                                  |
 
 ### Behavior
 
@@ -372,13 +390,19 @@ const workflows = await step.map(
   'index-sources',
   kb.sources,
   async (source) => {
-    const workflowId = await step('create-sync-workflow', async () =>
-      await source.syncWorkflow
-        .getOrCreate({ key: `${kbName}:${source.id}`, input: { /* ... */ } })
-        .then((x) => x.id)
+    const workflowId = await step(
+      'create-sync-workflow',
+      async () =>
+        await source.syncWorkflow
+          .getOrCreate({
+            key: `${kbName}:${source.id}`,
+            input: {
+              /* ... */
+            },
+          })
+          .then((x) => x.id)
     )
-    return await step.waitForWorkflow(source.id, workflowId)
-      .then((x) => x.output)
+    return await step.waitForWorkflow(source.id, workflowId).then((x) => x.output)
   },
   { concurrency: 10, maxAttempts: 1 }
 )
@@ -390,12 +414,13 @@ From the directory source — deleting files with concurrency:
 const deleted = await step.map(
   'deleting removed files',
   toRemove,
-  (f) => client.deleteFile({ id: f.id }).then(() => ({
-    file: f.id,
-    name: f.key,
-    hash: f.metadata?.hash || '',
-    size: f.size ?? -1,
-  })),
+  (f) =>
+    client.deleteFile({ id: f.id }).then(() => ({
+      file: f.id,
+      name: f.key,
+      hash: f.metadata?.hash || '',
+      size: f.size ?? -1,
+    })),
   { concurrency: 5 }
 )
 ```
@@ -457,13 +482,13 @@ step.batch<T>(
 
 ### Parameters
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `name` | `string` | required | Name for the batch operation. |
-| `items` | `T[]` | required | Full array of items. |
-| `run` | `(batch, { i }) => Promise<void>` | required | Function receiving a batch slice and the starting index. |
-| `opts.batchSize` | `number` | `20` | Number of items per batch. |
-| `opts.maxAttempts` | `number` | `5` | Max retries per batch. |
+| Parameter          | Type                              | Default  | Description                                              |
+| ------------------ | --------------------------------- | -------- | -------------------------------------------------------- |
+| `name`             | `string`                          | required | Name for the batch operation.                            |
+| `items`            | `T[]`                             | required | Full array of items.                                     |
+| `run`              | `(batch, { i }) => Promise<void>` | required | Function receiving a batch slice and the starting index. |
+| `opts.batchSize`   | `number`                          | `20`     | Number of items per batch.                               |
+| `opts.maxAttempts` | `number`                          | `5`      | Max retries per batch.                                   |
 
 ### Behavior
 
@@ -487,11 +512,11 @@ await step.batch(
 
 ### When to Use batch vs map/forEach
 
-| Use | When |
-|-----|------|
-| `step.batch()` | External API accepts arrays (bulk insert, batch API) |
-| `step.map()` | Need individual results per item, want concurrency |
-| `step.forEach()` | Side effects per item, want concurrency |
+| Use              | When                                                 |
+| ---------------- | ---------------------------------------------------- |
+| `step.batch()`   | External API accepts arrays (bulk insert, batch API) |
+| `step.map()`     | Need individual results per item, want concurrency   |
+| `step.forEach()` | Side effects per item, want concurrency              |
 
 ---
 
@@ -521,11 +546,7 @@ Internally creates three sub-steps: `{name}-key`, `{name}-start`, `{name}-wait`.
 ### Examples
 
 ```typescript
-const result = await step.executeWorkflow(
-  'run-analysis',
-  AnalysisWorkflow,
-  { data: input.rawData }
-)
+const result = await step.executeWorkflow('run-analysis', AnalysisWorkflow, { data: input.rawData })
 // result is typed as AnalysisWorkflow's output
 ```
 
@@ -658,6 +679,7 @@ if (shouldPauseForLater) {
 ### Caching and Idempotency
 
 Every step is identified by its name. When a workflow resumes:
+
 1. Steps that already have a `finishedAt` timestamp return their cached output immediately.
 2. Steps that failed with `maxAttemptsReached` re-throw their stored error.
 3. Only steps that haven't completed yet actually execute their `run` function.
@@ -671,6 +693,7 @@ Failed steps retry with exponential backoff: `min(100ms * e^attempt, 5000ms)`. A
 ### Execution Time Management
 
 The runtime monitors remaining execution time. If less than 10 seconds remain:
+
 - New steps will not start.
 - The workflow enters a brief sleep and then aborts.
 - On next invocation, execution resumes from the last incomplete step.
@@ -724,15 +747,26 @@ export const BulkProcessWorkflow = new Workflow({
     status: z.object({ processed: z.number(), total: z.number() }),
   },
   handler: async ({ input, step }) => {
-    const items = await step('fetch-items', async () => { /* ... */ })
+    const items = await step('fetch-items', async () => {
+      /* ... */
+    })
 
-    await step.forEach('process', items, async (item, { i }) => {
-      await processItem(item)
-      await step.notify('status', {
-        processed: i + 1,
-        total: items.length,
-      }, `status-${i}`)
-    }, { concurrency: 5 })
+    await step.forEach(
+      'process',
+      items,
+      async (item, { i }) => {
+        await processItem(item)
+        await step.notify(
+          'status',
+          {
+            processed: i + 1,
+            total: items.length,
+          },
+          `status-${i}`
+        )
+      },
+      { concurrency: 5 }
+    )
 
     return { total: items.length }
   },
@@ -749,11 +783,7 @@ handler: async ({ input, step }) => {
     'run-children',
     input.tasks,
     async (task) => {
-      return await step.executeWorkflow(
-        `child-${task.id}`,
-        ChildWorkflow,
-        { data: task.data }
-      )
+      return await step.executeWorkflow(`child-${task.id}`, ChildWorkflow, { data: task.data })
     },
     { concurrency: 3 }
   )
@@ -772,11 +802,15 @@ Every step in a workflow must have a unique name that does not change between ex
 ```typescript
 // WRONG — dynamic names break on resume if items change
 for (const item of items) {
-  await step(`process-${item.id}`, async () => { /* ... */ })
+  await step(`process-${item.id}`, async () => {
+    /* ... */
+  })
 }
 
 // CORRECT — use step.map() or step.forEach() for iteration
-await step.map('process-items', items, async (item) => { /* ... */ })
+await step.map('process-items', items, async (item) => {
+  /* ... */
+})
 ```
 
 ### step.request() needs custom stepName for repeated types
@@ -815,7 +849,7 @@ await step.forEach('process', items, async (item, { i }) => {
 
 ```typescript
 step.abort()
-console.log('never printed')  // unreachable
+console.log('never printed') // unreachable
 ```
 
 ### step.fail() reason string becomes the step name
@@ -829,7 +863,9 @@ All work inside a workflow handler should be wrapped in steps. Code between step
 ```typescript
 // WRONG — this runs on every resume
 const processed = heavyComputation(input.data)
-await step('use-result', async () => { /* ... */ })
+await step('use-result', async () => {
+  /* ... */
+})
 
 // CORRECT — wrap in a step
 const processed = await step('compute', async () => {

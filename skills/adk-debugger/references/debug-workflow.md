@@ -30,6 +30,7 @@ adk check --format json
 ```
 
 This catches:
+
 - Invalid `agent.config.ts`
 - Schema mismatches in actions, tools, workflows
 - Invalid entity names
@@ -114,17 +115,23 @@ adk traces conversation=<id> --format json
 Based on what you found in logs and traces, classify the issue:
 
 ### Runtime Error
+
 The code threw an exception or returned an error.
+
 - **Traces show:** `code_execution_exception` or `tool_call` with `success: false`
 - **Next:** See `common-failures.md` for specific patterns and fixes
 
 ### LLM Behavior
+
 The model made a bad decision — wrong tool, hallucinated values, refusal, or looping.
+
 - **Traces show:** `think` span with incorrect reasoning, or `tool_call` with wrong tool/params
 - **Next:** See `llm-debugging.md` for diagnosis and fixes
 
 ### Config Issue
+
 Missing or incorrect configuration — integration auth, agent.json, environment.
+
 - **Traces show:** May not have traces at all, or errors mentioning config/auth
 - **Logs show:** Startup errors, auth failures, missing config warnings
 - **Next:** See `common-failures.md` sections on config, integration failures, and agent.json vs agent.local.json
@@ -135,16 +142,16 @@ Missing or incorrect configuration — integration auth, agent.json, environment
 
 Apply a targeted fix based on the classification:
 
-| Classification | Where to Fix | Reference |
-|---------------|-------------|-----------|
-| Runtime error in handler | Action/tool/workflow handler code | `common-failures.md` |
-| Schema mismatch | Input/output schema definitions | `common-failures.md` § Build Errors |
-| Wrong tool selected | Tool descriptions, instructions | `llm-debugging.md` § Wrong Tool |
-| Hallucinated params | Input schemas, validation | `llm-debugging.md` § Hallucinated Parameters |
-| Model refusal | Instructions, tool descriptions | `llm-debugging.md` § Refusal |
-| Model looping | `onBeforeTool` guard, output clarity | `llm-debugging.md` § Looping |
-| Integration failure | Dev Console config, `adk add` | `common-failures.md` § Integration Failures |
-| Config issue | `agent.json`, `agent.local.json` | `common-failures.md` § Config Confusion |
+| Classification           | Where to Fix                         | Reference                                    |
+| ------------------------ | ------------------------------------ | -------------------------------------------- |
+| Runtime error in handler | Action/tool/workflow handler code    | `common-failures.md`                         |
+| Schema mismatch          | Input/output schema definitions      | `common-failures.md` § Build Errors          |
+| Wrong tool selected      | Tool descriptions, instructions      | `llm-debugging.md` § Wrong Tool              |
+| Hallucinated params      | Input schemas, validation            | `llm-debugging.md` § Hallucinated Parameters |
+| Model refusal            | Instructions, tool descriptions      | `llm-debugging.md` § Refusal                 |
+| Model looping            | `onBeforeTool` guard, output clarity | `llm-debugging.md` § Looping                 |
+| Integration failure      | Dev Console config, `adk add`        | `common-failures.md` § Integration Failures  |
+| Config issue             | `agent.json`, `agent.local.json`     | `common-failures.md` § Config Confusion      |
 
 ---
 
@@ -167,6 +174,7 @@ adk traces --format json
 ```
 
 Check that:
+
 - The bot responds correctly
 - The right tools are called with the right parameters
 - No error spans in the traces
@@ -192,10 +200,7 @@ export default new Eval({
     {
       user: 'the message that triggered the bug',
       assert: {
-        response: [
-          { not_contains: 'error' },
-          { llm_judge: 'Response correctly handles the scenario' },
-        ],
+        response: [{ not_contains: 'error' }, { llm_judge: 'Response correctly handles the scenario' }],
         tools: [{ called: 'expectedTool' }],
       },
     },
@@ -229,6 +234,7 @@ adk traces conversation=<id> --format json > traces.json
 ```
 
 Include:
+
 1. **Reproduction steps** — exact messages/events that trigger the issue
 2. **`adk check` output** — project state
 3. **Error logs** — relevant error entries

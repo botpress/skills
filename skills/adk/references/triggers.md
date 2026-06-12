@@ -9,11 +9,13 @@ Triggers allow your bot to react to events from the bot itself or integrated ser
 ## Basic Concepts
 
 ### What are Triggers?
+
 - **Event handlers**: React to bot or integration events
 - **Automated**: Execute automatically when events occur
 - **Flexible**: Can start workflows, update tables, or perform any action
 
 ### File Location
+
 - **Location**: `src/triggers/*.ts`
 - **Auto-registration**: Files automatically subscribe to specified events
 
@@ -22,21 +24,21 @@ Triggers allow your bot to react to events from the bot itself or integrated ser
 ### Basic Structure
 
 ```typescript
-import { Trigger } from "@botpress/runtime";
+import { Trigger } from '@botpress/runtime'
 
 export default new Trigger({
-  name: "myTrigger",
-  description: "Handles user creation events",
-  events: ["user.created"], // Events to subscribe to
+  name: 'myTrigger',
+  description: 'Handles user creation events',
+  events: ['user.created'], // Events to subscribe to
 
   handler: async ({ event }) => {
-    console.log(event.type); // "user.created"
-    console.log(event.payload); // Event data
+    console.log(event.type) // "user.created"
+    console.log(event.payload) // Event data
 
     // React to the event
-    await handleUserCreated(event.payload);
-  }
-});
+    await handleUserCreated(event.payload)
+  },
+})
 ```
 
 ### Multiple Events
@@ -45,28 +47,24 @@ Subscribe to multiple events in one trigger:
 
 ```typescript
 export default new Trigger({
-  name: "userEvents",
-  description: "Handles all user-related events",
-  events: [
-    "user.created",
-    "user.updated",
-    "user.deleted"
-  ],
+  name: 'userEvents',
+  description: 'Handles all user-related events',
+  events: ['user.created', 'user.updated', 'user.deleted'],
 
   handler: async ({ event }) => {
     switch (event.type) {
-      case "user.created":
-        await handleUserCreated(event.payload);
-        break;
-      case "user.updated":
-        await handleUserUpdated(event.payload);
-        break;
-      case "user.deleted":
-        await handleUserDeleted(event.payload);
-        break;
+      case 'user.created':
+        await handleUserCreated(event.payload)
+        break
+      case 'user.updated':
+        await handleUserUpdated(event.payload)
+        break
+      case 'user.deleted':
+        await handleUserDeleted(event.payload)
+        break
     }
-  }
-});
+  },
+})
 ```
 
 ## Event Types
@@ -77,23 +75,23 @@ Standard events emitted by the bot:
 
 ```typescript
 // User events
-"user.created"          // New user created
-"user.updated"          // User information updated
-"user.deleted"          // User deleted
+'user.created' // New user created
+'user.updated' // User information updated
+'user.deleted' // User deleted
 
 // Conversation events
-"conversation.started"  // New conversation started
-"conversation.ended"    // Conversation ended
-"message.created"       // New message in conversation
+'conversation.started' // New conversation started
+'conversation.ended' // Conversation ended
+'message.created' // New message in conversation
 
 // Workflow events
-"workflow.started"      // Workflow instance started
-"workflow.completed"    // Workflow completed successfully
-"workflow.failed"       // Workflow failed
+'workflow.started' // Workflow instance started
+'workflow.completed' // Workflow completed successfully
+'workflow.failed' // Workflow failed
 
 // Bot lifecycle events
-"bot.started"          // Bot started
-"bot.stopped"          // Bot stopped
+'bot.started' // Bot started
+'bot.stopped' // Bot stopped
 ```
 
 ### Integration Events
@@ -104,35 +102,36 @@ Events from integrated services use the pattern `integrationName:eventName`.
 
 ```typescript
 // Intercom events (real events from vertical-one)
-"intercom:conversationEvent"  // Fires on create/update/delete
-"intercom:contactEvent"       // Contact created/updated
-"intercom:adminEvent"         // Admin changes
+'intercom:conversationEvent' // Fires on create/update/delete
+'intercom:contactEvent' // Contact created/updated
+'intercom:adminEvent' // Admin changes
 
 // Slack events (verified with adk info slack --events)
-"slack:reactionAdded"
-"slack:reactionRemoved"
-"slack:memberJoinedChannel"
-"slack:memberJoinedWorkspace"
-"slack:memberLeftChannel"
-"slack:workflowWebhook"
+'slack:reactionAdded'
+'slack:reactionRemoved'
+'slack:memberJoinedChannel'
+'slack:memberJoinedWorkspace'
+'slack:memberLeftChannel'
+'slack:workflowWebhook'
 
 // Linear events (verified with adk info linear --events)
-"linear:issueCreated"
-"linear:issueUpdated"
-"linear:issueDeleted"
+'linear:issueCreated'
+'linear:issueUpdated'
+'linear:issueDeleted'
 
 // GitHub events (verified with adk info github --events)
-"github:issueOpened"
-"github:pullRequestOpened"
-"github:pullRequestMerged"
-"github:pullRequestReviewSubmitted"
+'github:issueOpened'
+'github:pullRequestOpened'
+'github:pullRequestMerged'
+'github:pullRequestReviewSubmitted'
 
 // Webchat events (verified with adk info webchat --events)
-"webchat:conversationStarted"
-"webchat:trigger"
+'webchat:conversationStarted'
+'webchat:trigger'
 ```
 
 **How to discover events:**
+
 ```bash
 # Search for an integration
 adk search email
@@ -152,28 +151,28 @@ Checking `adk info <integration> --events` confirms the event exists, but it doe
 Common pattern: Start a workflow when an event occurs:
 
 ```typescript
-import { Trigger } from "@botpress/runtime";
-import { OnboardingWorkflow } from "../workflows/onboarding";
+import { Trigger } from '@botpress/runtime'
+import { OnboardingWorkflow } from '../workflows/onboarding'
 
 export default new Trigger({
-  name: "userOnboarding",
-  description: "Start onboarding when user is created",
-  events: ["user.created"],
+  name: 'userOnboarding',
+  description: 'Start onboarding when user is created',
+  events: ['user.created'],
 
   handler: async ({ event }) => {
-    const { userId, email, name } = event.payload;
+    const { userId, email, name } = event.payload
 
     // Start onboarding workflow
     const instance = await OnboardingWorkflow.start({
       userId,
       email,
       name,
-      createdAt: new Date()
-    });
+      createdAt: new Date(),
+    })
 
-    console.log(`Started onboarding for ${userId}: ${instance.id}`);
-  }
-});
+    console.log(`Started onboarding for ${userId}: ${instance.id}`)
+  },
+})
 ```
 
 ### Updating Tables
@@ -181,34 +180,31 @@ export default new Trigger({
 Store event data in tables:
 
 ```typescript
-import { Trigger } from "@botpress/runtime";
-import { EventLogTable } from "../tables/EventLog";
+import { Trigger } from '@botpress/runtime'
+import { EventLogTable } from '../tables/EventLog'
 
 export default new Trigger({
-  name: "eventLogger",
-  description: "Log all events to database",
-  events: [
-    "user.created",
-    "user.updated",
-    "conversation.started",
-    "workflow.completed"
-  ],
+  name: 'eventLogger',
+  description: 'Log all events to database',
+  events: ['user.created', 'user.updated', 'conversation.started', 'workflow.completed'],
 
   handler: async ({ event }) => {
     // Store event in table
     await EventLogTable.createRows({
-      rows: [{
-        type: event.type,
-        payload: event.payload,
-        timestamp: new Date(),
-        metadata: {
-          source: event.source || "bot",
-          version: event.version || "1.0"
-        }
-      }]
-    });
-  }
-});
+      rows: [
+        {
+          type: event.type,
+          payload: event.payload,
+          timestamp: new Date(),
+          metadata: {
+            source: event.source || 'bot',
+            version: event.version || '1.0',
+          },
+        },
+      ],
+    })
+  },
+})
 ```
 
 ### Calling Actions
@@ -216,28 +212,29 @@ export default new Trigger({
 Execute bot actions or integration actions in response to events:
 
 ```typescript
-import { Trigger } from "@botpress/runtime";
-import { actions } from "@botpress/runtime";
+import { Trigger } from '@botpress/runtime'
+import { actions } from '@botpress/runtime'
 
 export default new Trigger({
-  name: "notificationSender",
-  description: "Send email notifications for important events",
-  events: ["workflow.failed", "user.deleted"],
+  name: 'notificationSender',
+  description: 'Send email notifications for important events',
+  events: ['workflow.failed', 'user.deleted'],
 
   handler: async ({ event }) => {
     // Call integration action (e.g., SendGrid)
     // First add the integration: adk add sendgrid
     await actions.sendgrid.sendEmail({
-      to: "admin@example.com",
-      from: "bot@example.com",
+      to: 'admin@example.com',
+      from: 'bot@example.com',
       subject: `Alert: ${event.type}`,
-      content: `Event occurred: ${JSON.stringify(event.payload)}`
-    });
-  }
-});
+      content: `Event occurred: ${JSON.stringify(event.payload)}`,
+    })
+  },
+})
 ```
 
 **Note:** The `actions` object provides access to:
+
 - **Bot actions**: `actions.myAction()` - your custom actions from `src/actions/`
 - **Integration actions**: `actions.integrationName.actionName()` - actions from installed integrations
 
@@ -248,42 +245,33 @@ export default new Trigger({
 Real-world example from vertical-one bot:
 
 ```typescript
-import { Trigger } from "@botpress/runtime";
-import {
-  syncSingleConversation,
-  deleteConversation,
-} from "../utils/syncConversation";
+import { Trigger } from '@botpress/runtime'
+import { syncSingleConversation, deleteConversation } from '../utils/syncConversation'
 
 export default new Trigger({
-  name: "onIntercomUpdate",
-  description:
-    "Updates the Intercom tables in realtime when conversations are created or messages are sent",
-  events: ["intercom:conversationEvent"],
+  name: 'onIntercomUpdate',
+  description: 'Updates the Intercom tables in realtime when conversations are created or messages are sent',
+  events: ['intercom:conversationEvent'],
 
   handler: async ({ event }) => {
-    const { eventType, conversationId } = event.payload;
+    const { eventType, conversationId } = event.payload
 
-    console.log(
-      `Intercom event: ${eventType} for conversation ${conversationId}`
-    );
+    console.log(`Intercom event: ${eventType} for conversation ${conversationId}`)
 
     try {
-      if (eventType === "deleted") {
+      if (eventType === 'deleted') {
         // Delete the conversation and its messages
-        await deleteConversation(conversationId);
+        await deleteConversation(conversationId)
       } else {
         // Sync the conversation with all its data
-        await syncSingleConversation(conversationId);
+        await syncSingleConversation(conversationId)
       }
     } catch (error) {
-      console.error(
-        `Failed to handle ${eventType} event for conversation ${conversationId}:`,
-        error
-      );
-      throw error;
+      console.error(`Failed to handle ${eventType} event for conversation ${conversationId}:`, error)
+      throw error
     }
   },
-});
+})
 ```
 
 ### Linear Integration
@@ -291,95 +279,96 @@ export default new Trigger({
 Real example from ADK source code:
 
 ```typescript
-import { Trigger } from "@botpress/runtime";
-import { LinearIssueTable } from "../tables/LinearIssues";
+import { Trigger } from '@botpress/runtime'
+import { LinearIssueTable } from '../tables/LinearIssues'
 
 export default new Trigger({
-  name: "onLinearIssueUpdate",
-  description: "Updates the Linear Issue Table when issues change",
-  events: [
-    "linear:issueCreated",
-    "linear:issueUpdated",
-    "linear:issueDeleted"
-  ],
+  name: 'onLinearIssueUpdate',
+  description: 'Updates the Linear Issue Table when issues change',
+  events: ['linear:issueCreated', 'linear:issueUpdated', 'linear:issueDeleted'],
 
   handler: async ({ event }) => {
-    if (event.type === "linear:issueDeleted") {
+    if (event.type === 'linear:issueDeleted') {
       await LinearIssueTable.deleteRows({
-        linearId: event.payload.id
-      });
-    } else if (event.type === "linear:issueCreated") {
+        linearId: event.payload.id,
+      })
+    } else if (event.type === 'linear:issueCreated') {
       await LinearIssueTable.createRows({
-        rows: [{
-          linearId: event.payload.linearIds?.issueId,
-          content: `# ${event.payload.title}\n\n${event.payload.description}`,
-          issue: event.payload,
-          linearUpdatedAt: event.payload.updatedAt
-        }]
-      });
-    } else if (event.type === "linear:issueUpdated") {
+        rows: [
+          {
+            linearId: event.payload.linearIds?.issueId,
+            content: `# ${event.payload.title}\n\n${event.payload.description}`,
+            issue: event.payload,
+            linearUpdatedAt: event.payload.updatedAt,
+          },
+        ],
+      })
+    } else if (event.type === 'linear:issueUpdated') {
       await LinearIssueTable.upsertRows({
-        rows: [{
-          linearId: event.payload.linearIds?.issueId,
-          content: `# ${event.payload.title}\n\n${event.payload.description}`,
-          issue: event.payload,
-          linearUpdatedAt: event.payload.updatedAt
-        }],
-        keyColumn: "linearId"
-      });
+        rows: [
+          {
+            linearId: event.payload.linearIds?.issueId,
+            content: `# ${event.payload.title}\n\n${event.payload.description}`,
+            issue: event.payload,
+            linearUpdatedAt: event.payload.updatedAt,
+          },
+        ],
+        keyColumn: 'linearId',
+      })
     }
-  }
-});
+  },
+})
 ```
 
 ### Slack Integration
 
 ```typescript
-import { Trigger } from "@botpress/runtime";
-import { SlackActivityTable } from "../tables/SlackActivity";
+import { Trigger } from '@botpress/runtime'
+import { SlackActivityTable } from '../tables/SlackActivity'
 
 export default new Trigger({
-  name: "slackActivityMonitor",
-  description: "Monitor Slack reactions and member activity",
-  events: [
-    "slack:reactionAdded",
-    "slack:memberJoinedChannel"
-  ],
+  name: 'slackActivityMonitor',
+  description: 'Monitor Slack reactions and member activity',
+  events: ['slack:reactionAdded', 'slack:memberJoinedChannel'],
 
   handler: async ({ event }) => {
-    if (event.type === "slack:reactionAdded") {
-      const { reaction, user, item } = event.payload;
+    if (event.type === 'slack:reactionAdded') {
+      const { reaction, user, item } = event.payload
 
       // Log important reactions to table
-      if (reaction === "fire" || reaction === "star" || reaction === "eyes") {
+      if (reaction === 'fire' || reaction === 'star' || reaction === 'eyes') {
         await SlackActivityTable.createRows({
-          rows: [{
-            type: "reaction",
-            reaction: reaction,
-            user: user,
-            messageId: item.ts,
-            channelId: item.channel,
-            timestamp: new Date()
-          }]
-        });
+          rows: [
+            {
+              type: 'reaction',
+              reaction: reaction,
+              user: user,
+              messageId: item.ts,
+              channelId: item.channel,
+              timestamp: new Date(),
+            },
+          ],
+        })
       }
     }
 
-    if (event.type === "slack:memberJoinedChannel") {
-      const { user, channel } = event.payload;
+    if (event.type === 'slack:memberJoinedChannel') {
+      const { user, channel } = event.payload
 
       // Log new member joins
       await SlackActivityTable.createRows({
-        rows: [{
-          type: "member_join",
-          user: user,
-          channelId: channel,
-          timestamp: new Date()
-        }]
-      });
+        rows: [
+          {
+            type: 'member_join',
+            user: user,
+            channelId: channel,
+            timestamp: new Date(),
+          },
+        ],
+      })
     }
-  }
-});
+  },
+})
 ```
 
 ## Advanced Patterns
@@ -390,31 +379,31 @@ Process events based on conditions:
 
 ```typescript
 export default new Trigger({
-  name: "conditionalProcessor",
-  events: ["user.created"],
+  name: 'conditionalProcessor',
+  events: ['user.created'],
 
   handler: async ({ event }) => {
-    const { email, source, metadata } = event.payload;
+    const { email, source, metadata } = event.payload
 
     // Only process certain users
-    if (!email.endsWith("@company.com")) {
-      console.log("Skipping external user");
-      return;
+    if (!email.endsWith('@company.com')) {
+      console.log('Skipping external user')
+      return
     }
 
     // Different handling based on source
-    if (source === "api") {
-      await handleApiUser(event.payload);
-    } else if (source === "signup") {
-      await handleSignupUser(event.payload);
+    if (source === 'api') {
+      await handleApiUser(event.payload)
+    } else if (source === 'signup') {
+      await handleSignupUser(event.payload)
     }
 
     // Check metadata flags
     if (metadata?.requiresApproval) {
-      await startApprovalWorkflow(event.payload);
+      await startApprovalWorkflow(event.payload)
     }
-  }
-});
+  },
+})
 ```
 
 ### Event Aggregation
@@ -422,43 +411,45 @@ export default new Trigger({
 Collect and batch process events:
 
 ```typescript
-import { Trigger } from "@botpress/runtime";
-import { EventBatchTable } from "../tables/EventBatch";
+import { Trigger } from '@botpress/runtime'
+import { EventBatchTable } from '../tables/EventBatch'
 
 export default new Trigger({
-  name: "eventAggregator",
-  events: ["metrics.recorded"],
+  name: 'eventAggregator',
+  events: ['metrics.recorded'],
 
   handler: async ({ event }) => {
     // Store event for batching
     await EventBatchTable.createRows({
-      rows: [{
-        type: event.type,
-        data: event.payload,
-        processed: false,
-        timestamp: new Date()
-      }]
-    });
+      rows: [
+        {
+          type: event.type,
+          data: event.payload,
+          processed: false,
+          timestamp: new Date(),
+        },
+      ],
+    })
 
     // Check if we should process batch
     const { rows } = await EventBatchTable.findRows({
       where: { processed: false },
-      limit: 100
-    });
+      limit: 100,
+    })
 
     if (rows.length >= 100) {
       // Process batch
-      await processBatch(rows);
+      await processBatch(rows)
 
       // Mark as processed
-      const ids = rows.map(r => r.id);
+      const ids = rows.map((r) => r.id)
       await EventBatchTable.updateRows({
         where: { id: { $in: ids } },
-        updates: { processed: true }
-      });
+        updates: { processed: true },
+      })
     }
-  }
-});
+  },
+})
 ```
 
 ### Workflow Orchestration
@@ -467,39 +458,39 @@ Chain workflows based on events:
 
 ```typescript
 export default new Trigger({
-  name: "workflowOrchestrator",
-  events: ["workflow.completed"],
+  name: 'workflowOrchestrator',
+  events: ['workflow.completed'],
 
   handler: async ({ event }) => {
-    const { workflowName, output } = event.payload;
+    const { workflowName, output } = event.payload
 
     // Chain workflows based on completion
     switch (workflowName) {
-      case "dataCollection":
+      case 'dataCollection':
         // Start processing workflow
         await ProcessingWorkflow.start({
-          data: output.collectedData
-        });
-        break;
+          data: output.collectedData,
+        })
+        break
 
-      case "processing":
+      case 'processing':
         // Start validation workflow
         await ValidationWorkflow.start({
-          processedData: output.result
-        });
-        break;
+          processedData: output.result,
+        })
+        break
 
-      case "validation":
+      case 'validation':
         // Start final reporting workflow
         if (output.isValid) {
           await ReportingWorkflow.start({
-            data: output.validatedData
-          });
+            data: output.validatedData,
+          })
         }
-        break;
+        break
     }
-  }
-});
+  },
+})
 ```
 
 ### Error Recovery
@@ -508,78 +499,87 @@ Handle failed events:
 
 ```typescript
 export default new Trigger({
-  name: "errorRecovery",
-  events: ["workflow.failed", "integration:error"],
+  name: 'errorRecovery',
+  events: ['workflow.failed', 'integration:error'],
 
   handler: async ({ event }) => {
-    const { error, context, retryCount = 0 } = event.payload;
+    const { error, context, retryCount = 0 } = event.payload
 
     // Log error
     await ErrorLogTable.createRows({
-      rows: [{
-        type: event.type,
-        error: error.message,
-        stack: error.stack,
-        context,
-        timestamp: new Date()
-      }]
-    });
+      rows: [
+        {
+          type: event.type,
+          error: error.message,
+          stack: error.stack,
+          context,
+          timestamp: new Date(),
+        },
+      ],
+    })
 
     // Attempt recovery
     if (retryCount < 3) {
       // Retry with backoff
-      setTimeout(async () => {
-        await RetryWorkflow.start({
-          originalEvent: event,
-          retryCount: retryCount + 1
-        });
-      }, Math.pow(2, retryCount) * 1000);
+      setTimeout(
+        async () => {
+          await RetryWorkflow.start({
+            originalEvent: event,
+            retryCount: retryCount + 1,
+          })
+        },
+        Math.pow(2, retryCount) * 1000
+      )
     } else {
       // Send alert after max retries
       await actions.sendAlert({
-        severity: "critical",
-        title: "Max retries exceeded",
-        details: { event, error }
-      });
+        severity: 'critical',
+        title: 'Max retries exceeded',
+        details: { event, error },
+      })
     }
-  }
-});
+  },
+})
 ```
 
 ## Best Practices
 
 ### 1. Use Descriptive Names
+
 ```typescript
 // ✅ Good
 export default new Trigger({
-  name: "linearIssueSync",
-  description: "Syncs Linear issues to internal tracking"
-});
+  name: 'linearIssueSync',
+  description: 'Syncs Linear issues to internal tracking',
+})
 
 // ❌ Bad
 export default new Trigger({
-  name: "trigger1",
-  description: "Does stuff"
-});
+  name: 'trigger1',
+  description: 'Does stuff',
+})
 ```
 
 ### 2. Handle Errors Gracefully
+
 ```typescript
 handler: async ({ event }) => {
   try {
-    await processEvent(event);
+    await processEvent(event)
   } catch (error) {
-    console.error(`Failed to process ${event.type}:`, error);
+    console.error(`Failed to process ${event.type}:`, error)
 
     // Store error for debugging
     await ErrorTable.createRows({
-      rows: [{
-        trigger: "myTrigger",
-        event: event.type,
-        error: error.message,
-        timestamp: new Date()
-      }]
-    });
+      rows: [
+        {
+          trigger: 'myTrigger',
+          event: event.type,
+          error: error.message,
+          timestamp: new Date(),
+        },
+      ],
+    })
 
     // Don't re-throw unless you want to retry
   }
@@ -587,12 +587,13 @@ handler: async ({ event }) => {
 ```
 
 ### 3. Avoid Heavy Processing
+
 ```typescript
 handler: async ({ event }) => {
   // ✅ Good: Start async workflow
   await HeavyProcessingWorkflow.start({
-    eventData: event.payload
-  });
+    eventData: event.payload,
+  })
 
   // ❌ Bad: Long-running synchronous processing
   // const result = await performHeavyComputation(event.payload);
@@ -600,34 +601,33 @@ handler: async ({ event }) => {
 ```
 
 ### 4. Use Event Patterns
+
 ```typescript
 // Group related events from multiple integrations
 export default new Trigger({
-  name: "issueTracker",
-  events: [
-    "linear:issueCreated",
-    "linear:issueUpdated",
-    "github:issueOpened",
-    "github:pullRequestOpened"
-  ],
+  name: 'issueTracker',
+  events: ['linear:issueCreated', 'linear:issueUpdated', 'github:issueOpened', 'github:pullRequestOpened'],
 
   handler: async ({ event }) => {
-    const [integration, action] = event.type.split(":");
+    const [integration, action] = event.type.split(':')
 
     // Common processing for all issue-related events
     await IssueTrackingTable.createRows({
-      rows: [{
-        source: integration,
-        eventType: action,
-        data: event.payload,
-        timestamp: new Date()
-      }]
-    });
-  }
-});
+      rows: [
+        {
+          source: integration,
+          eventType: action,
+          data: event.payload,
+          timestamp: new Date(),
+        },
+      ],
+    })
+  },
+})
 ```
 
 ### 5. Document Event Payloads
+
 ```typescript
 /**
  * Handles user creation events
@@ -642,78 +642,73 @@ export default new Trigger({
  * }
  */
 export default new Trigger({
-  name: "userCreatedHandler",
-  events: ["user.created"],
+  name: 'userCreatedHandler',
+  events: ['user.created'],
 
   handler: async ({ event }) => {
-    const { userId, email, name, source } = event.payload;
+    const { userId, email, name, source } = event.payload
     // Process with confidence in payload structure
-  }
-});
+  },
+})
 ```
 
 ## Common Patterns
 
 ### Audit Trail
+
 ```typescript
 export default new Trigger({
-  name: "auditTrail",
-  events: [
-    "user.created",
-    "user.updated",
-    "user.deleted",
-    "conversation.started"
-  ],
+  name: 'auditTrail',
+  events: ['user.created', 'user.updated', 'user.deleted', 'conversation.started'],
 
   handler: async ({ event }) => {
     await AuditTable.createRows({
-      rows: [{
-        eventType: event.type,
-        payload: event.payload,
-        userId: event.payload.userId || event.userId,
-        timestamp: new Date()
-      }]
-    });
-  }
-});
+      rows: [
+        {
+          eventType: event.type,
+          payload: event.payload,
+          userId: event.payload.userId || event.userId,
+          timestamp: new Date(),
+        },
+      ],
+    })
+  },
+})
 ```
 
 ### Notification System
+
 ```typescript
 export default new Trigger({
-  name: "notifications",
-  events: [
-    "workflow.failed",
-    "user.deleted",
-    "integration:error"
-  ],
+  name: 'notifications',
+  events: ['workflow.failed', 'user.deleted', 'integration:error'],
 
   handler: async ({ event }) => {
     const notifications = {
-      "workflow.failed": {
-        channel: "slack",
-        priority: "high",
-        template: "workflow-failure"
+      'workflow.failed': {
+        channel: 'slack',
+        priority: 'high',
+        template: 'workflow-failure',
       },
-      "user.deleted": {
-        channel: "email",
-        priority: "normal",
-        template: "user-deleted"
+      'user.deleted': {
+        channel: 'email',
+        priority: 'normal',
+        template: 'user-deleted',
       },
-      "integration:error": {
-        channel: "pagerduty",
-        priority: "critical",
-        template: "integration-error"
-      }
-    };
+      'integration:error': {
+        channel: 'pagerduty',
+        priority: 'critical',
+        template: 'integration-error',
+      },
+    }
 
-    const config = notifications[event.type];
+    const config = notifications[event.type]
     if (config) {
       await actions.sendNotification({
         ...config,
-        data: event.payload
-      });
+        data: event.payload,
+      })
     }
-  }
-});
+  },
+})
 ```

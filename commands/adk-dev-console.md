@@ -1,7 +1,7 @@
 ---
 name: adk-dev-console
 description: Explain ADK Dev Console features, tabs, and UI concepts
-argument-hint: "[UI concept, tab name, or question]"
+argument-hint: '[UI concept, tab name, or question]'
 ---
 
 Load the `adk-dev-console` skill, then answer the user's question about **$ARGUMENTS** immediately.

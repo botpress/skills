@@ -19,7 +19,7 @@ adk traces conversation=<id> --include-llm --format json
 adk traces --include-llm --format json
 ```
 
-**Always pass `--include-llm`** when summarizing. Without it, `think` spans are omitted and you lose the model's reasoning, which is essential for explaining *why* the agent did what it did.
+**Always pass `--include-llm`** when summarizing. Without it, `think` spans are omitted and you lose the model's reasoning, which is essential for explaining _why_ the agent did what it did.
 
 **Always pass `--format json`** for structured, parseable output.
 
@@ -53,17 +53,17 @@ handler.conversation (or handler.workflow, handler.action)
 
 ### Key fields per span type
 
-| Span Type | Fields to Read | What They Tell You |
-|-----------|---------------|-------------------|
-| `handler.conversation` | `context.conversationId`, `context.userId` | What triggered the trace (incoming message) |
-| `handler.workflow` | `name`, `context` | Which workflow was invoked |
-| `handler.action` | `name`, `context` | Which action was called |
-| `autonomous.iteration` | `data.iterationIndex` | Which LLM turn this is (0-indexed) |
-| `cognitive.request` | `data.model`, `data.tokens` | Which model was used, token counts |
-| `think` | `data.content` | The LLM's reasoning -- why it chose an action |
-| `tool_call` | `data.tool_name`, `data.input`, `data.output`, `status`, `data.error` | What tool was called, with what, and what happened |
-| `code_execution_exception` | `data.message`, `data.stackTrace` | Runtime error in the LLMz sandbox |
-| `end` | `data.response` | What the agent said back to the user |
+| Span Type                  | Fields to Read                                                        | What They Tell You                                 |
+| -------------------------- | --------------------------------------------------------------------- | -------------------------------------------------- |
+| `handler.conversation`     | `context.conversationId`, `context.userId`                            | What triggered the trace (incoming message)        |
+| `handler.workflow`         | `name`, `context`                                                     | Which workflow was invoked                         |
+| `handler.action`           | `name`, `context`                                                     | Which action was called                            |
+| `autonomous.iteration`     | `data.iterationIndex`                                                 | Which LLM turn this is (0-indexed)                 |
+| `cognitive.request`        | `data.model`, `data.tokens`                                           | Which model was used, token counts                 |
+| `think`                    | `data.content`                                                        | The LLM's reasoning -- why it chose an action      |
+| `tool_call`                | `data.tool_name`, `data.input`, `data.output`, `status`, `data.error` | What tool was called, with what, and what happened |
+| `code_execution_exception` | `data.message`, `data.stackTrace`                                     | Runtime error in the LLMz sandbox                  |
+| `end`                      | `data.response`                                                       | What the agent said back to the user               |
 
 ---
 
@@ -89,12 +89,12 @@ Do **not** use a fixed template. Write a natural-language narrative that reads l
 
 The summary depth should match what the developer is asking:
 
-| Developer Question | Summary Depth |
-|-------------------|---------------|
-| "What happened?" / "Summarize this trace" | **Brief** -- 3-5 sentences covering trigger, actions taken, outcome |
-| "Why did it do X?" / "Why did the bot call tool Y?" | **Focused** -- Zoom into the relevant `think` span and the tool call, explain the reasoning chain |
-| "What went wrong?" / "Why did this fail?" | **Diagnostic** -- Focus on the error path: what led to the failure, what the error was, whether recovery was attempted |
-| "Walk me through the whole trace" | **Detailed** -- Full chronological narrative covering every iteration and tool call |
+| Developer Question                                  | Summary Depth                                                                                                          |
+| --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| "What happened?" / "Summarize this trace"           | **Brief** -- 3-5 sentences covering trigger, actions taken, outcome                                                    |
+| "Why did it do X?" / "Why did the bot call tool Y?" | **Focused** -- Zoom into the relevant `think` span and the tool call, explain the reasoning chain                      |
+| "What went wrong?" / "Why did this fail?"           | **Diagnostic** -- Focus on the error path: what led to the failure, what the error was, whether recovery was attempted |
+| "Walk me through the whole trace"                   | **Detailed** -- Full chronological narrative covering every iteration and tool call                                    |
 
 ---
 

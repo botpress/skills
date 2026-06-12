@@ -6,14 +6,14 @@ Traces and logs are the primary debugging interface for ADK agents. Every conver
 
 Most commands support `--format json` for structured output — **always use it** when consuming output programmatically. The exception is `adk dev`, which has no `--format` flag: use `adk dev --non-interactive` to get a structured NDJSON event stream instead.
 
-| Command | Purpose | Options / tokens |
-|---------|---------|-----------------|
-| `adk check --format json` | Offline project validation — catches config/schema issues before runtime | — |
-| `adk logs --format json` | Browse or stream log entries | `--follow`, `--summary`, level filters (`error`, `warning`) |
-| `adk traces --format json` | Query traces with span details — filter by workflow, action, trigger, conversation, error, time | `workflow=`, `action=`, `trigger=`, `conversation=`, `trace=`, `error`, `since=`, `until=`, `limit=`, `--follow`, `--include-llm` |
-| `adk workflows runs --format json` | List or inspect durable workflow runs by id, name, or status | `name=`, `status=`, `limit=`, `nextToken=`, `<wrkflow_id>` |
-| `adk chat --single "msg" --format json` | Send a test message and get structured response | `--conversation-id` |
-| `adk dev --non-interactive` | Start dev server with structured NDJSON event stream (no TUI) | — |
+| Command                                 | Purpose                                                                                         | Options / tokens                                                                                                                  |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `adk check --format json`               | Offline project validation — catches config/schema issues before runtime                        | —                                                                                                                                 |
+| `adk logs --format json`                | Browse or stream log entries                                                                    | `--follow`, `--summary`, level filters (`error`, `warning`)                                                                       |
+| `adk traces --format json`              | Query traces with span details — filter by workflow, action, trigger, conversation, error, time | `workflow=`, `action=`, `trigger=`, `conversation=`, `trace=`, `error`, `since=`, `until=`, `limit=`, `--follow`, `--include-llm` |
+| `adk workflows runs --format json`      | List or inspect durable workflow runs by id, name, or status                                    | `name=`, `status=`, `limit=`, `nextToken=`, `<wrkflow_id>`                                                                        |
+| `adk chat --single "msg" --format json` | Send a test message and get structured response                                                 | `--conversation-id`                                                                                                               |
+| `adk dev --non-interactive`             | Start dev server with structured NDJSON event stream (no TUI)                                   | —                                                                                                                                 |
 
 ## Querying Logs
 
@@ -64,12 +64,12 @@ A trace represents one unit of agent activity. Each trace contains:
 
 Spans are the atomic units inside a trace. Each span has a `type` field:
 
-| Span Type | Key Fields | What It Means |
-|-----------|-----------|---------------|
-| `tool_call` | `tool_name`, `input`, `output`, `success`, `error` | A tool was invoked. Check `success` to see if it worked. |
-| `code_execution_exception` | `message`, `stackTrace` | Code error in the LLMz sandbox. Read `stackTrace` to find the source. |
-| `think` | `content` | LLM reasoning step — shows why the model made a decision. |
-| `end` | — | Conversation turn completed. |
+| Span Type                  | Key Fields                                         | What It Means                                                         |
+| -------------------------- | -------------------------------------------------- | --------------------------------------------------------------------- |
+| `tool_call`                | `tool_name`, `input`, `output`, `success`, `error` | A tool was invoked. Check `success` to see if it worked.              |
+| `code_execution_exception` | `message`, `stackTrace`                            | Code error in the LLMz sandbox. Read `stackTrace` to find the source. |
+| `think`                    | `content`                                          | LLM reasoning step — shows why the model made a decision.             |
+| `end`                      | —                                                  | Conversation turn completed.                                          |
 
 ### Reading a Trace
 
@@ -103,101 +103,101 @@ For monitoring traces in code, use the `onTrace` hook in conversation handlers. 
 
 ```typescript
 // src/conversations/extensions/logging.ts
-import { Autonomous } from "@botpress/runtime";
+import { Autonomous } from '@botpress/runtime'
 
-export const onTraceLogging: Autonomous.Hooks["onTrace"] = ({ trace, iteration }) => {
-  if (trace.type === "code_execution_exception") {
-    console.error(`Code Execution Error: ${trace.message}`, trace.stackTrace);
+export const onTraceLogging: Autonomous.Hooks['onTrace'] = ({ trace, iteration }) => {
+  if (trace.type === 'code_execution_exception') {
+    console.error(`Code Execution Error: ${trace.message}`, trace.stackTrace)
   }
 
-  if (trace.type === "tool_call" && !trace.success) {
+  if (trace.type === 'tool_call' && !trace.success) {
     console.error(
       `Error during tool call to "${trace.tool_name}" with input "${JSON.stringify(trace.input)}":`,
       trace.error
-    );
+    )
   }
-};
+}
 ```
 
 ### Comprehensive Trace Logging
 
 ```typescript
-export const onTraceLogging: Autonomous.Hooks["onTrace"] = ({ trace, iteration }) => {
+export const onTraceLogging: Autonomous.Hooks['onTrace'] = ({ trace, iteration }) => {
   switch (trace.type) {
-    case "code_execution_exception":
-      console.error(`[CODE ERROR] ${trace.message}`, trace.stackTrace);
-      break;
-    case "tool_call":
+    case 'code_execution_exception':
+      console.error(`[CODE ERROR] ${trace.message}`, trace.stackTrace)
+      break
+    case 'tool_call':
       if (trace.success) {
-        console.log(`[TOOL SUCCESS] ${trace.tool_name}`, trace.output);
+        console.log(`[TOOL SUCCESS] ${trace.tool_name}`, trace.output)
       } else {
-        console.error(`[TOOL ERROR] ${trace.tool_name}`, trace.error);
+        console.error(`[TOOL ERROR] ${trace.tool_name}`, trace.error)
       }
-      break;
-    case "think":
-      console.debug(`[THINK] ${trace.content}`);
-      break;
+      break
+    case 'think':
+      console.debug(`[THINK] ${trace.content}`)
+      break
     default:
-      console.log(`[TRACE] ${trace.type}`, trace);
+      console.log(`[TRACE] ${trace.type}`, trace)
   }
-};
+}
 ```
 
 ### Using in a Conversation
 
 ```typescript
-import { Conversation } from "@botpress/runtime";
-import { onTraceLogging } from "./extensions/logging";
+import { Conversation } from '@botpress/runtime'
+import { onTraceLogging } from './extensions/logging'
 
 export default new Conversation({
-  channel: "*",
+  channel: '*',
   handler: async ({ execute }) => {
     await execute({
       instructions: `You are a helpful assistant...`,
       hooks: {
         onTrace: (props) => onTraceLogging!(props),
       },
-    });
+    })
   },
-});
+})
 ```
 
 ### Performance Monitoring
 
 ```typescript
 export const makePerformanceMonitor = () => {
-  const startTime = Date.now();
-  const toolStartTimes = new Map<string, number>();
-  const toolMetrics = new Map<string, number[]>();
+  const startTime = Date.now()
+  const toolStartTimes = new Map<string, number>()
+  const toolMetrics = new Map<string, number[]>()
 
-  const onBeforeTool: Autonomous.Hooks["onBeforeTool"] = async ({ tool }) => {
-    toolStartTimes.set(tool.name, Date.now());
-  };
+  const onBeforeTool: Autonomous.Hooks['onBeforeTool'] = async ({ tool }) => {
+    toolStartTimes.set(tool.name, Date.now())
+  }
 
-  const onAfterTool: Autonomous.Hooks["onAfterTool"] = async ({ tool }) => {
-    const start = toolStartTimes.get(tool.name);
-    const duration = start ? Date.now() - start : 0;
-    const metrics = toolMetrics.get(tool.name) || [];
-    metrics.push(duration);
-    toolMetrics.set(tool.name, metrics);
-    console.log(`[PERF] ${tool.name}: ${duration}ms`);
-  };
+  const onAfterTool: Autonomous.Hooks['onAfterTool'] = async ({ tool }) => {
+    const start = toolStartTimes.get(tool.name)
+    const duration = start ? Date.now() - start : 0
+    const metrics = toolMetrics.get(tool.name) || []
+    metrics.push(duration)
+    toolMetrics.set(tool.name, metrics)
+    console.log(`[PERF] ${tool.name}: ${duration}ms`)
+  }
 
-  const onTrace: Autonomous.Hooks["onTrace"] = ({ trace }) => {
-    if (trace.type === "end") {
-      console.log(`[PERF] Total conversation: ${Date.now() - startTime}ms`);
-      console.log(`[PERF] Tool metrics:`, Object.fromEntries(toolMetrics));
+  const onTrace: Autonomous.Hooks['onTrace'] = ({ trace }) => {
+    if (trace.type === 'end') {
+      console.log(`[PERF] Total conversation: ${Date.now() - startTime}ms`)
+      console.log(`[PERF] Tool metrics:`, Object.fromEntries(toolMetrics))
     }
-  };
+  }
 
-  return { onBeforeTool, onAfterTool, onTrace };
-};
+  return { onBeforeTool, onAfterTool, onTrace }
+}
 ```
 
 ### Hook Reference
 
-| Hook | Parameters | When It Fires |
-|------|-----------|--------------|
+| Hook           | Parameters                               | When It Fires         |
+| -------------- | ---------------------------------------- | --------------------- |
 | `onBeforeTool` | `{ iteration, tool, input, controller }` | Before each tool call |
-| `onAfterTool` | `{ tool, output }` | After each tool call |
-| `onTrace` | `{ trace, iteration }` | On every trace event |
+| `onAfterTool`  | `{ tool, output }`                       | After each tool call  |
+| `onTrace`      | `{ trace, iteration }`                   | On every trace event  |

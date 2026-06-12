@@ -32,43 +32,43 @@ Tables provide structured data storage with automatic schema management, CRUD op
 ```typescript
 // ✅ CORRECT
 export const UsersTable = new Table({
-  name: "UsersTable",
+  name: 'UsersTable',
   columns: {
     // No id field - it's automatic!
     name: z.string(),
     email: z.string(),
   },
-});
+})
 
 // ❌ WRONG - id is defined (will fail!)
 export const Users = new Table({
   // Also missing "Table" suffix on variable name
-  name: "UsersTable",
+  name: 'UsersTable',
   columns: {
     id: z.string(), // ❌ Don't define id!
     name: z.string(),
   },
-});
+})
 ```
 
 ### Basic Table Structure
 
 ```typescript
-import { Table, z } from "@botpress/runtime";
+import { Table, z } from '@botpress/runtime'
 
 export const UsersTable = new Table({
-  name: "UsersTable",
-  description: "Stores user information",
+  name: 'UsersTable',
+  description: 'Stores user information',
 
   columns: {
     // Note: id is NOT defined - it's automatic!
     name: z.string(),
     email: z.string().email(),
-    role: z.enum(["admin", "user", "guest"]),
+    role: z.enum(['admin', 'user', 'guest']),
     createdAt: z.date(),
     metadata: z.object({}).passthrough(), // Flexible object
   },
-});
+})
 ```
 
 ### Table with Key Column and Tags
@@ -76,20 +76,20 @@ export const UsersTable = new Table({
 Use `keyColumn` to document the logical key for the table and `tags` for table metadata:
 
 ```typescript
-import { Table, z } from "@botpress/runtime";
+import { Table, z } from '@botpress/runtime'
 
 export const ExternalUsersTable = new Table({
-  name: "ExternalUsersTable",
-  description: "Users synced from external system",
+  name: 'ExternalUsersTable',
+  description: 'Users synced from external system',
 
   // Key column for upsert operations - must be a column name
-  keyColumn: "externalId",
+  keyColumn: 'externalId',
 
   // Tags for table metadata (key-value pairs)
   tags: {
-    source: "salesforce",
-    syncType: "incremental",
-    version: "2.0"
+    source: 'salesforce',
+    syncType: 'incremental',
+    version: '2.0',
   },
 
   columns: {
@@ -98,15 +98,17 @@ export const ExternalUsersTable = new Table({
     email: z.string().email(),
     lastSyncedAt: z.date(),
   },
-});
+})
 ```
 
 **Key Column Notes:**
+
 - `keyColumn` documents the intended unique key for the table.
 - Current runtime upsert helpers may still require `keyColumn` to be passed explicitly per `upsertRows()` call.
 - Do not assume table-level `keyColumn` is automatically applied everywhere.
 
 **Tags Use Cases:**
+
 - Track data source/origin
 - Version control for schemas
 - Environment markers (staging, production)
@@ -118,13 +120,13 @@ Tables support complex nested structures and flexible schemas:
 
 ```typescript
 export const ConversationsTable = new Table({
-  name: "ConversationsTable",
-  description: "Store conversation data with complex metadata",
+  name: 'ConversationsTable',
+  description: 'Store conversation data with complex metadata',
 
   columns: {
     // ISO date strings (common pattern for API data)
-    createdAt: z.string().describe("ISO 8601 date string"),
-    updatedAt: z.string().describe("ISO 8601 date string"),
+    createdAt: z.string().describe('ISO 8601 date string'),
+    updatedAt: z.string().describe('ISO 8601 date string'),
 
     // Optional fields
     waitingSince: z.string().optional(),
@@ -156,7 +158,7 @@ export const ConversationsTable = new Table({
           id: z.string(),
           name: z.string().optional(),
           email: z.string().optional(),
-        }),
+        })
       )
       .optional(),
 
@@ -164,13 +166,13 @@ export const ConversationsTable = new Table({
     metadata: z.object({}).passthrough(),
 
     // Discriminated unions for type safety
-    status: z.discriminatedUnion("type", [
-      z.object({ type: z.literal("active"), reason: z.string() }),
-      z.object({ type: z.literal("snoozed"), until: z.string() }),
-      z.object({ type: z.literal("closed"), closedAt: z.string() }),
+    status: z.discriminatedUnion('type', [
+      z.object({ type: z.literal('active'), reason: z.string() }),
+      z.object({ type: z.literal('snoozed'), until: z.string() }),
+      z.object({ type: z.literal('closed'), closedAt: z.string() }),
     ]),
   },
-});
+})
 ```
 
 ### Searchable Columns
@@ -179,14 +181,14 @@ Enable semantic search on specific columns:
 
 ```typescript
 export const DocumentsTable = new Table({
-  name: "DocumentsTable",
-  description: "Document storage with search",
+  name: 'DocumentsTable',
+  description: 'Document storage with search',
 
   columns: {
     // Searchable field with shorthand syntax
     title: {
       searchable: true,
-      schema: z.string().describe("Document title"),
+      schema: z.string().describe('Document title'),
     },
 
     // Enable semantic search on content
@@ -210,7 +212,7 @@ export const DocumentsTable = new Table({
   // Higher values (e.g., 5, 10, 20) give this table higher priority in search
   // Default is 1 if not specified
   factor: 5,
-});
+})
 ```
 
 ### Important Column Syntax
@@ -237,38 +239,38 @@ columns: {
 ### Creating Rows
 
 ```typescript
-import { UsersTable } from "./tables/Users";
+import { UsersTable } from './tables/Users'
 
 // Create single row (id is auto-assigned)
 await UsersTable.createRows({
   rows: [
     {
-      name: "John Doe",
-      email: "john@example.com",
-      role: "user",
+      name: 'John Doe',
+      email: 'john@example.com',
+      role: 'user',
       createdAt: new Date(),
-      metadata: { source: "signup" },
+      metadata: { source: 'signup' },
     },
   ],
-});
+})
 
 // Create multiple rows (ids are auto-assigned)
 await UsersTable.createRows({
   rows: [
     {
-      name: "Alice",
-      email: "alice@example.com",
-      role: "admin",
+      name: 'Alice',
+      email: 'alice@example.com',
+      role: 'admin',
       createdAt: new Date(),
     },
     {
-      name: "Bob",
-      email: "bob@example.com",
-      role: "user",
+      name: 'Bob',
+      email: 'bob@example.com',
+      role: 'user',
       createdAt: new Date(),
     },
   ],
-});
+})
 ```
 
 ### Finding Rows
@@ -276,36 +278,36 @@ await UsersTable.createRows({
 ```typescript
 // Find by condition
 const { rows } = await UsersTable.findRows({
-  filter: { role: "admin" },
-  orderBy: "createdAt",
-  orderDirection: "desc",
+  filter: { role: 'admin' },
+  orderBy: 'createdAt',
+  orderDirection: 'desc',
   limit: 10,
   offset: 0,
-});
+})
 
 // Find by multiple conditions
 const { rows } = await UsersTable.findRows({
   filter: {
-    role: "user",
-    email: "john@example.com",
+    role: 'user',
+    email: 'john@example.com',
   },
-});
+})
 
 // Find with complex conditions
 const { rows } = await UsersTable.findRows({
   filter: {
-    createdAt: { $gte: new Date("2024-01-01") },
+    createdAt: { $gte: new Date('2024-01-01') },
   },
-  orderBy: "name",
-  orderDirection: "asc",
-});
+  orderBy: 'name',
+  orderDirection: 'asc',
+})
 
 // Complex filters with logical operators
 const { rows } = await UsersTable.findRows({
   filter: {
-    $and: [{ role: "user" }, { createdAt: { $gte: new Date("2024-01-01") } }],
+    $and: [{ role: 'user' }, { createdAt: { $gte: new Date('2024-01-01') } }],
   },
-});
+})
 ```
 
 ### Getting Single Row
@@ -314,11 +316,11 @@ Get a specific row by its id:
 
 ```typescript
 // Get row by id
-const row = await UsersTable.getRow({ id: 123 });
+const row = await UsersTable.getRow({ id: 123 })
 
-console.log(row.id);        // 123
-console.log(row.name);      // Access row properties
-console.log(row.createdAt); // Auto-generated timestamp
+console.log(row.id) // 123
+console.log(row.name) // Access row properties
+console.log(row.createdAt) // Auto-generated timestamp
 ```
 
 ### Semantic Search
@@ -328,21 +330,21 @@ Search across searchable columns using the `search` parameter:
 ```typescript
 // Search documents
 const { rows } = await DocumentsTable.findRows({
-  search: "machine learning algorithms",
+  search: 'machine learning algorithms',
   limit: 5,
-});
+})
 
 // Results are ranked by semantic similarity
 rows.forEach((doc) => {
-  console.log(doc.title, doc.content);
-});
+  console.log(doc.title, doc.content)
+})
 
 // Combine search with filters
 const { rows } = await DocumentsTable.findRows({
-  search: "machine learning",
-  filter: { tags: { $in: ["ai", "ml"] } },
+  search: 'machine learning',
+  filter: { tags: { $in: ['ai', 'ml'] } },
   limit: 10,
-});
+})
 ```
 
 ### Upsert Operations
@@ -354,25 +356,25 @@ Upsert allows inserting or updating rows based on a key column:
 await MessagesTable.upsertRows({
   rows: [
     {
-      messageId: "msg-123", // Key column
-      content: "Updated content",
+      messageId: 'msg-123', // Key column
+      content: 'Updated content',
       timestamp: new Date(),
     },
   ],
-  keyColumn: "messageId", // Updates if messageId exists, inserts if not
-});
+  keyColumn: 'messageId', // Updates if messageId exists, inserts if not
+})
 
 // Upsert with id (optional, as number)
 await UsersTable.upsertRows({
   rows: [
     {
       id: 123, // Optional: provide id to update specific row
-      name: "Jane Doe",
-      email: "jane@example.com",
+      name: 'Jane Doe',
+      email: 'jane@example.com',
     },
   ],
-  keyColumn: "id",
-});
+  keyColumn: 'id',
+})
 
 // Bulk upsert with multiple rows
 await ContactsTable.upsertRows({
@@ -382,8 +384,8 @@ await ContactsTable.upsertRows({
     email: contact.email,
     updatedAt: new Date(),
   })),
-  keyColumn: "contactId",
-});
+  keyColumn: 'contactId',
+})
 ```
 
 ### Updating Rows
@@ -396,19 +398,19 @@ await UsersTable.updateRows({
   rows: [
     {
       id: 123, // Row ID (required)
-      role: "admin",
+      role: 'admin',
       metadata: { promoted: true },
     },
   ],
-});
+})
 
 // Update multiple rows
 await UsersTable.updateRows({
   rows: [
-    { id: 123, role: "admin" },
-    { id: 456, role: "user" },
+    { id: 123, role: 'admin' },
+    { id: 456, role: 'user' },
   ],
-});
+})
 ```
 
 **Note:** For tables with computed columns, see "Computed Columns" section below for the `waitComputed` option.
@@ -418,19 +420,19 @@ await UsersTable.updateRows({
 ```typescript
 // Delete by filter condition
 await UsersTable.deleteRows({
-  role: "guest",
-});
+  role: 'guest',
+})
 
 // Delete with complex filter
 await UsersTable.deleteRows({
-  $and: [{ role: "guest" }, { createdAt: { $lt: new Date("2024-01-01") } }],
-});
+  $and: [{ role: 'guest' }, { createdAt: { $lt: new Date('2024-01-01') } }],
+})
 
 // Delete by specific IDs
-await UsersTable.deleteRowIds([123, 456, 789]);
+await UsersTable.deleteRowIds([123, 456, 789])
 
 // Delete all rows (use with caution!)
-await UsersTable.deleteAllRows();
+await UsersTable.deleteAllRows()
 ```
 
 ### Advanced: Direct Table Operations
@@ -438,19 +440,19 @@ await UsersTable.deleteAllRows();
 In workflows, you can also use the client for low-level table operations:
 
 ```typescript
-import { Workflow } from "@botpress/runtime";
+import { Workflow } from '@botpress/runtime'
 
 export const ResetTablesWorkflow = new Workflow({
-  name: "resetTables",
-  description: "Resets specific tables",
+  name: 'resetTables',
+  description: 'Resets specific tables',
   async handler({ client }) {
     // Delete entire table (drops and recreates)
-    await client._inner.deleteTable({ table: "MyTable" });
+    await client._inner.deleteTable({ table: 'MyTable' })
 
     // Other low-level operations available via client._inner
     // Use with caution as these bypass type safety
   },
-});
+})
 ```
 
 ## Complex Schemas
@@ -459,7 +461,7 @@ export const ResetTablesWorkflow = new Workflow({
 
 ```typescript
 export const OrdersTable = new Table({
-  name: "OrdersTable",
+  name: 'OrdersTable',
 
   columns: {
     customer: z.object({
@@ -472,7 +474,7 @@ export const OrdersTable = new Table({
         productId: z.string(),
         quantity: z.number().int().positive(),
         price: z.number().positive(),
-      }),
+      })
     ),
     shipping: z.object({
       address: z.string(),
@@ -480,19 +482,19 @@ export const OrdersTable = new Table({
       country: z.string(),
       postalCode: z.string(),
     }),
-    status: z.enum(["pending", "processing", "shipped", "delivered"]),
+    status: z.enum(['pending', 'processing', 'shipped', 'delivered']),
     total: z.number().positive(),
     createdAt: z.date(),
     updatedAt: z.date(),
   },
-});
+})
 ```
 
 ### Optional and Default Values
 
 ```typescript
 export const ProductsTable = new Table({
-  name: "ProductsTable",
+  name: 'ProductsTable',
 
   columns: {
     name: z.string(),
@@ -503,14 +505,14 @@ export const ProductsTable = new Table({
     inStock: z.boolean().default(true),
 
     // Optional with default
-    category: z.string().optional().default("uncategorized"),
+    category: z.string().optional().default('uncategorized'),
 
     // Nullable field
     discountPrice: z.number().positive().nullable(),
 
     metadata: z.object({}).passthrough().optional(),
   },
-});
+})
 ```
 
 ### Computed Columns
@@ -518,10 +520,10 @@ export const ProductsTable = new Table({
 Computed columns are automatically calculated based on other column values. They support dependencies and are recomputed when their dependencies change.
 
 ```typescript
-import { Table, z } from "@botpress/runtime";
+import { Table, z } from '@botpress/runtime'
 
 export const ProfilesTable = new Table({
-  name: "ProfilesTable",
+  name: 'ProfilesTable',
 
   columns: {
     firstName: z.string(),
@@ -531,9 +533,9 @@ export const ProfilesTable = new Table({
     fullName: {
       computed: true,
       schema: z.string(),
-      dependencies: ["firstName", "lastName"],
+      dependencies: ['firstName', 'lastName'],
       value: async (row) => {
-        return `${row.firstName} ${row.lastName}`;
+        return `${row.firstName} ${row.lastName}`
       },
     },
 
@@ -543,13 +545,13 @@ export const ProfilesTable = new Table({
     ageInMonths: {
       computed: true,
       schema: z.number(),
-      dependencies: ["age"],
+      dependencies: ['age'],
       value: async (row) => {
-        return row.age * 12;
+        return row.age * 12
       },
     },
   },
-});
+})
 ```
 
 #### Using Computed Columns
@@ -561,14 +563,14 @@ Computed columns are calculated automatically when rows are created or updated:
 await ProfilesTable.createRows({
   rows: [
     {
-      firstName: "John",
-      lastName: "Doe",
+      firstName: 'John',
+      lastName: 'Doe',
       age: 30,
       // fullName and ageInMonths will be computed automatically
       // id is auto-assigned by server
     },
   ],
-});
+})
 
 // The created row will have: id (number), fullName = "John Doe", ageInMonths = 360
 ```
@@ -583,17 +585,17 @@ await ProfilesTable.updateRows({
   rows: [
     {
       id: 123, // Row id as number
-      firstName: "Jane", // fullName will be recomputed
+      firstName: 'Jane', // fullName will be recomputed
     },
   ],
   waitComputed: true, // Wait for fullName to finish computing
-});
+})
 
 // Without waitComputed, computed columns update eventually
 await ProfilesTable.updateRows({
-  rows: [{ id: 123, firstName: "Jane" }],
+  rows: [{ id: 123, firstName: 'Jane' }],
   // Returns immediately, computed columns update in background
-});
+})
 ```
 
 #### Complex Dependencies
@@ -602,7 +604,7 @@ Computed columns can have multiple dependencies and form dependency chains:
 
 ```typescript
 export const OrdersTable = new Table({
-  name: "OrdersTable",
+  name: 'OrdersTable',
 
   columns: {
     price: z.number(),
@@ -613,7 +615,7 @@ export const OrdersTable = new Table({
     subtotal: {
       computed: true,
       schema: z.number(),
-      dependencies: ["price", "quantity"],
+      dependencies: ['price', 'quantity'],
       value: async (row) => row.price * row.quantity,
     },
 
@@ -621,7 +623,7 @@ export const OrdersTable = new Table({
     tax: {
       computed: true,
       schema: z.number(),
-      dependencies: ["subtotal", "taxRate"],
+      dependencies: ['subtotal', 'taxRate'],
       value: async (row) => row.subtotal * row.taxRate,
     },
 
@@ -629,11 +631,11 @@ export const OrdersTable = new Table({
     total: {
       computed: true,
       schema: z.number(),
-      dependencies: ["subtotal", "tax"],
+      dependencies: ['subtotal', 'tax'],
       value: async (row) => row.subtotal + row.tax,
     },
   },
-});
+})
 ```
 
 #### Computed Column Use Cases
@@ -642,7 +644,7 @@ export const OrdersTable = new Table({
 
 ```typescript
 export const UsersTable = new Table({
-  name: "UsersTable",
+  name: 'UsersTable',
   columns: {
     firstName: z.string(),
     lastName: z.string(),
@@ -653,20 +655,20 @@ export const UsersTable = new Table({
     bio: {
       computed: true,
       schema: z.string(),
-      dependencies: ["firstName", "lastName", "age"],
+      dependencies: ['firstName', 'lastName', 'age'],
       value: async (row) => {
-        return `Name: ${row.firstName} ${row.lastName}, Age: ${row.age}`;
+        return `Name: ${row.firstName} ${row.lastName}, Age: ${row.age}`
       },
     },
   },
-});
+})
 ```
 
 **Calculations:**
 
 ```typescript
 export const ProductsTable = new Table({
-  name: "ProductsTable",
+  name: 'ProductsTable',
   columns: {
     price: z.number(),
     cost: z.number(),
@@ -675,20 +677,20 @@ export const ProductsTable = new Table({
     profitMargin: {
       computed: true,
       schema: z.number(),
-      dependencies: ["price", "cost"],
+      dependencies: ['price', 'cost'],
       value: async (row) => {
-        return ((row.price - row.cost) / row.price) * 100;
+        return ((row.price - row.cost) / row.price) * 100
       },
     },
   },
-});
+})
 ```
 
 **Data Transformations:**
 
 ```typescript
 export const ContactsTable = new Table({
-  name: "ContactsTable",
+  name: 'ContactsTable',
   columns: {
     phone: z.string(),
 
@@ -696,14 +698,14 @@ export const ContactsTable = new Table({
     phoneNormalized: {
       computed: true,
       schema: z.string(),
-      dependencies: ["phone"],
+      dependencies: ['phone'],
       value: async (row) => {
         // Remove all non-digit characters
-        return row.phone.replace(/\D/g, "");
+        return row.phone.replace(/\D/g, '')
       },
     },
   },
-});
+})
 ```
 
 #### Important Notes
@@ -720,15 +722,15 @@ export const ContactsTable = new Table({
 ### In Actions
 
 ```typescript
-import { Action, z } from "@botpress/runtime";
-import { UsersTable } from "../tables/Users";
+import { Action, z } from '@botpress/runtime'
+import { UsersTable } from '../tables/Users'
 
 export const createUser = new Action({
-  name: "createUser",
+  name: 'createUser',
   input: z.object({
     name: z.string(),
     email: z.string().email(),
-    role: z.enum(["admin", "user", "guest"]),
+    role: z.enum(['admin', 'user', 'guest']),
   }),
   output: z.object({
     userId: z.string(),
@@ -740,13 +742,13 @@ export const createUser = new Action({
     const existing = await UsersTable.findRows({
       filter: { email: input.email },
       limit: 1,
-    });
+    })
 
     if (existing.rows.length > 0) {
       return {
         userId: existing.rows[0].id,
         created: false,
-      };
+      }
     }
 
     // Create new user
@@ -760,75 +762,75 @@ export const createUser = new Action({
           metadata: {},
         },
       ],
-    });
+    })
 
     return {
       userId: result.rows[0].id.toString(),
       created: true,
-    };
+    }
   },
-});
+})
 ```
 
 ### In Workflows
 
 ```typescript
-import { Workflow, z } from "@botpress/runtime";
-import { AuditLogTable } from "../tables/AuditLog";
+import { Workflow, z } from '@botpress/runtime'
+import { AuditLogTable } from '../tables/AuditLog'
 
 export const ProcessingWorkflow = new Workflow({
-  name: "processing",
+  name: 'processing',
   input: z.object({ data: z.string() }),
 
   handler: async ({ input, step }) => {
     // Log workflow start
-    await step("log-start", async () => {
+    await step('log-start', async () => {
       await AuditLogTable.createRows({
         rows: [
           {
-            action: "workflow_started",
-            details: { workflow: "processing", input },
+            action: 'workflow_started',
+            details: { workflow: 'processing', input },
             timestamp: new Date(),
           },
         ],
-      });
-    });
+      })
+    })
 
     // Process data
-    const result = await step("process", async () => {
-      return await processData(input.data);
-    });
+    const result = await step('process', async () => {
+      return await processData(input.data)
+    })
 
     // Log completion
-    await step("log-complete", async () => {
+    await step('log-complete', async () => {
       await AuditLogTable.createRows({
         rows: [
           {
-            action: "workflow_completed",
-            details: { workflow: "processing", result },
+            action: 'workflow_completed',
+            details: { workflow: 'processing', result },
             timestamp: new Date(),
           },
         ],
-      });
-    });
+      })
+    })
 
-    return { success: true };
+    return { success: true }
   },
-});
+})
 ```
 
 ### In Conversations
 
 ```typescript
-import { Conversation, user } from "@botpress/runtime";
-import { ConversationHistoryTable } from "../tables/ConversationHistory";
+import { Conversation, user } from '@botpress/runtime'
+import { ConversationHistoryTable } from '../tables/ConversationHistory'
 
 export const Chat = new Conversation({
-  channel: "chat.channel",
+  channel: 'chat.channel',
 
   async handler({ message, conversation }) {
     // Store message in history
-    if (message?.type === "text") {
+    if (message?.type === 'text') {
       await ConversationHistoryTable.createRows({
         rows: [
           {
@@ -838,27 +840,27 @@ export const Chat = new Conversation({
             timestamp: new Date(),
           },
         ],
-      });
+      })
     }
 
     // Search previous conversations
-    if (message?.payload.text?.startsWith("/search")) {
-      const query = message.payload.text.substring(7).trim();
+    if (message?.payload.text?.startsWith('/search')) {
+      const query = message.payload.text.substring(7).trim()
 
       const { rows } = await ConversationHistoryTable.findRows({
         search: query,
         limit: 5,
-      });
+      })
 
       await conversation.send({
-        type: "text",
+        type: 'text',
         payload: {
           text: `Found ${rows.length} matching conversations`,
         },
-      });
+      })
     }
   },
-});
+})
 ```
 
 ## Using Tables with Knowledge Bases
@@ -902,17 +904,17 @@ export const fetchPaginatedData = new Action({
   }),
 
   async handler({ input }) {
-    const offset = (input.page - 1) * input.pageSize;
+    const offset = (input.page - 1) * input.pageSize
 
     const { rows } = await MyTable.findRows({
       limit: input.pageSize,
       offset,
-      orderBy: "createdAt",
-      orderDirection: "desc",
-    });
+      orderBy: 'createdAt',
+      orderDirection: 'desc',
+    })
 
     // Get total row count
-    const { rows: totalRows } = await MyTable.getTable();
+    const { rows: totalRows } = await MyTable.getTable()
 
     return {
       rows,
@@ -922,9 +924,9 @@ export const fetchPaginatedData = new Action({
         total: totalRows,
         totalPages: Math.ceil(totalRows / input.pageSize),
       },
-    };
+    }
   },
-});
+})
 ```
 
 ### 4. Optimize Searchable Content
@@ -940,7 +942,7 @@ export const DocumentsTable = new Table({
       searchable: true, // Optimized for search
     },
   },
-});
+})
 
 // When creating rows
 await DocumentsTable.createRows({
@@ -950,7 +952,7 @@ await DocumentsTable.createRows({
       searchContent: stripHtml(originalContent).toLowerCase(), // Optimized
     },
   ],
-});
+})
 ```
 
 ## Common Patterns
@@ -959,7 +961,7 @@ await DocumentsTable.createRows({
 
 ```typescript
 export const AuditLogTable = new Table({
-  name: "AuditLogTable",
+  name: 'AuditLogTable',
   columns: {
     userId: z.string(),
     action: z.string(),
@@ -969,14 +971,10 @@ export const AuditLogTable = new Table({
     metadata: z.object({}).passthrough(),
     timestamp: z.date(),
   },
-});
+})
 
 // Helper function
-export async function logAction(
-  userId: string,
-  action: string,
-  details: Record<string, any>,
-) {
+export async function logAction(userId: string, action: string, details: Record<string, any>) {
   await AuditLogTable.createRows({
     rows: [
       {
@@ -986,7 +984,7 @@ export async function logAction(
         timestamp: new Date(),
       },
     ],
-  });
+  })
 }
 ```
 
@@ -994,34 +992,30 @@ export async function logAction(
 
 ```typescript
 export const CacheTable = new Table({
-  name: "CacheTable",
+  name: 'CacheTable',
   columns: {
     key: z.string(),
     value: z.unknown(),
     expiresAt: z.date(),
     createdAt: z.date(),
   },
-});
+})
 
 // Cache helper
-export async function getCached<T>(
-  key: string,
-  fetcher: () => Promise<T>,
-  ttlMinutes: number = 60,
-): Promise<T> {
+export async function getCached<T>(key: string, fetcher: () => Promise<T>, ttlMinutes: number = 60): Promise<T> {
   // Check cache
   const { rows } = await CacheTable.findRows({
     filter: { key },
     limit: 1,
-  });
+  })
 
-  const cached = rows[0];
+  const cached = rows[0]
   if (cached && cached.expiresAt > new Date()) {
-    return cached.value as T;
+    return cached.value as T
   }
 
   // Fetch new value
-  const value = await fetcher();
+  const value = await fetcher()
 
   // Store in cache
   await CacheTable.upsertRows({
@@ -1033,10 +1027,10 @@ export async function getCached<T>(
         createdAt: new Date(),
       },
     ],
-    keyColumn: "key",
-  });
+    keyColumn: 'key',
+  })
 
-  return value;
+  return value
 }
 ```
 
@@ -1068,22 +1062,22 @@ When table schemas change:
 ```typescript
 // Original table
 export const UsersTable = new Table({
-  name: "UsersTable",
+  name: 'UsersTable',
   columns: {
     name: z.string(),
     email: z.string(),
   },
-});
+})
 
 // After adding a column - sync handles this automatically
 export const UsersTable = new Table({
-  name: "UsersTable",
+  name: 'UsersTable',
   columns: {
     name: z.string(),
     email: z.string(),
-    role: z.string().default("user"), // New column with default
+    role: z.string().default('user'), // New column with default
   },
-});
+})
 ```
 
 **Important:** Adding columns with defaults is safe. Removing columns or changing types may require manual migration.
@@ -1093,18 +1087,18 @@ export const UsersTable = new Table({
 For advanced scenarios, you can use the client directly:
 
 ```typescript
-import { Workflow } from "@botpress/runtime";
+import { Workflow } from '@botpress/runtime'
 
 export const MigrateTablesWorkflow = new Workflow({
-  name: "migrateTables",
+  name: 'migrateTables',
 
   async handler({ client }) {
     // Delete and recreate a table (use with caution!)
-    await client._inner.deleteTable({ table: "MyTable" });
+    await client._inner.deleteTable({ table: 'MyTable' })
 
     // Note: The table will be recreated on next sync
   },
-});
+})
 ```
 
 ## Troubleshooting

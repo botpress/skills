@@ -74,18 +74,18 @@ Here are production-tested intervals for common data types:
 ```typescript
 function useMessages(ticketId?: string) {
   return useQuery({
-    queryKey: ["messages", ticketId],
+    queryKey: ['messages', ticketId],
     enabled: !!ticketId,
     queryFn: () => {
-      if (!ticketId) return { rows: [] };
+      if (!ticketId) return { rows: [] }
       return listMessages(ticketId, {
         limit: 1000,
-        orderBy: "createdAt",
-        orderDirection: "asc",
-      });
+        orderBy: 'createdAt',
+        orderDirection: 'asc',
+      })
     },
     refetchInterval: 1000, // 1 second
-  });
+  })
 }
 ```
 
@@ -98,15 +98,16 @@ function useMessages(ticketId?: string) {
 ```typescript
 function useActiveTickets() {
   return useQuery({
-    queryKey: ["tickets", "active"],
-    queryFn: () => listTickets({
-      filter: { state: { $in: ["open", "snoozed"] } },
-      limit: 1000,
-      orderBy: "updatedAt",
-      orderDirection: "desc",
-    }),
+    queryKey: ['tickets', 'active'],
+    queryFn: () =>
+      listTickets({
+        filter: { state: { $in: ['open', 'snoozed'] } },
+        limit: 1000,
+        orderBy: 'updatedAt',
+        orderDirection: 'desc',
+      }),
     refetchInterval: 1000 * 3, // 3 seconds
-  });
+  })
 }
 ```
 
@@ -119,18 +120,18 @@ function useActiveTickets() {
 ```typescript
 function useAnalysis(ticketId?: string) {
   return useQuery({
-    queryKey: ["analysis", ticketId],
+    queryKey: ['analysis', ticketId],
     enabled: !!ticketId,
     queryFn: () => {
-      if (!ticketId) return { rows: [] };
+      if (!ticketId) return { rows: [] }
       return listAnalysisResults(ticketId, {
         limit: 1000,
-        orderBy: "updatedAt",
-        orderDirection: "desc",
-      });
+        orderBy: 'updatedAt',
+        orderDirection: 'desc',
+      })
     },
     refetchInterval: 1000 * 5, // 5 seconds
-  });
+  })
 }
 ```
 
@@ -143,15 +144,16 @@ function useAnalysis(ticketId?: string) {
 ```typescript
 function useClosedTickets() {
   return useQuery({
-    queryKey: ["tickets", "closed"],
-    queryFn: () => listTickets({
-      filter: { state: "closed" },
-      limit: 1000,
-      orderBy: "updatedAt",
-      orderDirection: "desc",
-    }),
+    queryKey: ['tickets', 'closed'],
+    queryFn: () =>
+      listTickets({
+        filter: { state: 'closed' },
+        limit: 1000,
+        orderBy: 'updatedAt',
+        orderDirection: 'desc',
+      }),
     refetchInterval: 1000 * 30, // 30 seconds
-  });
+  })
 }
 ```
 
@@ -164,10 +166,10 @@ function useClosedTickets() {
 ```typescript
 function useAdminList() {
   return useQuery({
-    queryKey: ["admins"],
+    queryKey: ['admins'],
     queryFn: () => listAdmins(),
     refetchInterval: 1000 * 60 * 5, // 5 minutes
-  });
+  })
 }
 ```
 
@@ -177,21 +179,23 @@ function useAdminList() {
 
 ## Choosing the Right Interval
 
-| Data Type | Interval | Use Case |
-|-----------|----------|----------|
-| **User-facing critical** | 1-3s | Active items, live messages, real-time dashboards |
-| **Secondary/contextual** | 5-10s | Analysis results, background processing status |
-| **Background data** | 30s-1min | Closed items, historical data, secondary lists |
-| **Static/config data** | 5+ minutes | User lists, settings, configuration |
+| Data Type                | Interval   | Use Case                                          |
+| ------------------------ | ---------- | ------------------------------------------------- |
+| **User-facing critical** | 1-3s       | Active items, live messages, real-time dashboards |
+| **Secondary/contextual** | 5-10s      | Analysis results, background processing status    |
+| **Background data**      | 30s-1min   | Closed items, historical data, secondary lists    |
+| **Static/config data**   | 5+ minutes | User lists, settings, configuration               |
 
 ### Cost vs UX Trade-off
 
 **Faster intervals**:
+
 - Better user experience
 - More real-time feel
 - Higher network costs, more server load, battery drain on mobile
 
 **Slower intervals**:
+
 - Lower network/server costs, better battery life
 - Less responsive feel, users may miss updates
 
@@ -208,18 +212,19 @@ Only fetch data when it's actually needed:
 ```typescript
 function useMessages(ticketId?: string) {
   return useQuery({
-    queryKey: ["messages", ticketId],
+    queryKey: ['messages', ticketId],
     enabled: !!ticketId, // Only fetch if ticketId exists
     queryFn: () => {
-      if (!ticketId) return { rows: [] };
-      return listMessages(ticketId);
+      if (!ticketId) return { rows: [] }
+      return listMessages(ticketId)
     },
     refetchInterval: 1000,
-  });
+  })
 }
 ```
 
 **Why this matters**:
+
 - Saves network requests when no item is selected
 - Prevents errors from invalid API calls
 - Improves performance
@@ -228,14 +233,15 @@ function useMessages(ticketId?: string) {
 
 ```typescript
 const messagesQuery = useQuery({
-  queryKey: ["messages", ticketId],
+  queryKey: ['messages', ticketId],
   enabled: isActive && !!ticketId, // Multiple conditions
   refetchInterval: isActive ? 1000 : false, // Stop polling when paused
   // ...
-});
+})
 ```
 
 **Use cases**:
+
 - User switches tabs (pause background tab queries)
 - Modal/dialog is closed (pause modal-specific queries)
 - Component is hidden (pause until visible)
@@ -250,19 +256,19 @@ Detect tab visibility and adjust intervals:
 
 ```typescript
 function useActiveTickets() {
-  const [isVisible, setIsVisible] = useState(!document.hidden);
+  const [isVisible, setIsVisible] = useState(!document.hidden)
 
   useEffect(() => {
-    const handleVisibilityChange = () => setIsVisible(!document.hidden);
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
-  }, []);
+    const handleVisibilityChange = () => setIsVisible(!document.hidden)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+  }, [])
 
   return useQuery({
-    queryKey: ["tickets", "active"],
-    queryFn: () => listTickets({ filter: { state: { $in: ["open", "snoozed"] } } }),
+    queryKey: ['tickets', 'active'],
+    queryFn: () => listTickets({ filter: { state: { $in: ['open', 'snoozed'] } } }),
     refetchInterval: isVisible ? 1000 * 3 : 1000 * 30,
-  });
+  })
 }
 ```
 
@@ -272,19 +278,19 @@ function useActiveTickets() {
 useEffect(() => {
   const handleVisibilityChange = () => {
     if (document.hidden) {
-      queryClient.setQueryDefaults(["messages"], {
+      queryClient.setQueryDefaults(['messages'], {
         refetchInterval: false,
-      });
+      })
     } else {
-      queryClient.setQueryDefaults(["messages"], {
+      queryClient.setQueryDefaults(['messages'], {
         refetchInterval: 1000,
-      });
+      })
     }
-  };
+  }
 
-  document.addEventListener("visibilitychange", handleVisibilityChange);
-  return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
-}, []);
+  document.addEventListener('visibilitychange', handleVisibilityChange)
+  return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+}, [])
 ```
 
 ---
@@ -314,7 +320,7 @@ Get the best of both worlds:
 
 ```typescript
 // User action — instant feedback via optimistic update
-await closeTicket({ ticketId, agentId });
+await closeTicket({ ticketId, agentId })
 
 // Polling — catches updates from other agents
 refetchInterval: 1000 * 3 // Background sync
@@ -326,11 +332,11 @@ Save resources when data isn't visible:
 
 ```typescript
 const messagesQuery = useQuery({
-  queryKey: ["messages", ticketId],
+  queryKey: ['messages', ticketId],
   enabled: isTicketOpen, // Pause when closed
   refetchInterval: isTicketOpen ? 1000 : false,
   queryFn: () => listMessages(ticketId),
-});
+})
 ```
 
 ### 4. Handle Connection Errors
@@ -382,6 +388,7 @@ return (
 - 36,000 requests/hour
 
 **Mitigation**:
+
 - Use slower intervals for non-critical data
 - Pause queries when not visible
 - Consider WebSockets only if costs become prohibitive (rare)
@@ -391,6 +398,7 @@ return (
 Frequent polling drains mobile device batteries:
 
 **Best practices**:
+
 - Use 5+ second intervals on mobile
 - Pause polling when app is in background
 - Use `visibilitychange` events to pause/resume
@@ -398,9 +406,10 @@ Frequent polling drains mobile device batteries:
 ### Use Longer Intervals for Background Tabs
 
 ```typescript
-const refetchInterval = document.visibilityState === "visible"
-  ? 1000 * 3  // Active tab: 3 seconds
-  : 1000 * 30; // Background tab: 30 seconds
+const refetchInterval =
+  document.visibilityState === 'visible'
+    ? 1000 * 3 // Active tab: 3 seconds
+    : 1000 * 30 // Background tab: 30 seconds
 ```
 
 ---
@@ -408,11 +417,13 @@ const refetchInterval = document.visibilityState === "visible"
 ## Summary
 
 **Polling Strategy**:
+
 - Use `refetchInterval` on `useQuery` for most real-time needs
 - Match intervals to data importance (1s–5min range)
 - WebSockets are rarely needed for ADK frontends
 
 **Performance**:
+
 - Pause queries when not needed (`enabled` flag)
 - Slow down for background tabs (`visibilitychange`)
 - Show loading/stale indicators
@@ -420,6 +431,7 @@ const refetchInterval = document.visibilityState === "visible"
 - Consider battery/network costs
 
 **Production Intervals**:
+
 - Messages: 1 second
 - Active items: 3 seconds
 - Analysis: 5 seconds
