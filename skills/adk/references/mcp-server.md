@@ -13,6 +13,7 @@ adk mcp:init --all --project-dir ./bot
 ```
 
 This generates configuration files for:
+
 - **Claude Code**: `.mcp.json`
 - **VS Code**: `.vscode/mcp.json`
 - **Cursor**: `.cursor/mcp.json`
@@ -50,6 +51,7 @@ adk mcp:init [options]
 ```
 
 **Options:**
+
 - `--tool <name>` - Generate for specific tool (claude-code, vscode, cursor)
 - `--all` - Generate for all supported tools
 - `--force` - Overwrite existing config
@@ -88,16 +90,20 @@ The generated config includes `--cwd` to target the correct directory:
 ## Troubleshooting
 
 **"Not in an ADK project directory"**
+
 - Ensure `--cwd` points to directory with `agent.config.ts`
 
 **"Dev server is not running"**
+
 - Start the dev server: `adk dev`
 
 **"MCP can connect, but messaging/workflow tools fail"**
+
 - Use the default console port: `adk dev --port-console 3001`
 - Current MCP dev-server-backed tools assume `http://localhost:3001`
 
 **"No chat or webchat integration found"**
+
 - Add an integration: `adk add chat` or `adk add webchat`
 
 **Inspect the MCP server:**

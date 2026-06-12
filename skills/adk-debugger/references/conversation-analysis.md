@@ -17,15 +17,15 @@ adk conversations list limit=5 --format json
 
 **Output** (JSON): Array of objects, each with:
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `conversationId` | string | Unique conversation identifier |
-| `firstSeen` | string | ISO timestamp of the first recorded turn |
-| `lastSeen` | string | ISO timestamp of the most recent turn |
-| `traceCount` | number | Total number of turns in the conversation |
-| `integration` | string | Which integration the conversation came from (e.g., `slack`, `webchat`) |
-| `channel` | string | Which channel within the integration (e.g., `dm`, `thread`) |
-| `hasErrors` | boolean | Whether any turn in the conversation had errors |
+| Field            | Type    | Description                                                             |
+| ---------------- | ------- | ----------------------------------------------------------------------- |
+| `conversationId` | string  | Unique conversation identifier                                          |
+| `firstSeen`      | string  | ISO timestamp of the first recorded turn                                |
+| `lastSeen`       | string  | ISO timestamp of the most recent turn                                   |
+| `traceCount`     | number  | Total number of turns in the conversation                               |
+| `integration`    | string  | Which integration the conversation came from (e.g., `slack`, `webchat`) |
+| `channel`        | string  | Which channel within the integration (e.g., `dm`, `thread`)             |
+| `hasErrors`      | boolean | Whether any turn in the conversation had errors                         |
 
 ### Show a conversation's timeline
 
@@ -39,24 +39,24 @@ adk conversations show <conversation-id> --include-llm --format json
 
 **Output** (JSON): Object with:
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `conversationId` | string | The conversation ID |
-| `turnCount` | number | Total number of turns |
-| `turns` | array | Ordered list of turn objects |
+| Field            | Type   | Description                  |
+| ---------------- | ------ | ---------------------------- |
+| `conversationId` | string | The conversation ID          |
+| `turnCount`      | number | Total number of turns        |
+| `turns`          | array  | Ordered list of turn objects |
 
 Each turn object contains:
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `traceId` | string | Trace ID for this turn (use for drill-down) |
-| `startedAt` | string | ISO timestamp when the turn started |
-| `duration` | string | How long the turn took (e.g., `"2.3s"`) |
-| `status` | string | `"ok"` or `"error"` |
-| `trigger` | string | What started this turn (e.g., user message, event, workflow) |
-| `toolCalls` | array | Tools invoked during this turn |
-| `errors` | array | Error strings, if any |
-| `llmContent` | array | LLM reasoning data (only with `--include-llm`) |
+| Field        | Type   | Description                                                  |
+| ------------ | ------ | ------------------------------------------------------------ |
+| `traceId`    | string | Trace ID for this turn (use for drill-down)                  |
+| `startedAt`  | string | ISO timestamp when the turn started                          |
+| `duration`   | string | How long the turn took (e.g., `"2.3s"`)                      |
+| `status`     | string | `"ok"` or `"error"`                                          |
+| `trigger`    | string | What started this turn (e.g., user message, event, workflow) |
+| `toolCalls`  | array  | Tools invoked during this turn                               |
+| `errors`     | array  | Error strings, if any                                        |
+| `llmContent` | array  | LLM reasoning data (only with `--include-llm`)               |
 
 Each `toolCalls` entry has: `name`, `status`, `duration`, `error?`
 
@@ -116,9 +116,7 @@ Given this conversation data:
       "duration": "3.2s",
       "status": "ok",
       "trigger": "User message via slack/dm",
-      "toolCalls": [
-        { "name": "lookupOrder", "status": "ok", "duration": "0.9s" }
-      ],
+      "toolCalls": [{ "name": "lookupOrder", "status": "ok", "duration": "0.9s" }],
       "errors": []
     },
     {
@@ -167,7 +165,7 @@ Given this conversation data:
 adk conversations show <conversation-id> --include-llm --format json
 ```
 
-**Always use `--include-llm`** for explanations. Without it, you lose the LLM's reasoning, which is essential for explaining *why* the agent did what it did.
+**Always use `--include-llm`** for explanations. Without it, you lose the LLM's reasoning, which is essential for explaining _why_ the agent did what it did.
 
 **What to cover for each turn:**
 
@@ -200,7 +198,10 @@ Given the same conversation with `--include-llm`:
       "toolCalls": [],
       "errors": [],
       "llmContent": [
-        { "name": "cognitive.iteration", "data": "The user said 'Hi, I need help with an order'. This is a greeting with intent to discuss an order. I'll respond and ask for the order number." }
+        {
+          "name": "cognitive.iteration",
+          "data": "The user said 'Hi, I need help with an order'. This is a greeting with intent to discuss an order. I'll respond and ask for the order number."
+        }
       ]
     },
     {
@@ -209,12 +210,13 @@ Given the same conversation with `--include-llm`:
       "duration": "3.2s",
       "status": "ok",
       "trigger": "User message via slack/dm",
-      "toolCalls": [
-        { "name": "lookupOrder", "status": "ok", "duration": "0.9s" }
-      ],
+      "toolCalls": [{ "name": "lookupOrder", "status": "ok", "duration": "0.9s" }],
       "errors": [],
       "llmContent": [
-        { "name": "cognitive.iteration", "data": "The user provided order number #4521. I should look this up to get the details before responding." }
+        {
+          "name": "cognitive.iteration",
+          "data": "The user provided order number #4521. I should look this up to get the details before responding."
+        }
       ]
     },
     {
@@ -229,7 +231,10 @@ Given the same conversation with `--include-llm`:
       "errors": ["Cannot cancel shipped order"],
       "llmContent": [
         { "name": "cognitive.iteration", "data": "The user wants to cancel order #4521. I'll use cancelOrder." },
-        { "name": "cognitive.iteration", "data": "cancelOrder failed -- the order is already shipped. I need to tell the user and suggest a return instead." }
+        {
+          "name": "cognitive.iteration",
+          "data": "cancelOrder failed -- the order is already shipped. I need to tell the user and suggest a return instead."
+        }
       ]
     },
     {
@@ -241,7 +246,10 @@ Given the same conversation with `--include-llm`:
       "toolCalls": [],
       "errors": [],
       "llmContent": [
-        { "name": "cognitive.iteration", "data": "The user asked how to start a return. I know the process from the instructions -- they need to go to the returns portal. No tool call needed." }
+        {
+          "name": "cognitive.iteration",
+          "data": "The user asked how to start a return. I know the process from the instructions -- they need to go to the returns portal. No tool call needed."
+        }
       ]
     }
   ]
@@ -276,12 +284,12 @@ adk conversations --format json
 
 Use the list output to identify the conversation. Key signals:
 
-| Signal | How to Use |
-|--------|-----------|
-| `lastSeen` | Most recent conversation is usually the one they're asking about |
-| `hasErrors` | If they're debugging a failure, look for `hasErrors: true` |
+| Signal                    | How to Use                                                                      |
+| ------------------------- | ------------------------------------------------------------------------------- |
+| `lastSeen`                | Most recent conversation is usually the one they're asking about                |
+| `hasErrors`               | If they're debugging a failure, look for `hasErrors: true`                      |
 | `integration` / `channel` | If they mention "the Slack conversation" or "the webchat issue", match on these |
-| `traceCount` | High turn counts may indicate stuck loops or long interactions |
+| `traceCount`              | High turn counts may indicate stuck loops or long interactions                  |
 
 ### Step 3: Show the conversation
 
@@ -413,7 +421,7 @@ The conversation timeline shows what the agent did, not the exact user messages.
 
 ❌ **Don't re-explain tool behavior the developer already knows**
 
-If the developer built the tools, they know what `lookupOrder` does. Focus on *what happened* and *why*, not what the tool is for.
+If the developer built the tools, they know what `lookupOrder` does. Focus on _what happened_ and _why_, not what the tool is for.
 
 ❌ **Don't ignore the overall arc**
 

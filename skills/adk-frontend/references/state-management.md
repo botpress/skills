@@ -7,27 +7,30 @@ This guide covers client-side state management in ADK frontend projects using Zu
 Understanding when to use each tool is critical for maintainable architecture:
 
 **Use Zustand for:**
+
 - **Global app state**: UI preferences, theme settings
 - **Application logic state**: File uploads, form wizards, multi-step flows
 - **Client-side only data**: User preferences, UI state that doesn't sync to server
 - **Singleton management**: Botpress client instances, configuration
 
 **Use TanStack Query for:**
+
 - **Server state**: Data from bot actions, tables, knowledge bases
 - **API responses**: Fetching, caching, and synchronizing server data
 - **Background updates**: Automatic refetching, invalidation, polling
 - **Request state**: Loading, error, and success states for API calls
 
 **Clear separation of concerns:**
+
 ```typescript
 // Zustand for client management
-const client = useClientsStore((state) => state.getAPIClient());
+const client = useClientsStore((state) => state.getAPIClient())
 
 // TanStack Query for server data
 const { data } = useQuery({
-  queryKey: ["tickets"],
-  queryFn: () => listTickets({ state: "open" }),
-});
+  queryKey: ['tickets'],
+  queryFn: () => listTickets({ state: 'open' }),
+})
 ```
 
 > **Note:** For the Botpress client store pattern (creating, caching, and managing client instances), see [Botpress Client](./botpress-client.md).
@@ -39,27 +42,27 @@ const { data } = useQuery({
 This is a concrete example of Zustand managing file upload state — the kind of complex client-side logic that **should not** live in TanStack Query:
 
 ```typescript
-import { create } from "zustand";
+import { create } from 'zustand'
 
-const MAX_FILES = 10;
+const MAX_FILES = 10
 
-export type FileType = "image" | "video" | "audio" | "file";
+export type FileType = 'image' | 'video' | 'audio' | 'file'
 
 export type FileItem = {
-  name: string;
-  type: FileType;
-  url?: string;
-  instance: File;
-  status: "loading" | "error" | "uploaded";
-};
+  name: string
+  type: FileType
+  url?: string
+  instance: File
+  status: 'loading' | 'error' | 'uploaded'
+}
 
 type ComposerFileStore = {
-  files: FileItem[];
-  setFiles: (files: FileItem[]) => void;
-  upsertFile: (file: FileItem) => void;
-  deleteFile: (filename: string) => void;
-  addFile: (file: File, uploadFn?: (file: File) => Promise<string>) => void;
-};
+  files: FileItem[]
+  setFiles: (files: FileItem[]) => void
+  upsertFile: (file: FileItem) => void
+  deleteFile: (filename: string) => void
+  addFile: (file: File, uploadFn?: (file: File) => Promise<string>) => void
+}
 
 export const useComposerFileStore = create<ComposerFileStore>((set, get) => ({
   files: [],
@@ -68,69 +71,80 @@ export const useComposerFileStore = create<ComposerFileStore>((set, get) => ({
 
   upsertFile: (incomingFile) =>
     set(({ files }) => {
-      const fileExists = files.some((f) => f.name === incomingFile.name);
+      const fileExists = files.some((f) => f.name === incomingFile.name)
       const filesArr = fileExists
-        ? files.map((file) =>
-            file.name === incomingFile.name ? { ...file, ...incomingFile } : file
-          )
-        : [...files, { ...incomingFile }];
-      return { files: filesArr };
+        ? files.map((file) => (file.name === incomingFile.name ? { ...file, ...incomingFile } : file))
+        : [...files, { ...incomingFile }]
+      return { files: filesArr }
     }),
 
   addFile: async (file, uploadFn) => {
-    const hasReachedMaxFiles = get().files.length >= MAX_FILES;
-    if (hasReachedMaxFiles) return;
+    const hasReachedMaxFiles = get().files.length >= MAX_FILES
+    if (hasReachedMaxFiles) return
 
-    const fileName = file.name;
+    const fileName = file.name
 
     // Determine file type based on MIME type
-    let fileType: FileType = "file";
-    if (file.type.startsWith("image/")) fileType = "image";
-    else if (file.type.startsWith("video/")) fileType = "video";
-    else if (file.type.startsWith("audio/")) fileType = "audio";
+    let fileType: FileType = 'file'
+    if (file.type.startsWith('image/')) fileType = 'image'
+    else if (file.type.startsWith('video/')) fileType = 'video'
+    else if (file.type.startsWith('audio/')) fileType = 'audio'
 
-    if (fileType === "image" && uploadFn) {
-      const previewUrl = URL.createObjectURL(file);
+    if (fileType === 'image' && uploadFn) {
+      const previewUrl = URL.createObjectURL(file)
 
       // Add file with loading status
       get().upsertFile({
-        name: fileName, type: fileType, url: previewUrl,
-        instance: file, status: "loading",
-      });
+        name: fileName,
+        type: fileType,
+        url: previewUrl,
+        instance: file,
+        status: 'loading',
+      })
 
       try {
-        const uploadedUrl = await uploadFn(file);
+        const uploadedUrl = await uploadFn(file)
         get().upsertFile({
-          name: fileName, type: fileType, url: uploadedUrl,
-          instance: file, status: "uploaded",
-        });
-        URL.revokeObjectURL(previewUrl);
+          name: fileName,
+          type: fileType,
+          url: uploadedUrl,
+          instance: file,
+          status: 'uploaded',
+        })
+        URL.revokeObjectURL(previewUrl)
       } catch (error) {
-        console.error("Failed to upload image:", error);
+        console.error('Failed to upload image:', error)
         get().upsertFile({
-          name: fileName, type: fileType, url: previewUrl,
-          instance: file, status: "error",
-        });
+          name: fileName,
+          type: fileType,
+          url: previewUrl,
+          instance: file,
+          status: 'error',
+        })
       }
     } else {
-      const url = URL.createObjectURL(file);
+      const url = URL.createObjectURL(file)
       get().upsertFile({
-        name: fileName, type: fileType, url,
-        instance: file, status: "uploaded",
-      });
+        name: fileName,
+        type: fileType,
+        url,
+        instance: file,
+        status: 'uploaded',
+      })
     }
   },
 
   deleteFile: (filename) =>
     set(({ files }) => {
-      const file = files.find((f) => f.name === filename);
-      if (file?.url) URL.revokeObjectURL(file.url);
-      return { files: files.filter((file) => file.name !== filename) };
+      const file = files.find((f) => f.name === filename)
+      if (file?.url) URL.revokeObjectURL(file.url)
+      return { files: files.filter((file) => file.name !== filename) }
     }),
-}));
+}))
 ```
 
 **Key ADK patterns demonstrated:**
+
 - **Optimistic UI**: Shows preview immediately, uploads in background
 - **Status tracking**: loading → uploaded/error states
 - **Resource cleanup**: Revokes object URLs to prevent memory leaks
@@ -163,7 +177,7 @@ function UploadedFileCount() {
 ### Multiple Values with Shallow
 
 ```typescript
-import { shallow } from "zustand/shallow";
+import { shallow } from 'zustand/shallow'
 
 function FileUploader() {
   const { files, addFile, deleteFile } = useComposerFileStore(
@@ -173,7 +187,7 @@ function FileUploader() {
       deleteFile: state.deleteFile,
     }),
     shallow
-  );
+  )
   // ...
 }
 ```
@@ -181,12 +195,12 @@ function FileUploader() {
 ### Accessing Store Outside React
 
 ```typescript
-export const getComposerFiles = () => useComposerFileStore.getState().files;
+export const getComposerFiles = () => useComposerFileStore.getState().files
 
 // Use in non-React code
 function handleExternalEvent() {
-  const currentFiles = getComposerFiles();
-  console.log("Current files:", currentFiles);
+  const currentFiles = getComposerFiles()
+  console.log('Current files:', currentFiles)
 }
 ```
 
@@ -197,25 +211,25 @@ function handleExternalEvent() {
 For persisting state to localStorage:
 
 ```typescript
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 
 type PreferencesStore = {
-  theme: "light" | "dark";
-  setTheme: (theme: "light" | "dark") => void;
-};
+  theme: 'light' | 'dark'
+  setTheme: (theme: 'light' | 'dark') => void
+}
 
 export const usePreferencesStore = create<PreferencesStore>()(
   persist(
     (set) => ({
-      theme: "light",
+      theme: 'light',
       setTheme: (theme) => set({ theme }),
     }),
     {
-      name: "user-preferences", // localStorage key
+      name: 'user-preferences', // localStorage key
     }
   )
-);
+)
 ```
 
 ---
@@ -238,11 +252,11 @@ const useAppStore = create(...);   // Everything mixed together
 
 ```typescript
 // Good — compute in selector
-const hasFiles = useComposerFileStore((state) => state.files.length > 0);
+const hasFiles = useComposerFileStore((state) => state.files.length > 0)
 
 // Bad — compute in render
-const files = useComposerFileStore((state) => state.files);
-const hasFiles = files.length > 0; // Re-computes on every render
+const files = useComposerFileStore((state) => state.files)
+const hasFiles = files.length > 0 // Re-computes on every render
 ```
 
 ### 3. Separate Concerns (Server vs App State)
@@ -339,11 +353,13 @@ function MyComponent() {
 ## Summary
 
 **Use Zustand for:**
+
 - Client instance management (see [Botpress Client](./botpress-client.md))
 - Global app state (theme, preferences, user settings)
 - Complex UI state that needs to be shared (file uploads, multi-step wizards)
 
 **Don't use Zustand for:**
+
 - Server state (use TanStack Query)
 - Form state (use useState or React Hook Form)
 - Temporary component state (use useState)

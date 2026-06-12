@@ -187,18 +187,18 @@ When users ask about calling actions, reference `calling-actions.md`:
 
 ```typescript
 // 1. Cookie helpers
-function setCookie(name: string, value: string, days = 365);
-function getCookie(name: string): string | null;
-function deleteCookie(name: string);
+function setCookie(name: string, value: string, days = 365)
+function getCookie(name: string): string | null
+function deleteCookie(name: string)
 
 // 2. AuthContext
 interface AuthContextType {
-  token: string | null;
-  isAuthenticated: boolean;
-  userProfile: UserProfile | null;
-  isLoadingProfile: boolean;
-  login: (token: string) => void;
-  logout: () => void;
+  token: string | null
+  isAuthenticated: boolean
+  userProfile: UserProfile | null
+  isLoadingProfile: boolean
+  login: (token: string) => void
+  logout: () => void
 }
 
 // 3. OAuth Flow
@@ -214,30 +214,27 @@ interface AuthContextType {
 const useClientsStore = create<ClientsState>()((set, get) => ({
   APIClients: {},
   getAPIClient: (props) => {
-    const key = props?.botId
-      ? `${props.workspaceId}-${props.botId}`
-      : (props?.workspaceId ?? DEFAULT_API_CLIENT_KEY);
+    const key = props?.botId ? `${props.workspaceId}-${props.botId}` : (props?.workspaceId ?? DEFAULT_API_CLIENT_KEY)
 
-    const cached = get().APIClients[key];
-    if (cached) return cached;
+    const cached = get().APIClients[key]
+    if (cached) return cached
 
     const newClient = new APIClient({
       apiUrl: API_BASE_URL,
       workspaceId: props?.workspaceId,
-      token: getPat() ?? "",
+      token: getPat() ?? '',
       botId: props?.botId,
-    });
+    })
 
     set((state) => ({
       APIClients: { ...state.APIClients, [key]: newClient },
-    }));
+    }))
 
-    return newClient;
+    return newClient
   },
-}));
+}))
 
-export const getApiClient = (props?) =>
-  useClientsStore.getState().getAPIClient(props);
+export const getApiClient = (props?) => useClientsStore.getState().getAPIClient(props)
 ```
 
 ### Type Import Pattern
@@ -247,38 +244,38 @@ export const getApiClient = (props?) =>
 /// <reference path="../../../bot/.adk/action-types.d.ts" />
 /// <reference path="../../../bot/.adk/table-types.d.ts" />
 
-import type { BotActionDefinitions } from "@botpress/runtime/_types/actions";
-import type { TableDefinitions } from "@botpress/runtime/_types/tables";
+import type { BotActionDefinitions } from '@botpress/runtime/_types/actions'
+import type { TableDefinitions } from '@botpress/runtime/_types/tables'
 
 // Create type aliases
-export type SendMessageAction = BotActionDefinitions["sendMessage"];
-export type TicketTableRow = TableDefinitions["TicketsTable"]["Output"];
+export type SendMessageAction = BotActionDefinitions['sendMessage']
+export type TicketTableRow = TableDefinitions['TicketsTable']['Output']
 ```
 
 ### Action Call Pattern
 
 ```typescript
 // services/bot-service.ts
-export async function sendMessage(input: SendMessageAction["input"]) {
-  const client = getApiClient({ botId, workspaceId });
+export async function sendMessage(input: SendMessageAction['input']) {
+  const client = getApiClient({ botId, workspaceId })
   const result = await client.callAction({
-    type: "sendMessage",
+    type: 'sendMessage',
     input,
-  });
-  return result.output as SendMessageAction["output"];
+  })
+  return result.output as SendMessageAction['output']
 }
 
 // Component usage with useMutation
 const { mutate: send, isPending } = useMutation({
   mutationFn: sendMessage,
   onSuccess: () => {
-    toast.success("Message sent");
-    queryClient.invalidateQueries({ queryKey: ["messages"] });
+    toast.success('Message sent')
+    queryClient.invalidateQueries({ queryKey: ['messages'] })
   },
   onError: (error) => {
-    toast.error("Failed to send message");
+    toast.error('Failed to send message')
   },
-});
+})
 ```
 
 ---
@@ -377,10 +374,10 @@ When answering questions, always verify these patterns against the documentation
 
 ```typescript
 // ✅ CORRECT - Use client store
-const client = getApiClient({ workspaceId, botId });
+const client = getApiClient({ workspaceId, botId })
 
 // ❌ WRONG - Create new client every time
-const client = new Client({ apiUrl, workspaceId, token, botId });
+const client = new Client({ apiUrl, workspaceId, token, botId })
 ```
 
 ### 2. Type Imports
@@ -388,34 +385,34 @@ const client = new Client({ apiUrl, workspaceId, token, botId });
 ```typescript
 // ✅ CORRECT - Triple-slash at top of file
 /// <reference path="../../../bot/.adk/action-types.d.ts" />
-import type { BotActionDefinitions } from "@botpress/runtime/_types/actions";
+import type { BotActionDefinitions } from '@botpress/runtime/_types/actions'
 
 // ❌ WRONG - No triple-slash reference
-import type { BotActionDefinitions } from "@botpress/runtime/_types/actions";
+import type { BotActionDefinitions } from '@botpress/runtime/_types/actions'
 ```
 
 ### 3. Action Calls
 
 ```typescript
 // ✅ CORRECT - Service layer with types
-export async function sendMessage(input: SendMessageAction["input"]) {
-  const client = getApiClient({ botId, workspaceId });
-  const result = await client.callAction({ type: "sendMessage", input });
-  return result.output as SendMessageAction["output"];
+export async function sendMessage(input: SendMessageAction['input']) {
+  const client = getApiClient({ botId, workspaceId })
+  const result = await client.callAction({ type: 'sendMessage', input })
+  return result.output as SendMessageAction['output']
 }
 
 // ❌ WRONG - Direct call in component
-const result = await client.callAction({ type: "sendMessage", input: data });
+const result = await client.callAction({ type: 'sendMessage', input: data })
 ```
 
 ### 4. Authentication Storage
 
 ```typescript
 // ✅ CORRECT - Cookie with SameSite
-document.cookie = `token=${value};expires=${expires};path=/;SameSite=Lax`;
+document.cookie = `token=${value};expires=${expires};path=/;SameSite=Lax`
 
 // ❌ WRONG - localStorage without security
-localStorage.setItem("token", value);
+localStorage.setItem('token', value)
 ```
 
 ---

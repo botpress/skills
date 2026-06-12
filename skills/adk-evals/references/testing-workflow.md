@@ -53,10 +53,10 @@ adk evals --format json # machine-readable JSON output (for CI)
 
 ### Exit codes
 
-| Code | Meaning |
-|------|---------|
-| `0` | All evals passed |
-| `1` | One or more evals failed |
+| Code | Meaning                  |
+| ---- | ------------------------ |
+| `0`  | All evals passed         |
+| `1`  | One or more evals failed |
 
 Use this in CI to gate merges on eval results.
 
@@ -120,6 +120,7 @@ adk chat
 ```
 
 This opens an interactive chat session with your dev bot. Use it to:
+
 - Manually test a flow before formalizing it as an eval
 - Quickly verify a fix after a failing eval
 - Explore edge cases interactively
@@ -146,6 +147,7 @@ adk logs                    # browse recent logs
 ```
 
 Use traces to verify:
+
 - Which tools were called (and with what inputs/outputs)
 - Whether a workflow was entered or completed
 - Where the bot spent its time (latency analysis)

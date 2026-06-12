@@ -3,8 +3,8 @@ name: Check commands manifest
 on:
   pull_request:
     paths:
-      - "commands/**"
-      - "scripts/generate-manifest.sh"
+      - 'commands/**'
+      - 'scripts/generate-manifest.sh'
 
 jobs:
   check:

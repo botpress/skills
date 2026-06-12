@@ -29,7 +29,7 @@ Create a query client instance with sensible defaults:
 **File: `src/lib/query-client.ts`**
 
 ```typescript
-import { QueryClient } from "@tanstack/react-query";
+import { QueryClient } from '@tanstack/react-query'
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -37,7 +37,7 @@ export const queryClient = new QueryClient({
       retry: 1,
     },
   },
-});
+})
 ```
 
 ### Provider Setup
@@ -101,16 +101,17 @@ Query keys uniquely identify queries and control caching:
 
 ```typescript
 // Static key
-queryKey: ["tickets"]
+queryKey: ['tickets']
 
 // Dynamic key with parameters
-queryKey: ["ticket", ticketId]
+queryKey: ['ticket', ticketId]
 
 // Complex key with filters
-queryKey: ["tickets", { status: "open", limit: 50 }]
+queryKey: ['tickets', { status: 'open', limit: 50 }]
 ```
 
 **Rules:**
+
 - Include all parameters that affect the data
 - Use array format for nested dependencies
 - Keep keys consistent across your app
@@ -121,12 +122,12 @@ Control when queries refetch:
 
 ```typescript
 const { data } = useQuery({
-  queryKey: ["tickets"],
+  queryKey: ['tickets'],
   queryFn: fetchTickets,
   refetchInterval: 3000, // Refetch every 3 seconds
   refetchOnWindowFocus: true, // Refetch when window regains focus
   staleTime: 5000, // Consider data fresh for 5 seconds
-});
+})
 ```
 
 ## Mutations (useMutation)
@@ -184,24 +185,24 @@ Update UI immediately before the server responds:
 const mutation = useMutation({
   mutationFn: sendMessage,
   onMutate: async (newMessage) => {
-    await queryClient.cancelQueries({ queryKey: ["messages", ticketId] });
+    await queryClient.cancelQueries({ queryKey: ['messages', ticketId] })
 
-    const previousMessages = queryClient.getQueryData(["messages", ticketId]);
+    const previousMessages = queryClient.getQueryData(['messages', ticketId])
 
-    queryClient.setQueryData(["messages", ticketId], (old: any) => ({
+    queryClient.setQueryData(['messages', ticketId], (old: any) => ({
       ...old,
       rows: [...old.rows, newMessage],
-    }));
+    }))
 
-    return { previousMessages };
+    return { previousMessages }
   },
   onError: (err, newMessage, context) => {
-    queryClient.setQueryData(["messages", ticketId], context?.previousMessages);
+    queryClient.setQueryData(['messages', ticketId], context?.previousMessages)
   },
   onSettled: () => {
-    queryClient.invalidateQueries({ queryKey: ["messages", ticketId] });
+    queryClient.invalidateQueries({ queryKey: ['messages', ticketId] })
   },
-});
+})
 ```
 
 ### Invalidation and Refetching
@@ -210,13 +211,13 @@ After mutations, invalidate affected queries:
 
 ```typescript
 // Invalidate specific query
-queryClient.invalidateQueries({ queryKey: ["tickets"] });
+queryClient.invalidateQueries({ queryKey: ['tickets'] })
 
 // Invalidate all queries starting with "ticket"
-queryClient.invalidateQueries({ queryKey: ["ticket"] });
+queryClient.invalidateQueries({ queryKey: ['ticket'] })
 
 // Refetch immediately
-queryClient.refetchQueries({ queryKey: ["tickets"] });
+queryClient.refetchQueries({ queryKey: ['tickets'] })
 ```
 
 ## Advanced: TanStack DB Collections
@@ -226,6 +227,7 @@ queryClient.refetchQueries({ queryKey: ["tickets"] });
 ### What are Collections?
 
 **TanStack DB Collections** provide:
+
 - **Autocompleted local state**: Instant UI updates before server confirmation
 - **Automatic server sync**: Background synchronization with your bot's tables
 - **Query-like API**: Built on TanStack Query with additional mutation features
@@ -244,28 +246,28 @@ pnpm add @tanstack/db @tanstack/query-db-collection
 Basic collection setup:
 
 ```typescript
-import { createCollection } from "@tanstack/db";
-import { queryCollectionOptions } from "@tanstack/query-db-collection";
-import { queryClient } from "./lib/query-client";
-import { listTickets } from "./services/tickets";
+import { createCollection } from '@tanstack/db'
+import { queryCollectionOptions } from '@tanstack/query-db-collection'
+import { queryClient } from './lib/query-client'
+import { listTickets } from './services/tickets'
 
 export const ticketsCollection = createCollection(
   queryCollectionOptions({
-    queryKey: ["tickets"],
+    queryKey: ['tickets'],
     queryFn: async () => {
       return listTickets({
-        filter: { state: { $in: ["open", "snoozed"] } },
+        filter: { state: { $in: ['open', 'snoozed'] } },
         limit: 1000,
-        orderBy: "updatedAt",
-        orderDirection: "desc",
-      });
+        orderBy: 'updatedAt',
+        orderDirection: 'desc',
+      })
     },
     queryClient,
     refetchInterval: 3000,
     select: (data) => data.rows,
     getKey: (item) => item.id,
   })
-);
+)
 ```
 
 ### Different Refetch Intervals
@@ -276,26 +278,26 @@ Not all data needs the same refresh rate:
 // Active data the user is watching — fast refresh
 export const activeTicketsCollection = createCollection(
   queryCollectionOptions({
-    queryKey: ["active-tickets"],
-    queryFn: async () => listTickets({ filter: { state: { $in: ["open", "snoozed"] } } }),
+    queryKey: ['active-tickets'],
+    queryFn: async () => listTickets({ filter: { state: { $in: ['open', 'snoozed'] } } }),
     queryClient,
     refetchInterval: 1000 * 3, // 3 seconds
     select: (data) => data.rows,
     getKey: (item) => item.id,
   })
-);
+)
 
 // Closed items — slow refresh
 export const closedTicketsCollection = createCollection(
   queryCollectionOptions({
-    queryKey: ["closed-tickets"],
-    queryFn: async () => listTickets({ filter: { state: "closed" } }),
+    queryKey: ['closed-tickets'],
+    queryFn: async () => listTickets({ filter: { state: 'closed' } }),
     queryClient,
     refetchInterval: 1000 * 30, // 30 seconds
     select: (data) => data.rows,
     getKey: (item) => item.id,
   })
-);
+)
 ```
 
 ### Parameterized Collections
@@ -306,37 +308,38 @@ export const closedTicketsCollection = createCollection(
 function createMessagesCollection(ticketId?: string) {
   return createCollection(
     queryCollectionOptions({
-      queryKey: ["messages", ticketId],
+      queryKey: ['messages', ticketId],
       enabled: !!ticketId,
       queryFn: async () => {
-        if (!ticketId) return { rows: [] };
+        if (!ticketId) return { rows: [] }
         return listMessages(ticketId, {
           limit: 1000,
-          orderBy: "createdAt",
-          orderDirection: "asc",
-        });
+          orderBy: 'createdAt',
+          orderDirection: 'asc',
+        })
       },
       queryClient,
       refetchInterval: 1000, // 1 second for chat messages
       select: (data) => data.rows,
       getKey: (item) => item.id,
     })
-  );
+  )
 }
 
 // Cache collections by ID to avoid recreating
-const messagesCollections = new Map();
+const messagesCollections = new Map()
 
 export function getTicketMessagesCollection(ticketId?: string) {
-  const cacheKey = ticketId || "__undefined__";
+  const cacheKey = ticketId || '__undefined__'
   if (!messagesCollections.has(cacheKey)) {
-    messagesCollections.set(cacheKey, createMessagesCollection(ticketId));
+    messagesCollections.set(cacheKey, createMessagesCollection(ticketId))
   }
-  return messagesCollections.get(cacheKey);
+  return messagesCollections.get(cacheKey)
 }
 ```
 
 **Key features:**
+
 - Factory function for dynamic parameters
 - Map-based caching prevents duplicate collections
 - `enabled` flag prevents premature fetching
@@ -358,16 +361,16 @@ Optimistic actions combine instant UI updates with server synchronization:
 
 ```typescript
 export const sendNewMessage = createOptimisticAction<{
-  message: string;
-  agentId: string;
-  ticketId: string;
-  messageType: "comment" | "note";
-  attachmentUrls?: string[];
+  message: string
+  agentId: string
+  ticketId: string
+  messageType: 'comment' | 'note'
+  attachmentUrls?: string[]
   attachmentFiles?: Array<{
-    content_type: string;
-    data: string;
-    name: string;
-  }>;
+    content_type: string
+    data: string
+    name: string
+  }>
 }>({
   onMutate: (props) => {
     // Step 1: Insert optimistic entry — instant UI update
@@ -375,7 +378,7 @@ export const sendNewMessage = createOptimisticAction<{
       {
         id: Math.floor(Math.random() * 1000000000), // Temporary ID
         content: props.message,
-        author: { id: props.agentId, type: "agent" },
+        author: { id: props.agentId, type: 'agent' },
         attachments: [],
         computed: {},
         ticketId: props.ticketId,
@@ -384,12 +387,12 @@ export const sendNewMessage = createOptimisticAction<{
         updatedAt: new Date().toISOString(),
         details: {},
         external_id: undefined,
-        messageId: "",
+        messageId: '',
         redacted: false,
-        state: "sent",
+        state: 'sent',
       },
       { optimistic: true }
-    );
+    )
   },
   mutationFn: async (props) => {
     // Step 2: Send real API call
@@ -400,12 +403,12 @@ export const sendNewMessage = createOptimisticAction<{
       messageType: props.messageType,
       attachmentUrls: props.attachmentUrls,
       attachmentFiles: props.attachmentFiles,
-    });
+    })
 
     // Step 3: Refetch to get real server state
-    await getTicketMessagesCollection(props.ticketId).utils.refetch();
+    await getTicketMessagesCollection(props.ticketId).utils.refetch()
   },
-});
+})
 ```
 
 **How it works:**
@@ -451,22 +454,23 @@ Control update frequency based on data characteristics:
 
 ```typescript
 // Real-time data (chat messages, notifications)
-refetchInterval: 1000  // 1 second
+refetchInterval: 1000 // 1 second
 
 // Frequently changing data (active tickets)
-refetchInterval: 1000 * 3  // 3 seconds
+refetchInterval: 1000 * 3 // 3 seconds
 
 // Background updates (analysis, reports)
-refetchInterval: 1000 * 5  // 5 seconds
+refetchInterval: 1000 * 5 // 5 seconds
 
 // Slow-changing data (closed items, archives)
-refetchInterval: 1000 * 30  // 30 seconds
+refetchInterval: 1000 * 30 // 30 seconds
 
 // Very slow changes (admin lists, settings)
-refetchInterval: 1000 * 60 * 5  // 5 minutes
+refetchInterval: 1000 * 60 * 5 // 5 minutes
 ```
 
 **Guidelines:**
+
 - Faster = better UX, but higher server load
 - Match interval to actual update frequency
 - Consider user expectations (chat vs. analytics)
@@ -476,8 +480,8 @@ refetchInterval: 1000 * 60 * 5  // 5 minutes
 Collections need unique identifiers for tracking changes:
 
 ```typescript
-getKey: (item) => item.id       // Use ID field
-getKey: (item) => item.key      // Use key field
+getKey: (item) => item.id // Use ID field
+getKey: (item) => item.key // Use key field
 getKey: (item) => `${item.type}-${item.id}` // Composite key
 ```
 
@@ -490,30 +494,30 @@ Create collections based on runtime parameters:
 function createMessagesCollection(ticketId?: string) {
   return createCollection(
     queryCollectionOptions({
-      queryKey: ["messages", ticketId],
+      queryKey: ['messages', ticketId],
       enabled: !!ticketId,
       queryFn: async () => {
-        if (!ticketId) return { rows: [] };
-        return listMessages(ticketId);
+        if (!ticketId) return { rows: [] }
+        return listMessages(ticketId)
       },
       // ... other options
     })
-  );
+  )
 }
 
 // Caching factory results
-const collectionsCache = new Map();
+const collectionsCache = new Map()
 
 export function getMessagesCollection(ticketId?: string) {
-  const cacheKey = ticketId || "__undefined__";
+  const cacheKey = ticketId || '__undefined__'
   if (!collectionsCache.has(cacheKey)) {
-    collectionsCache.set(cacheKey, createMessagesCollection(ticketId));
+    collectionsCache.set(cacheKey, createMessagesCollection(ticketId))
   }
-  return collectionsCache.get(cacheKey);
+  return collectionsCache.get(cacheKey)
 }
 
 // Usage
-const messages = getMessagesCollection(ticketId).useQuery();
+const messages = getMessagesCollection(ticketId).useQuery()
 ```
 
 ### Collection Utilities
@@ -521,16 +525,16 @@ const messages = getMessagesCollection(ticketId).useQuery();
 Collections expose useful utilities:
 
 ```typescript
-const collection = ticketsCollection;
+const collection = ticketsCollection
 
 // Manual refetch
-await collection.utils.refetch();
+await collection.utils.refetch()
 
 // Insert item
-collection.insert(newItem, { optimistic: true });
+collection.insert(newItem, { optimistic: true })
 
 // Get current data
-const data = collection.utils.getData();
+const data = collection.utils.getData()
 ```
 
 ## Best Practices
@@ -541,14 +545,10 @@ Organize keys hierarchically:
 
 ```typescript
 // Good: Hierarchical, predictable
-["tickets"]                             // All tickets
-["tickets", "open"]                     // Open tickets
-["tickets", ticketId]                   // Single ticket
-["tickets", ticketId, "messages"]       // Ticket messages
-
-// Bad: Flat, hard to invalidate
-["openTickets"]
-["ticketMessages123"]
+;['tickets'][('tickets', 'open')][('tickets', ticketId)][('tickets', ticketId, 'messages')][ // All tickets // Open tickets // Single ticket // Ticket messages
+  // Bad: Flat, hard to invalidate
+  'openTickets'
+]['ticketMessages123']
 ```
 
 ### Refetch Intervals (Active vs Background)
@@ -564,7 +564,7 @@ refetchInterval: 1000 * 30 // 30 seconds
 
 // Or use focus-aware intervals
 refetchInterval: (query) => {
-  return document.hasFocus() ? 1000 * 3 : 1000 * 30;
+  return document.hasFocus() ? 1000 * 3 : 1000 * 30
 }
 ```
 
@@ -573,12 +573,14 @@ refetchInterval: (query) => {
 When to use optimistic updates:
 
 **Good candidates:**
+
 - Chat messages
 - Status changes
 - Simple data updates
 - High-confidence success rate
 
 **Avoid for:**
+
 - Complex validations
 - Server-side computations
 - Critical operations (payments)
@@ -635,16 +637,16 @@ function TicketList() {
 Define types for your data:
 
 ```typescript
-import { z } from "zod";
+import { z } from 'zod'
 
 const ticketSchema = z.object({
   id: z.number(),
   title: z.string(),
-  status: z.enum(["open", "closed", "snoozed"]),
+  status: z.enum(['open', 'closed', 'snoozed']),
   updatedAt: z.string(),
-});
+})
 
-type Ticket = z.infer<typeof ticketSchema>;
+type Ticket = z.infer<typeof ticketSchema>
 ```
 
 ### Separation of Concerns
@@ -667,26 +669,28 @@ src/
 ```
 
 **Services layer:**
+
 ```typescript
 // services/tickets.ts
 export async function listTickets(params: ListParams) {
   return client.findTableRows({
-    table: "TicketsTable",
+    table: 'TicketsTable',
     ...params,
-  });
+  })
 }
 ```
 
 **Component layer:**
+
 ```typescript
 // components/TicketList.tsx
-import { listTickets } from "../services/tickets";
+import { listTickets } from '../services/tickets'
 
 export function TicketList() {
   const { data } = useQuery({
-    queryKey: ["tickets"],
+    queryKey: ['tickets'],
     queryFn: () => listTickets({ limit: 100 }),
-  });
+  })
   // ...
 }
 ```
@@ -709,6 +713,7 @@ export function TicketList() {
 - **Factory patterns**: Dynamic collections with caching
 
 Choose the right tool:
+
 - **Basic queries** → `useQuery` + `useMutation`
 - **Real-time dashboards** → TanStack DB Collections
 - **Chat interfaces** → Collections + optimistic actions

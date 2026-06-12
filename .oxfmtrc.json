@@ -1,0 +1,8 @@
+{
+  "$schema": "https://unpkg.com/oxfmt@0.41.0/configuration_schema.json",
+  "printWidth": 120,
+  "tabWidth": 2,
+  "semi": false,
+  "singleQuote": true,
+  "trailingComma": "es5"
+}

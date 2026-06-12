@@ -27,11 +27,11 @@ Activate when users ask about:
 
 ## Available Documentation
 
-| File | Contents |
-|------|----------|
-| `references/agent-steps.md` | Agent Steps visualization — turns, iterations, tools, messages, state mutations, cost tracking, status indicators |
-| `references/pages.md` | Every page/tab in the Dev Console — what it shows, key features, layout |
-| `references/component-registry.md` | Component Registry — installed vs registry tabs, component lifecycle, runtime registry internals, UI features |
+| File                                  | Contents                                                                                                                                                    |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `references/agent-steps.md`           | Agent Steps visualization — turns, iterations, tools, messages, state mutations, cost tracking, status indicators                                           |
+| `references/pages.md`                 | Every page/tab in the Dev Console — what it shows, key features, layout                                                                                     |
+| `references/component-registry.md`    | Component Registry — installed vs registry tabs, component lifecycle, runtime registry internals, UI features                                               |
 | `references/multi-agent-dashboard.md` | Multi-agent architecture, agent selector, console modes (local/cloud), dev/prod targets, CLI commands (`adk ps`, `adk kill`, `adk dashboard`, `adk status`) |
 
 ## How to Answer
@@ -47,15 +47,15 @@ Match depth to the question:
 
 ### Tab Groups
 
-| Group | Pages | Purpose |
-|-------|-------|---------|
-| **Chat** | Chat | Test the agent via webchat + see Agent Steps |
-| **Build** | Agent Map | Interactive agent architecture graph (experimental, feature-flagged behind `enable_agent_forge`) |
-| **Components** | Webchat Components, Actions, Workflows, Triggers | Browse component registry, test bot primitives |
-| **Test** | RAG Search, Evals | Test knowledge search and run automated evals |
-| **Data** | Knowledge, Tables, Files | Manage knowledge bases, tables, and files |
-| **Observe** | Conversations, Traces, Logs | View conversation history, execution traces, runtime logs |
-| **Config** | Settings, Integrations | Agent config, secrets, LLM settings, integration management |
+| Group          | Pages                                            | Purpose                                                                                          |
+| -------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| **Chat**       | Chat                                             | Test the agent via webchat + see Agent Steps                                                     |
+| **Build**      | Agent Map                                        | Interactive agent architecture graph (experimental, feature-flagged behind `enable_agent_forge`) |
+| **Components** | Webchat Components, Actions, Workflows, Triggers | Browse component registry, test bot primitives                                                   |
+| **Test**       | RAG Search, Evals                                | Test knowledge search and run automated evals                                                    |
+| **Data**       | Knowledge, Tables, Files                         | Manage knowledge bases, tables, and files                                                        |
+| **Observe**    | Conversations, Traces, Logs                      | View conversation history, execution traces, runtime logs                                        |
+| **Config**     | Settings, Integrations                           | Agent config, secrets, LLM settings, integration management                                      |
 
 ### Multi-Agent Sidebar
 
@@ -84,28 +84,28 @@ The right panel of the Chat page shows **Agent Steps** — a real-time visualiza
 
 ### Key URLs
 
-| Path | Page |
-|------|------|
-| `/chat` | Chat + Agent Steps |
-| `/agent-map` | Agent Map — interactive architecture graph (experimental) |
-| `/components` | Component registry + installed components |
-| `/actions` | Actions browser |
-| `/workflows` | Workflows + run history |
-| `/search` | RAG search testing |
-| `/evals` | Eval definitions + runs |
-| `/knowledge` | Knowledge base management |
-| `/tables` | Table data management |
-| `/traces` | Full trace viewer |
-| `/conversations` | Conversation history |
-| `/logs` | Runtime logs |
-| `/settings` | Agent configuration |
-| `/integrations` | Integration management |
+| Path             | Page                                                      |
+| ---------------- | --------------------------------------------------------- |
+| `/chat`          | Chat + Agent Steps                                        |
+| `/agent-map`     | Agent Map — interactive architecture graph (experimental) |
+| `/components`    | Component registry + installed components                 |
+| `/actions`       | Actions browser                                           |
+| `/workflows`     | Workflows + run history                                   |
+| `/search`        | RAG search testing                                        |
+| `/evals`         | Eval definitions + runs                                   |
+| `/knowledge`     | Knowledge base management                                 |
+| `/tables`        | Table data management                                     |
+| `/traces`        | Full trace viewer                                         |
+| `/conversations` | Conversation history                                      |
+| `/logs`          | Runtime logs                                              |
+| `/settings`      | Agent configuration                                       |
+| `/integrations`  | Integration management                                    |
 
 ### Multi-Agent CLI Commands
 
-| Command | Purpose |
-|---------|---------|
-| `adk ps` | List running agents and processes with PIDs, ports, uptime (supports `--watch`) |
-| `adk dashboard` | Open the DevConsole in standalone mode (no agent required) |
-| `adk kill` | Stop agents or the entire DevConsole (`--all`, `--current`, `--pid`, or by name) |
-| `adk status` | Show project health and status info |
+| Command         | Purpose                                                                          |
+| --------------- | -------------------------------------------------------------------------------- |
+| `adk ps`        | List running agents and processes with PIDs, ports, uptime (supports `--watch`)  |
+| `adk dashboard` | Open the DevConsole in standalone mode (no agent required)                       |
+| `adk kill`      | Stop agents or the entire DevConsole (`--all`, `--current`, `--pid`, or by name) |
+| `adk status`    | Show project health and status info                                              |

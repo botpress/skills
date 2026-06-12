@@ -1,12 +1,12 @@
 ---
 name: adk-test
 description: Invoke an ADK primitive end-to-end with realistic input to confirm it works
-argument-hint: "[primitive name] [input]"
+argument-hint: '[primitive name] [input]'
 ---
 
 Load the `adk` skill, then run the named primitive immediately.
 
-This is exploratory, one-shot testing — *does it work right now?*. It is distinct from `/adk-eval`, which writes persistent assertion-based eval files. If the user wants assertions or coverage, route them there.
+This is exploratory, one-shot testing — _does it work right now?_. It is distinct from `/adk-eval`, which writes persistent assertion-based eval files. If the user wants assertions or coverage, route them there.
 
 If `$ARGUMENTS` is empty, list the user's primitives and ask which to test.
 
@@ -21,7 +21,7 @@ If `$ARGUMENTS` is empty, list the user's primitives and ask which to test.
    - **Table:** insert a sample row, run a representative query, then **delete the row** before reporting. Tag the test row with a recognizable marker (e.g., a `__test_<timestamp>` value in a string column) so the cleanup query is unambiguous. If the project is linked to a shared or production workspace, ask the user before inserting at all — offer to scope the test to a local dev table instead.
    - **Knowledge base:** run a search query against it.
 3. **Run it and read traces.** Capture the response. Run `adk traces --format json` filtered to the most recent invocation if the response alone is not enough to judge correctness.
-4. **Report.** Show the input used, the output, latency, and any errors or surprising behavior. Be explicit if the trace shows the primitive was *not* exercised (e.g., the LLM ignored the tool).
+4. **Report.** Show the input used, the output, latency, and any errors or surprising behavior. Be explicit if the trace shows the primitive was _not_ exercised (e.g., the LLM ignored the tool).
 5. **Suggest follow-ups.** If the test surfaced something worth pinning down, offer `/adk-eval <name>` to capture it as a regression eval. If it failed, offer `/adk-debug` with the relevant context.
 
 Clean up any disposable runner scripts under `.adk/scratch/test-*.ts` after the test unless the user asks to keep them.

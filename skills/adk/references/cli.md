@@ -464,7 +464,7 @@ adk logs warning since=1h          # last hour of warnings
 
 ### adk traces
 
-Read execution traces — tool calls, action invocations, LLM steps, error context — for understanding *what happened* during a turn, beyond what `adk logs` reports. Reads from the local SQLite trace store under `.adk/`.
+Read execution traces — tool calls, action invocations, LLM steps, error context — for understanding _what happened_ during a turn, beyond what `adk logs` reports. Reads from the local SQLite trace store under `.adk/`.
 
 ```bash
 adk traces [tokens...] [options]
@@ -652,16 +652,19 @@ adk integrations info <name>             # Full integration details
 ```
 
 **`adk integrations search` options:**
+
 - `--format json` - Machine-readable output
 - `--limit <n>` - Max results (default: 20)
 
 **`adk integrations list` options:**
+
 - `--available` - Browse Hub instead of installed
 - `--format json` - Machine-readable output
 - `--verbose` - Show config details
 - `--limit <n>` - Max results (default: 50)
 
 **`adk integrations info` options:**
+
 - `--actions` - Show only actions
 - `--channels` - Show only channels
 - `--events` - Show only events
@@ -680,12 +683,14 @@ adk integrations configure <alias>       # Set/unset config values
 ```
 
 **`adk integrations add` options:**
+
 - `--alias <name>` - Custom alias for code access
 - `--target <env>` - Environment (dev/prod)
 - `--config key=value` - Set config at install time (repeatable)
 - `--format json`
 
 **`adk integrations configure` options:**
+
 - `--set key=value` - Set config values (repeatable)
 - `--unset key` - Remove config keys (repeatable)
 - `--target <env>` - Environment (dev/prod)
@@ -724,9 +729,11 @@ adk integrations diff                    # Show lock vs cloud differences
 `adk pull-lock` and `adk push-lock` (no subcommand) run pull/push for both integrations and plugins at once.
 
 **`adk integrations pull-lock` options:**
+
 - `--dry-run` - Preview without writing the lock file
 
 **`adk integrations push-lock` options:**
+
 - `--dry-run` - Preview without applying
 - `--yes` - Skip confirmation
 
@@ -751,10 +758,12 @@ adk plugins diff                         # Show lock vs cloud differences
 ```
 
 **Plugin-specific flags:**
+
 - `adk plugins add --dep iface=alias` - Wire interface dependency (repeatable)
 - `adk plugins configure --map iface=alias` - Remap interface dependency
 
 **Shared with `adk integrations upgrade`:**
+
 - `--to <version>` - Target specific version
 
 Plugins require interfaces implemented by installed integrations. The CLI auto-resolves dependencies when unambiguous. See **[Plugins](./plugins.md)** for details.
@@ -1087,6 +1096,7 @@ adk run <script> [args...] [options]
 **Description:**
 
 Executes a TypeScript script with access to the full ADK runtime, including:
+
 - Bot client with authentication
 - All tables, workflows, and actions from your project
 - Type-safe access to your bot's configuration
@@ -1102,18 +1112,18 @@ Executes a TypeScript script with access to the full ADK runtime, including:
 
 ```typescript
 // scripts/migrate-users.ts
-import { UsersTable } from "../src/tables/Users";
+import { UsersTable } from '../src/tables/Users'
 
-const { rows } = await UsersTable.findRows({ limit: 100 });
+const { rows } = await UsersTable.findRows({ limit: 100 })
 
 for (const user of rows) {
   await UsersTable.updateRows({
-    rows: [{ id: user.id, migrated: true }]
-  });
-  console.log(`Migrated user: ${user.id}`);
+    rows: [{ id: user.id, migrated: true }],
+  })
+  console.log(`Migrated user: ${user.id}`)
 }
 
-console.log(`✅ Migrated ${rows.length} users`);
+console.log(`✅ Migrated ${rows.length} users`)
 ```
 
 **Examples:**

@@ -20,6 +20,7 @@ Real-time conversation interface for testing the agent.
 **Layout:** Webchat embed (left) + Agent Steps visualization (right)
 
 **Features:**
+
 - Webchat panel for sending messages to the agent
 - Agent Steps panel showing execution flow (see `agent-steps.md`)
 - Conversation picker dropdown (filters to webchat conversations)
@@ -35,6 +36,7 @@ Interactive bird's-eye visualization of the agent's architecture as a graph. Fea
 **Layout:** Full-screen React Flow canvas with auto-layout (elkjs) + detail panel
 
 **Features:**
+
 - Graph nodes for agent primitives: triggers, actions, workflows, autonomous handlers, knowledge bases, tables
 - Edges showing relationships between primitives
 - Auto-layout with elkjs; user can drag nodes (positions persist to localStorage per agent)
@@ -57,16 +59,19 @@ Browse the component registry and inspect components installed in the agent.
 **Tabs:**
 
 **Installed** — Components present in the agent's `src/components/` directory:
+
 - Masonry card layout with component preview (rendered in shadow DOM)
 - Click a card to open overlay with full details
 - Empty state: "No components installed yet" with guidance
 
 **Registry** — Available components from the external component registry:
+
 - Same masonry layout
 - Click a card to open overlay with installation instructions and metadata
 - Empty state: "Registry is empty"
 
 **Features:**
+
 - Live reload on component source changes
 - Preview rendering via shadow DOM isolation
 - Error states for load/fetch failures
@@ -81,6 +86,7 @@ Browse and test bot actions and integration actions.
 **Layout:** Sidebar (action list) + detail pane
 
 **Features:**
+
 - Bot custom actions with input/output schema visualization
 - Integration actions grouped by integration (icon, title, description)
 - "Invoke action" button opens a modal to test with live inputs
@@ -93,6 +99,7 @@ Browse workflows and view execution history.
 **Layout:** Sidebar (workflow list) + detail pane
 
 **Features:**
+
 - Workflow name, path, description, timeout badge
 - "Invoke workflow" button to trigger manually
 - Workflow definition schema
@@ -106,6 +113,7 @@ Browse event triggers defined in the agent.
 **Layout:** Sidebar (trigger list) + detail pane
 
 **Features:**
+
 - Trigger names and event types
 - Trigger metadata and status
 
@@ -120,6 +128,7 @@ Test knowledge base search interactively.
 **Layout:** Sidebar (KB filter + content tree) + search input + results area + detail drawer
 
 **Features:**
+
 - Dropdown to filter by specific knowledge base
 - Query input with advanced settings (result limit, context depth)
 - Search results as cards: relevance score, source file, text snippet
@@ -134,6 +143,7 @@ Run and inspect automated conversation tests.
 **Layout:** Sidebar (eval list) + detail pane
 
 **Features:**
+
 - Eval definitions with run history
 - Run status: pending, in-progress, completed
 - Per-turn assertion results with pass/fail badges
@@ -154,6 +164,7 @@ Manage knowledge bases and uploaded files.
 **Layout:** Sidebar (KB list) + toolbar + file grid
 
 **Features:**
+
 - Knowledge base list with icons and descriptions
 - File grid: name, size, upload date, status badge (synced/syncing/error/local)
 - Filter by name, source, status, date range
@@ -169,6 +180,7 @@ Manage agent data tables.
 **Layout:** Sidebar (table list) + toolbar + data grid + pagination
 
 **Features:**
+
 - Table definitions with row counts
 - Sortable, filterable data grid (100 rows/page)
 - Add/edit/delete rows
@@ -184,6 +196,7 @@ Browse agent files.
 **Layout:** Folder browser
 
 **Features:**
+
 - Folder tree: All Files, Knowledge Base, System, Webchat
 - File list with name, size, modification time
 - Copy file path button
@@ -201,6 +214,7 @@ View all conversations with the agent.
 **Layout:** Full-page table
 
 **Features:**
+
 - Table columns: ID, Integration → Channel, Created, Updated, Preview
 - Sortable columns
 - Real-time polling for new conversations
@@ -213,6 +227,7 @@ Deep execution trace inspection. More detailed than Agent Steps — shows the fu
 **Layout:** Full-page trace viewer
 
 **Features:**
+
 - Hierarchical span tree grouped by parent
 - Span detail panel: name, timing, status, full data payload
 - JSON and tree view of span data
@@ -228,6 +243,7 @@ Agent runtime logs.
 **Layout:** Full-page log viewer
 
 **Features:**
+
 - Real-time log stream (stdout, stderr, info)
 - Time range filters: 5m, 15m, 1h, 6h, all
 - Text search/filter
@@ -245,6 +261,7 @@ Agent runtime logs.
 Agent configuration management.
 
 **Sections (sidebar navigation):**
+
 1. **Overview** — Agent metadata: name, Bot ID, Workspace ID, file path, created/updated dates. Copy buttons for IDs.
 2. **Configuration Variables** (dev only) — Runtime config schema and values. Add/edit/delete variables.
 3. **Secrets** (dev only) — Secret schema and values. Add/edit/delete secrets.
@@ -255,6 +272,7 @@ Agent configuration management.
 Install, configure, and manage integrations.
 
 **Features:**
+
 - Integration Hub UI (Botpress component)
 - OAuth redirect handling
 - Integration name and alias resolution

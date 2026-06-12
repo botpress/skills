@@ -78,10 +78,7 @@ Replace `tsconfig.json` with:
 ```json
 {
   "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
+  "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }]
 }
 ```
 
@@ -127,6 +124,7 @@ Replace `tsconfig.app.json` with:
 ```
 
 **Key features:**
+
 - **Strict mode enabled** for type safety
 - **Path alias `@/`** maps to `./src/` for clean imports
 - **moduleResolution: bundler** for modern Vite bundling
@@ -137,35 +135,36 @@ Replace `tsconfig.app.json` with:
 Replace `vite.config.ts` with:
 
 ```typescript
-import path from "path";
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import tanstackRouter from "@tanstack/router-plugin/vite";
-import tailwindcss from "@tailwindcss/vite";
+import path from 'path'
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tanstackRouter from '@tanstack/router-plugin/vite'
+import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [
     // IMPORTANT: TanStack Router MUST come before React plugin
     tanstackRouter({
-      target: "react",
+      target: 'react',
       autoCodeSplitting: true,
     }),
     react({
       babel: {
-        plugins: [["babel-plugin-react-compiler"]],
+        plugins: [['babel-plugin-react-compiler']],
       },
     }),
     tailwindcss(),
   ],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      '@': path.resolve(__dirname, './src'),
     },
   },
-});
+})
 ```
 
 **Important notes:**
+
 - **Plugin order matters**: `@tanstack/router-plugin` must be registered before `@vitejs/plugin-react`
 - **React Compiler**: Enables automatic optimizations for React 19
 - **Path alias**: Enables `import { foo } from "@/lib/foo"` instead of relative paths
@@ -192,18 +191,17 @@ VITE_WORKSPACE_ID=your_workspace_id
 Create `src/config.ts`:
 
 ```typescript
-export const botId = import.meta.env.VITE_BOT_ID as string;
-export const workspaceId = import.meta.env.VITE_WORKSPACE_ID as string;
+export const botId = import.meta.env.VITE_BOT_ID as string
+export const workspaceId = import.meta.env.VITE_WORKSPACE_ID as string
 
 // Validate required config
 if (!botId || !workspaceId) {
-  throw new Error(
-    "Missing required environment variables. Please check your .env file."
-  );
+  throw new Error('Missing required environment variables. Please check your .env file.')
 }
 ```
 
 **Why a config file?**
+
 - Centralized configuration makes it easier to update
 - Type safety with TypeScript
 - Runtime validation catches missing variables early
@@ -214,7 +212,7 @@ if (!botId || !workspaceId) {
 Create `src/lib/query-client.ts`:
 
 ```typescript
-import { QueryClient } from "@tanstack/react-query";
+import { QueryClient } from '@tanstack/react-query'
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -224,10 +222,11 @@ export const queryClient = new QueryClient({
       refetchOnWindowFocus: false,
     },
   },
-});
+})
 ```
 
 **Configuration explained:**
+
 - **retry: 1** - Retry failed queries once before giving up
 - **staleTime: 5 minutes** - Cache data for 5 minutes before refetching
 - **refetchOnWindowFocus: false** - Don't refetch when user returns to tab
@@ -239,33 +238,33 @@ export const queryClient = new QueryClient({
 Create `src/services/test.ts`:
 
 ```typescript
-import { Client } from "@botpress/client";
-import { botId, workspaceId } from "@/config";
+import { Client } from '@botpress/client'
+import { botId, workspaceId } from '@/config'
 
 // For testing — in production, use the client store pattern from botpress-client.md
 function getTestClient(pat: string) {
   return new Client({
-    apiUrl: "https://api.botpress.cloud",
+    apiUrl: 'https://api.botpress.cloud',
     workspaceId,
     token: pat,
     botId,
-  });
+  })
 }
 
 export async function testBotConnection(pat: string) {
-  const client = getTestClient(pat);
+  const client = getTestClient(pat)
 
   try {
     const result = await client.callAction({
-      type: "listTables",
+      type: 'listTables',
       input: {},
-    });
+    })
 
-    console.log("Bot connection successful!", result);
-    return result;
+    console.log('Bot connection successful!', result)
+    return result
   } catch (error) {
-    console.error("Bot connection failed:", error);
-    throw error;
+    console.error('Bot connection failed:', error)
+    throw error
   }
 }
 ```
@@ -349,6 +348,7 @@ my-frontend/
 **Problem:** TypeScript doesn't recognize `@/` imports.
 
 **Solution:**
+
 1. Verify `tsconfig.app.json` has the `paths` configuration
 2. Restart TypeScript server in your editor (VS Code: Cmd+Shift+P → "Restart TypeScript Server")
 3. Ensure `vite.config.ts` has the matching alias configuration
@@ -358,6 +358,7 @@ my-frontend/
 **Problem:** API calls return 401 errors.
 
 **Solutions:**
+
 1. **Check your PAT is valid**: Go to https://app.botpress.cloud → Settings → Personal Access Tokens
 2. **Create a new token** if needed
 3. **Ensure PAT has access** to the correct workspace
@@ -367,6 +368,7 @@ my-frontend/
 **Problem:** Browser blocks requests with CORS policy errors.
 
 **Solution:** This usually means:
+
 - Your bot is not deployed (`adk deploy` first)
 - Using wrong workspace/bot IDs (verify against your bot config)
 - API URL is incorrect (should be `https://api.botpress.cloud`)
@@ -376,6 +378,7 @@ my-frontend/
 **Problem:** Build fails with router-related errors.
 
 **Solution:**
+
 - Ensure `@tanstack/router-plugin` comes **before** `@vitejs/plugin-react` in `vite.config.ts`
 - Clear build cache: `rm -rf node_modules/.vite && pnpm dev`
 
@@ -401,6 +404,7 @@ my-frontend/
 **Problem:** Vite can't resolve path aliases.
 
 **Solution:**
+
 1. Install types for Node.js: `pnpm add -D @types/node`
 2. Verify `vite.config.ts` imports `path` correctly
 3. Restart dev server: `Ctrl+C` then `pnpm dev`

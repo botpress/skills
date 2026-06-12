@@ -6,13 +6,13 @@ Users consume plugins. They do not author them.
 
 ## Plugin vs Integration
 
-| | Plugin | Integration |
-|--|--------|-------------|
-| **Purpose** | Adds behavior/logic to your bot | Connects to an external platform |
-| **Installed via** | `adk plugins add <name>` | `adk add <name>` or `adk integrations add <name>` |
-| **May depend on** | Integrations (via interface wiring) | Nothing |
-| **Lock file key** | `plugins` | `integrations` |
-| **Action call format** | `plugins.<alias>.actions.<action>(input)` | `actions.<alias>.<action>(input)` |
+|                        | Plugin                                    | Integration                                       |
+| ---------------------- | ----------------------------------------- | ------------------------------------------------- |
+| **Purpose**            | Adds behavior/logic to your bot           | Connects to an external platform                  |
+| **Installed via**      | `adk plugins add <name>`                  | `adk add <name>` or `adk integrations add <name>` |
+| **May depend on**      | Integrations (via interface wiring)       | Nothing                                           |
+| **Lock file key**      | `plugins`                                 | `integrations`                                    |
+| **Action call format** | `plugins.<alias>.actions.<action>(input)` | `actions.<alias>.<action>(input)`                 |
 
 ## CLI Commands
 
@@ -161,10 +161,10 @@ adk plugins configure desk-hitl --map hitlService=freshdesk
 Installed plugins expose typed actions via the `plugins` proxy from `@botpress/runtime`. The ADK generates types automatically so you get full autocompletion.
 
 ```typescript
-import { plugins } from "@botpress/runtime";
+import { plugins } from '@botpress/runtime'
 
 // Call a plugin action: plugins.<alias>.actions.<actionName>(input)
-const result = await plugins.myPlugin.actions.doSomething({ key: "value" });
+const result = await plugins.myPlugin.actions.doSomething({ key: 'value' })
 ```
 
 The call format is `plugins.<alias>.actions.<action>()`. This differs from integration actions, which use `actions.<alias>.<action>()`. See [Integration Actions](./integration-actions.md) for comparison.
@@ -200,12 +200,12 @@ Plugins live in `dependencies.dev.lock.json` (or `dependencies.prod.lock.json`) 
 
 Each plugin entry has:
 
-| Field | Description |
-|-------|-------------|
-| `name` | Plugin name on the Hub |
-| `version` | Installed version |
-| `enabled` | Whether the plugin is active |
-| `config` | Configuration key-value pairs |
+| Field          | Description                                 |
+| -------------- | ------------------------------------------- |
+| `name`         | Plugin name on the Hub                      |
+| `version`      | Installed version                           |
+| `enabled`      | Whether the plugin is active                |
+| `config`       | Configuration key-value pairs               |
 | `dependencies` | Map of interface alias to integration alias |
 
 ## Environment Variable References

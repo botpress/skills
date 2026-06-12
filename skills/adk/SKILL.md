@@ -56,7 +56,7 @@ Most primitives must be placed in `src/` directory (assets use the `assets/` dir
 The first time you help with an ADK project in a session, silently check the project's health:
 
 1. Run `adk check --format json` and `adk status --format json`.
-2. If there are errors or warnings (unconfigured integrations, missing models, validation issues), proactively mention them before answering the user's question: *"Before we start — I noticed [issue]. Want me to help fix that?"*
+2. If there are errors or warnings (unconfigured integrations, missing models, validation issues), proactively mention them before answering the user's question: _"Before we start — I noticed [issue]. Want me to help fix that?"_
 3. Only do this once per session. Don't re-run on every question.
 
 ## Available Commands
@@ -69,7 +69,7 @@ If the user asks "what can you help with?", "what commands are available?", or i
 - **Document**: `/adk-document` (create, review, update, sync, search)
 - **Understand**: `/adk-explain` (explain bot architecture and components), `/adk-dev-console` (navigate the Dev Console)
 
-Then ask: *"What are you working on?"*
+Then ask: _"What are you working on?"_
 
 ## When to Use This Skill
 
@@ -319,46 +319,46 @@ import {
   conversation,
   configuration,
   context,
-} from "@botpress/runtime";
+} from '@botpress/runtime'
 ```
 
 ### State Management
 
 ```typescript
 // Bot state (defined in agent.config.ts)
-bot.state.maintenanceMode = true;
-bot.state.lastDeployedAt = new Date().toISOString();
+bot.state.maintenanceMode = true
+bot.state.lastDeployedAt = new Date().toISOString()
 
 // User state (defined in agent.config.ts)
-user.state.preferredLanguage = "en";
-user.state.onboardingComplete = true;
+user.state.preferredLanguage = 'en'
+user.state.onboardingComplete = true
 
 // User tags
-user.tags.email; // Access user metadata
+user.tags.email // Access user metadata
 ```
 
 ### Calling Actions
 
 ```typescript
 // Call bot actions
-await actions.fetchUser({ userId: "123" });
-await actions.processOrder({ orderId: "456" });
+await actions.fetchUser({ userId: '123' })
+await actions.processOrder({ orderId: '456' })
 
 // Call integration actions
-await actions.slack.sendMessage({ channel: "...", text: "..." });
-await actions.linear.issueList({ teamId: "..." });
+await actions.slack.sendMessage({ channel: '...', text: '...' })
+await actions.linear.issueList({ teamId: '...' })
 
 // Convert action to tool
-tools: [fetchUser.asTool()];
+tools: [fetchUser.asTool()]
 ```
 
 ### Context API
 
 ```typescript
 // Get runtime services
-const client = context.get("client"); // Botpress client
-const cognitive = context.get("cognitive"); // AI model client
-const citations = context.get("citations"); // Citation manager
+const client = context.get('client') // Botpress client
+const cognitive = context.get('cognitive') // AI model client
+const citations = context.get('citations') // Citation manager
 ```
 
 ### File Naming
@@ -391,11 +391,11 @@ pnpm install      # Works fine
 
 ```typescript
 // ✅ CORRECT - Always from @botpress/runtime
-import { Action, Autonomous, Workflow, z } from "@botpress/runtime";
+import { Action, Autonomous, Workflow, z } from '@botpress/runtime'
 
 // ❌ WRONG - Never from zod or @botpress/sdk
-import { z } from "zod"; // ❌ Wrong
-import { Action } from "@botpress/sdk"; // ❌ Wrong
+import { z } from 'zod' // ❌ Wrong
+import { Action } from '@botpress/sdk' // ❌ Wrong
 ```
 
 ### Export Patterns
@@ -435,9 +435,9 @@ handler({ userId }) {  // ❌ Wrong - must be { input }
 export const myTool = new Autonomous.Tool({
   handler: async ({ query, maxResults }) => {
     // ✅ Direct destructuring OK
-    return search(query, maxResults);
+    return search(query, maxResults)
   },
-});
+})
 ```
 
 ### Conversations

@@ -21,20 +21,20 @@ Knowledge Bases enable RAG (Retrieval Augmented Generation) by indexing document
 ### Basic Structure
 
 ```typescript
-import { Knowledge, DataSource } from "@botpress/runtime";
+import { Knowledge, DataSource } from '@botpress/runtime'
 
 // Define a data source
-const docsSource = DataSource.Directory.fromPath("src/knowledge/docs", {
-  id: "docs",
-  filter: (path) => path.endsWith(".md") || path.endsWith(".pdf"),
-});
+const docsSource = DataSource.Directory.fromPath('src/knowledge/docs', {
+  id: 'docs',
+  filter: (path) => path.endsWith('.md') || path.endsWith('.pdf'),
+})
 
 // Create knowledge base
 export const DocsKnowledgeBase = new Knowledge({
-  name: "docsKB",
-  description: "Documentation knowledge base",
+  name: 'docsKB',
+  description: 'Documentation knowledge base',
   sources: [docsSource],
-});
+})
 ```
 
 ## Data Source Types
@@ -44,16 +44,14 @@ export const DocsKnowledgeBase = new Knowledge({
 Index local markdown, PDF, and text files:
 
 ```typescript
-const docsSource = DataSource.Directory.fromPath("src/knowledge", {
-  id: "docs",
+const docsSource = DataSource.Directory.fromPath('src/knowledge', {
+  id: 'docs',
 
   // Filter specific file types
   filter: (path) => {
-    return (
-      path.endsWith(".md") || path.endsWith(".pdf") || path.endsWith(".txt")
-    );
+    return path.endsWith('.md') || path.endsWith('.pdf') || path.endsWith('.txt')
   },
-});
+})
 ```
 
 **Note**: Local file sources are for development only and won't work in production.
@@ -64,46 +62,36 @@ Index websites via sitemap or direct URLs:
 
 ```typescript
 // From sitemap
-const websiteSource = DataSource.Website.fromSitemap(
-  "https://docs.example.com/sitemap.xml",
-  {
-    id: "website",
-    maxPages: 500, // Maximum pages to crawl (1-50000)
-    maxDepth: 3, // Maximum crawl depth (1-20)
-    fetch: "node:fetch", // Optional: 'node:fetch' or 'integration:browser'
+const websiteSource = DataSource.Website.fromSitemap('https://docs.example.com/sitemap.xml', {
+  id: 'website',
+  maxPages: 500, // Maximum pages to crawl (1-50000)
+  maxDepth: 3, // Maximum crawl depth (1-20)
+  fetch: 'node:fetch', // Optional: 'node:fetch' or 'integration:browser'
 
-    // Filter pages
-    filter: (context) => {
-      // Skip archive pages
-      if (context.url.includes("/archive/")) {
-        return false;
-      }
-      // Only include documentation pages
-      return context.url.includes("/docs/");
-    },
+  // Filter pages
+  filter: (context) => {
+    // Skip archive pages
+    if (context.url.includes('/archive/')) {
+      return false
+    }
+    // Only include documentation pages
+    return context.url.includes('/docs/')
   },
-);
+})
 
 // From direct URLs
 const urlsSource = DataSource.Website.fromUrls(
-  [
-    "https://example.com/page1",
-    "https://example.com/page2",
-    "https://example.com/page3",
-  ],
+  ['https://example.com/page1', 'https://example.com/page2', 'https://example.com/page3'],
   {
-    id: "specific_pages",
-  },
-);
+    id: 'specific_pages',
+  }
+)
 
 // From llms.txt (AI-friendly site manifest)
-const llmsTxtSource = DataSource.Website.fromLlmsTxt(
-  "https://example.com/llms.txt",
-  {
-    id: "llms_txt",
-    maxPages: 100,
-  },
-);
+const llmsTxtSource = DataSource.Website.fromLlmsTxt('https://example.com/llms.txt', {
+  id: 'llms_txt',
+  maxPages: 100,
+})
 ```
 
 ### 3. Table-Based
@@ -111,10 +99,10 @@ const llmsTxtSource = DataSource.Website.fromLlmsTxt(
 Table-backed knowledge sources are not fully implemented yet. The shape below is useful as a forward-looking pattern, but today you should treat it as experimental and prefer directory- or website-backed sources for production workflows.
 
 ```typescript
-import { FAQTable } from "../tables/FAQ";
+import { FAQTable } from '../tables/FAQ'
 
 const tableSource = DataSource.Table.fromTable(FAQTable, {
-  id: "faq_kb",
+  id: 'faq_kb',
 
   // Transform row data into searchable text
   transform: ({ row }) => {
@@ -123,14 +111,14 @@ const tableSource = DataSource.Table.fromTable(FAQTable, {
 Answer: ${row.answer}
 
 Category: ${row.category}
-Tags: ${row.tags.join(", ")}`;
+Tags: ${row.tags.join(', ')}`
   },
 
   // Optional: Filter rows
   filter: ({ row }) => {
-    return row.published === true;
+    return row.published === true
   },
-});
+})
 ```
 
 ### 4. Multiple Sources
@@ -139,27 +127,27 @@ Combine different source types:
 
 ```typescript
 export const CombinedKnowledgeBase = new Knowledge({
-  name: "combinedKB",
-  description: "Knowledge from multiple sources",
+  name: 'combinedKB',
+  description: 'Knowledge from multiple sources',
   sources: [
     // Local documentation
-    DataSource.Directory.fromPath("src/knowledge/docs", {
-      id: "local_docs",
+    DataSource.Directory.fromPath('src/knowledge/docs', {
+      id: 'local_docs',
     }),
 
     // Website documentation
-    DataSource.Website.fromSitemap("https://docs.example.com/sitemap.xml", {
-      id: "online_docs",
+    DataSource.Website.fromSitemap('https://docs.example.com/sitemap.xml', {
+      id: 'online_docs',
       maxPages: 100,
     }),
 
     // FAQ from database
     DataSource.Table.fromTable(FAQTable, {
-      id: "faq",
+      id: 'faq',
       transform: ({ row }) => `Q: ${row.question}\nA: ${row.answer}`,
     }),
   ],
-});
+})
 ```
 
 ## Using Knowledge Bases
@@ -169,25 +157,24 @@ export const CombinedKnowledgeBase = new Knowledge({
 Provide knowledge bases to AI during execution:
 
 ```typescript
-import { Conversation } from "@botpress/runtime";
-import { DocsKnowledgeBase, FAQKnowledgeBase } from "../knowledge";
+import { Conversation } from '@botpress/runtime'
+import { DocsKnowledgeBase, FAQKnowledgeBase } from '../knowledge'
 
 export const Chat = new Conversation({
-  channel: "chat.channel",
+  channel: 'chat.channel',
 
   async handler({ execute }) {
     await execute({
-      instructions:
-        "You are a helpful assistant. Use the provided knowledge to answer questions accurately.",
+      instructions: 'You are a helpful assistant. Use the provided knowledge to answer questions accurately.',
 
       // Add knowledge bases
       knowledge: [DocsKnowledgeBase, FAQKnowledgeBase],
 
       // Optional: Add tools that can search knowledge
       tools: [searchTool],
-    });
+    })
   },
-});
+})
 ```
 
 ### In Workflows
@@ -195,22 +182,22 @@ export const Chat = new Conversation({
 Knowledge bases work the same in workflows:
 
 ```typescript
-import { Workflow } from "@botpress/runtime";
-import { DocsKnowledgeBase } from "../knowledge";
+import { Workflow } from '@botpress/runtime'
+import { DocsKnowledgeBase } from '../knowledge'
 
 export const ResearchWorkflow = new Workflow({
-  name: "research",
+  name: 'research',
 
   handler: async ({ input, execute }) => {
     const result = await execute({
       instructions: `Research the topic: ${input.topic}`,
       knowledge: [DocsKnowledgeBase],
-      model: "openai:gpt-4o",
-    });
+      model: 'openai:gpt-4o',
+    })
 
-    return { research: result };
+    return { research: result }
   },
-});
+})
 ```
 
 ### Manual Search
@@ -218,25 +205,25 @@ export const ResearchWorkflow = new Workflow({
 Search knowledge bases programmatically:
 
 ```typescript
-import { context } from "@botpress/runtime";
-import { DocsKnowledgeBase } from "../knowledge";
+import { context } from '@botpress/runtime'
+import { DocsKnowledgeBase } from '../knowledge'
 
 export const searchAction = new Action({
-  name: "searchDocs",
+  name: 'searchDocs',
   input: z.object({ query: z.string() }),
 
   async handler({ input }) {
-    const client = context.get("client");
+    const client = context.get('client')
 
     // Search knowledge base
     const { passages } = await client.searchFiles({
       query: input.query,
       tags: {
-        source: "knowledge-base",
+        source: 'knowledge-base',
         kbName: [DocsKnowledgeBase.name],
       },
       limit: 5,
-    });
+    })
 
     return {
       results: passages.map((p) => ({
@@ -244,9 +231,9 @@ export const searchAction = new Action({
         score: p.score,
         source: p.file.key,
       })),
-    };
+    }
   },
-});
+})
 ```
 
 ## Syncing Knowledge Bases
@@ -287,13 +274,13 @@ Refresh knowledge bases programmatically:
 
 ```typescript
 // Smart refresh - only changed files (uses SHA256 hashing)
-await MyKnowledgeBase.refresh();
+await MyKnowledgeBase.refresh()
 
 // Force refresh - re-indexes everything
-await MyKnowledgeBase.refresh({ force: true });
+await MyKnowledgeBase.refresh({ force: true })
 
 // Refresh specific source
-await MyKnowledgeBase.refreshSource("docs");
+await MyKnowledgeBase.refreshSource('docs')
 ```
 
 For scheduled or triggered refresh, use the same refresh methods in workflows, actions, or conversation handlers.
@@ -303,17 +290,17 @@ For scheduled or triggered refresh, use the same refresh methods in workflows, a
 Track knowledge sources used in responses:
 
 ```typescript
-const citations = context.get("citations");
+const citations = context.get('citations')
 
 // Register source when using knowledge passage
 const { tag } = citations.registerSource({
   file: passage.file.key,
   title: passage.file.tags.title,
   url: passage.file.tags.url,
-});
+})
 
 // Include citation tag in content
-const citedContent = `<${tag}>${passage.content}</${tag}>`;
+const citedContent = `<${tag}>${passage.content}</${tag}>`
 ```
 
 For complete citation implementation examples, see the autonomous execution documentation.
@@ -326,19 +313,19 @@ Select knowledge bases based on user context:
 
 ```typescript
 // Select knowledge based on user department
-const knowledgeBases = [GeneralKB];
+const knowledgeBases = [GeneralKB]
 
-if (user.department === "engineering") {
-  knowledgeBases.push(EngineeringKB, TechnicalDocsKB);
-} else if (user.department === "sales") {
-  knowledgeBases.push(SalesKB, ProductKB);
+if (user.department === 'engineering') {
+  knowledgeBases.push(EngineeringKB, TechnicalDocsKB)
+} else if (user.department === 'sales') {
+  knowledgeBases.push(SalesKB, ProductKB)
 }
 
 // Pass to execute()
 await execute({
-  instructions: "Answer based on department-specific knowledge",
+  instructions: 'Answer based on department-specific knowledge',
   knowledge: knowledgeBases,
-});
+})
 ```
 
 ### Content Transformation
@@ -348,11 +335,11 @@ Enhance content with metadata before indexing (Table and Website sources support
 ```typescript
 // Table source with transformation
 const docsTableSource = DataSource.Table.fromTable(DocsTable, {
-  id: "docs_table",
+  id: 'docs_table',
 
   // Filter specific rows
   filter: ({ row }) => {
-    return row.status === "published" && !row.deprecated;
+    return row.status === 'published' && !row.deprecated
   },
 
   // Transform row data into searchable text with metadata
@@ -360,12 +347,12 @@ const docsTableSource = DataSource.Table.fromTable(DocsTable, {
     return `
 Title: ${row.title}
 Category: ${row.category}
-Tags: ${row.tags.join(", ")}
+Tags: ${row.tags.join(', ')}
 Author: ${row.author}
 
-${row.content}`;
+${row.content}`
   },
-});
+})
 ```
 
 **Note**: Directory sources only support `filter`, not `transform`. Use Table or Website sources for content transformation.
@@ -376,17 +363,17 @@ Create separate knowledge bases per language:
 
 ```typescript
 export const EnglishKB = new Knowledge({
-  name: "englishKB",
-  sources: [DataSource.Directory.fromPath("src/knowledge/en", { id: "docs_en" })],
-});
+  name: 'englishKB',
+  sources: [DataSource.Directory.fromPath('src/knowledge/en', { id: 'docs_en' })],
+})
 
 export const SpanishKB = new Knowledge({
-  name: "spanishKB",
-  sources: [DataSource.Directory.fromPath("src/knowledge/es", { id: "docs_es" })],
-});
+  name: 'spanishKB',
+  sources: [DataSource.Directory.fromPath('src/knowledge/es', { id: 'docs_es' })],
+})
 
 // Select based on user language
-const kb = userLanguage === "es" ? SpanishKB : EnglishKB;
+const kb = userLanguage === 'es' ? SpanishKB : EnglishKB
 ```
 
 ## Best Practices
@@ -411,12 +398,12 @@ src/knowledge/
 
 ```typescript
 // ✅ Good
-export const TechnicalDocsKB = new Knowledge({ name: "technicalDocs" });
-export const CustomerFAQKB = new Knowledge({ name: "customerFAQ" });
+export const TechnicalDocsKB = new Knowledge({ name: 'technicalDocs' })
+export const CustomerFAQKB = new Knowledge({ name: 'customerFAQ' })
 
 // ❌ Bad
-export const KB1 = new Knowledge({ name: "kb1" });
-export const Stuff = new Knowledge({ name: "stuff" });
+export const KB1 = new Knowledge({ name: 'kb1' })
+export const Stuff = new Knowledge({ name: 'stuff' })
 ```
 
 ### 3. Refresh Frequently-Changing Content

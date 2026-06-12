@@ -1,7 +1,7 @@
 ---
 name: adk-integration
 description: Discover, add, and configure Botpress integrations
-argument-hint: "[integration name or question]"
+argument-hint: '[integration name or question]'
 ---
 
 Load the `adk` skill, then help with integrations immediately.

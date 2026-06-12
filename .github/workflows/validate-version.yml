@@ -3,18 +3,18 @@ name: Validate version
 on:
   pull_request:
     paths:
-      - "skills.json"
-      - "skills/**"
-      - "commands/**"
-      - ".claude-plugin/**"
-      - "scripts/sync-versions.sh"
+      - 'skills.json'
+      - 'skills/**'
+      - 'commands/**'
+      - '.claude-plugin/**'
+      - 'scripts/sync-versions.sh'
   push:
     branches:
       - master
       - dev
     paths:
-      - "skills.json"
-      - ".claude-plugin/**"
+      - 'skills.json'
+      - '.claude-plugin/**'
 
 jobs:
   validate:
