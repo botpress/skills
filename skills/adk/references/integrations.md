@@ -1,21 +1,21 @@
 # Integration Management
 
-Integrations connect your agent to external platforms and services. Manage them entirely through the CLI — never hand-edit lock files.
+Integrations connect your agent to external platforms and services. Manage them through the CLI or Dev Console — never hand-edit dependency snapshots.
 
 ## CLI Commands
 
 All integration management uses the `adk integrations` subcommand family. Every mutation command supports `--target <env>` (dev or prod, default: dev) and `--format <format>` (text or json).
 
-> **Deprecated aliases:** The old flat commands (`adk add`, `adk remove`, `adk search`, `adk list`, `adk info`, `adk upgrade`) still work as shims but emit deprecation warnings. Use the `adk integrations` subcommands instead.
+> **Removed aliases:** The old flat commands (`adk add`, `adk remove`, `adk search`, `adk list`, `adk info`, `adk upgrade`) are no longer part of the public CLI. Use the `adk integrations` subcommands instead.
 
 ### Discovery
 
-| Command                             | Description                 | Key Flags                                                        |
-| ----------------------------------- | --------------------------- | ---------------------------------------------------------------- |
-| `adk integrations search <query>`   | Search by keyword           | `--format json`, `--limit <n>` (default: 20)                     |
-| `adk integrations list --available` | Browse all Hub integrations | `--format json`, `--limit <n>` (default: 50)                     |
-| `adk integrations list`             | Show installed dependencies | `--format json`, `--verbose`                                     |
-| `adk integrations info <name>`      | Full integration details    | `--actions`, `--channels`, `--events`, `--full`, `--format json` |
+| Command                                      | Description                                       | Key Flags                    |
+| -------------------------------------------- | ------------------------------------------------- | ---------------------------- |
+| `adk integrations search <query>`            | Search Hub integrations by keyword                | `--format json`              |
+| `adk integrations search --interface <name>` | Find Hub integrations that implement an interface | `--format json`              |
+| `adk integrations list`                      | Show installed dependencies                       | `--format json`, `--verbose` |
+| `adk integrations info <name[@version]>`     | Full integration details                          | `--format json`              |
 
 Use `--format json` for programmatic inspection of config schemas, action shapes, and event payloads.
 
@@ -30,26 +30,28 @@ Use `--format json` for programmatic inspection of config schemas, action shapes
 | `adk integrations disable <alias>`      | Disable without removing                | `--target <env>`                                         |
 | `adk integrations configure <alias>`    | Set or unset config values              | `--set key=value`, `--unset key`, `--target <env>`       |
 
-### State Management
+### State Inspection and Promotion
 
-| Command                      | Description                                  | Key Flags                              |
-| ---------------------------- | -------------------------------------------- | -------------------------------------- |
-| `adk integrations pull-lock` | Pull cloud state into lock file              | `--target <env>`, `--dry-run`          |
-| `adk integrations push-lock` | Push lock file to cloud                      | `--target <env>`, `--dry-run`, `--yes` |
-| `adk integrations copy`      | Copy integration state between environments  | `--from <env>`, `--to <env>`           |
-| `adk integrations diff`      | Show differences between lock file and cloud | `--target <env>`                       |
+| Command                   | Description                                 | Key Flags                                          |
+| ------------------------- | ------------------------------------------- | -------------------------------------------------- |
+| `adk integrations status` | Show capability state and remediation       | `--target <env>`, `--format json`                  |
+| `adk integrations copy`   | Copy integration state between environments | `--from <env>`, `--to <env>`, `--dry-run`, `--yes` |
+| `adk integrations diff`   | Show snapshot vs Cloud differences          | `--target <env>`                                   |
 
-## Lock File System
+## Snapshot System
 
-Integration state lives in per-environment lock files at the project root:
+Integration state lives in Botpress Cloud. The ADK writes generated per-environment snapshots under `.adk/dependencies/`:
 
-- `dependencies.dev.lock.json` — development environment
-- `dependencies.prod.lock.json` — production environment
+- `.adk/dependencies/dev.json` — development environment snapshot
+- `.adk/dependencies/prod.json` — production environment snapshot
+- `.adk/dependencies/migration.json` — one-way legacy migration marker
 
 ```json
 {
   "version": 1,
   "env": "dev",
+  "botId": "bot_123",
+  "fetchedAt": "2026-06-10T12:00:00.000Z",
   "integrations": {
     "slack": {
       "name": "slack",
@@ -73,12 +75,13 @@ Integration state lives in per-environment lock files at the project root:
 
 **Key principles:**
 
-- Cloud is the source of truth. The lock file is a local reflection refreshed after every mutation.
-- Never edit lock files by hand — use `adk integrations` commands.
+- Cloud is the source of truth. Snapshots are local reflections refreshed after mutations and Cloud reads.
+- Never edit snapshots by hand — use `adk integrations` commands or the Dev Console.
 - The `--target` flag controls which environment (dev/prod) a command operates on.
 - Config values support env substitution: `${env:API_KEY}` resolves to `process.env.API_KEY` at apply time.
+- Use `adk dependencies export` / `adk dependencies import` for explicit dependency-only restore artifacts. These files are separate from generated `.adk/dependencies/*.json` snapshots.
 
-**Migration from agent.config.ts:** Projects with a legacy `dependencies` block in `agent.config.ts` are auto-migrated to lock files on the first CLI command. The migration is one-shot and skipped if lock files already exist.
+**Migration from agent.config.ts / legacy lock files:** Projects with a legacy `dependencies` block in `agent.config.ts` or legacy `dependencies.<env>.lock.json` files are auto-migrated on the first CLI command. If Cloud has no dependency state for an environment, legacy state is imported to Cloud automatically, including prod. The migration is one-shot and skipped when `.adk/dependencies/migration.json` exists; the marker contents are informational and are not parsed for gating.
 
 ## Integration Lifecycle
 
@@ -86,7 +89,7 @@ Integration state lives in per-environment lock files at the project root:
 
 ```bash
 adk integrations search slack
-adk integrations list --available
+adk integrations search --interface hitl
 adk integrations info slack --format json
 ```
 
@@ -100,7 +103,7 @@ adk integrations add agi/linear@2.0.0
 
 Always pin to a specific version. Without `--alias`, the integration name becomes the alias.
 
-What happens: the integration is resolved, an entry is written to the lock file, and the integration starts **disabled** with status `registration_pending`.
+What happens: the integration is resolved, applied to Cloud, and the local snapshot is refreshed. OAuth or missing-required-field integrations may be installed disabled with an `unconfigured` status until configuration/authorization is complete.
 
 ### 3. Configure
 
@@ -125,7 +128,7 @@ registration_pending → registered       (success)
                      → registration_failed  (error)
 ```
 
-Check status with `adk integrations list`.
+Check status with `adk integrations status`.
 
 ### 5. Use in Code
 
@@ -146,6 +149,17 @@ adk integrations upgrade slack
 ```
 
 After upgrading, check for breaking changes in the new version, then re-deploy with `adk deploy`.
+
+### Dependency Snapshot Import/Export
+
+```bash
+adk dependencies export [file] --target dev
+adk dependencies export [file] --target prod --no-config
+adk dependencies import <file> --dry-run
+adk dependencies import <file> --target prod --yes
+```
+
+Use these commands when you need to move or restore one environment's integration/plugin state without exporting the whole project. Export includes config by default and prints a security notice; pass `--no-config` before sharing an artifact. Import applies the captured state to the selected Cloud bot, refreshes the local snapshot, and restores the previous local snapshot after `--dry-run`.
 
 ## Configuration Types
 

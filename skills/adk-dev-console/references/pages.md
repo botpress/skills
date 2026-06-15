@@ -26,6 +26,7 @@ Real-time conversation interface for testing the agent.
 - Conversation picker dropdown (filters to webchat conversations)
 - "Open conversation traces" link to jump to full Traces view
 - Download transcript button
+- Agent(0) side panel can show a **Tasks** dock when Agent(0) emits todo-tool updates: collapsed progress count, active task text, and an expandable list with status and priority.
 
 ---
 
@@ -279,6 +280,19 @@ Install, configure, and manage integrations.
 - Configuration editing via UI
 - Installation status per integration
 - Configured integrations' actions appear on the Actions page
+- Dependency actions for comparing dev/prod state and promoting reviewed changes
+- In Cloud Console mode, install/uninstall/upgrade controls are disabled; finish config/auth in the Hub or disable/remove the dependency from the owning environment.
+
+### Deploy Dialog
+
+The deploy dialog computes the same deploy plan as `adk deploy`.
+
+**Warnings and blockers:**
+
+- Missing required secrets block deploy until values are provided.
+- Enabled dependencies that are unavailable, unconfigured, or unresolved block deploy.
+- Integration version mismatches are non-blocking: if dev and prod have the same alias/name but different versions, the dialog shows a warning and points to Integrations dependency actions for Compare Dev vs Prod and Promote Dev to Prod.
+- Destructive table, KB, or asset changes require explicit confirmation.
 
 ---
 

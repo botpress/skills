@@ -22,7 +22,7 @@ The ADK provides primitives for:
 - Knowledge Bases (RAG implementation)
 - Triggers (event-driven automation)
 - Assets (static files with permanent URLs)
-- Integrations (external service connections managed via CLI and lock files)
+- Integrations (external service connections managed via CLI and dependency snapshots)
 - Plugins (reusable agent extensions with interface dependencies)
 - **Zai** (production-ready LLM utility library for common AI operations)
 
@@ -42,12 +42,17 @@ Most primitives must be placed in `src/` directory (assets use the `assets/` dir
 │   ├── triggers/      # Event handlers → subscribe to events
 │   ├── knowledge/     # Knowledge bases → RAG with semantic search
 │   └── utils/         # Shared helpers (not auto-registered)
-├── dependencies.dev.lock.json   # Integration/plugin state (dev)
-├── dependencies.prod.lock.json  # Integration/plugin state (prod)
+├── .adk/
+│   └── dependencies/
+│       ├── dev.json             # Generated dependency snapshot (dev)
+│       ├── prod.json            # Generated dependency snapshot (prod)
+│       └── migration.json       # One-way legacy migration marker
+├── .agent0/
+│   └── capabilities/            # Project-local Agent(0) capability bundle
 └── agent.config.ts    # Bot configuration
 ```
 
-> **Note:** Integrations and plugins are managed via lock files and the `adk integrations` / `adk plugins` CLI. See `integrations.md` and `plugins.md`.
+> **Note:** Manage integrations and plugins via the `adk integrations` / `adk plugins` CLI or the Dev Console. Botpress Cloud is the source of truth; `.adk/dependencies/` contains generated local snapshots for fast/offline reads and should not be edited manually. See `integrations.md` and `plugins.md`.
 
 > **Critical:** Files outside `src/` are not discovered. Location = behavior.
 
@@ -117,8 +122,8 @@ For integration discovery and CLI queries, use the Bash tool to run commands dir
 # Search for integrations
 adk integrations search <query>
 
-# List all available integrations
-adk integrations list --available
+# Find integrations that implement an interface
+adk integrations search --interface <interface-name>
 
 # Get detailed integration info (actions, channels, events)
 adk integrations info <integration-name>
@@ -155,6 +160,10 @@ adk link --workspace ws_123 --bot bot_456
 # More automation-friendly dev mode (NDJSON events, no TUI)
 adk dev --non-interactive
 
+# Review/apply project compatibility updates after ADK upgrades
+adk project upgrade --dry-run
+adk project upgrade
+
 # Auto-approve non-destructive deploy-plan changes
 adk deploy --yes
 ```
@@ -167,6 +176,7 @@ Use these defaults when relevant:
 - Treat `adk link --workspace ... --bot ...` as scriptable, but not guaranteed safe in every no-TTY environment.
 - Treat `adk dev --non-interactive` as CI-friendly, not fully prompt-free.
 - Treat `adk deploy --yes` as auto-approving non-destructive deploy-plan changes; config validation and destructive storage changes can still block automation.
+- If project commands report a runtime/package mismatch, run `adk project upgrade --dry-run` first, then `adk project upgrade` to apply compatibility patches.
 
 **When to use CLI commands:**
 

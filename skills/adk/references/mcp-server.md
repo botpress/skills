@@ -104,7 +104,7 @@ The generated config includes `--cwd` to target the correct directory:
 
 **"No chat or webchat integration found"**
 
-- Add an integration: `adk add chat` or `adk add webchat`
+- Add an integration: `adk integrations add chat@<version>` or `adk integrations add webchat@<version>`
 
 **Inspect the MCP server:**
 

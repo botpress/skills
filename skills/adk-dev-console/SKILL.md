@@ -15,6 +15,7 @@ The Dev Console is a **singleton shared dashboard**: one UI server per user, wit
 Activate when users ask about:
 
 - **UI concepts** — "What are Agent Steps?", "What does the Observe tab show?", "What is a turn?", "What is the component registry?", "What is the Agent Map?"
+- **Agent(0) UI** — "What are the Tasks under Agent(0)?", "Where did the todo list come from?", "Why is Agent(0) showing task progress?"
 - **Dev Console navigation** — "What tabs are available?", "Where do I find traces?", "How do I test RAG?"
 - **Reading execution data** — "What do the steps mean?", "Why is my step red?", "What's the cost shown?"
 - **Component registry** — "Where do I find custom components?", "How do I install a component?", "What components are available?"
@@ -56,6 +57,10 @@ Match depth to the question:
 | **Data**       | Knowledge, Tables, Files                         | Manage knowledge bases, tables, and files                                                        |
 | **Observe**    | Conversations, Traces, Logs                      | View conversation history, execution traces, runtime logs                                        |
 | **Config**     | Settings, Integrations                           | Agent config, secrets, LLM settings, integration management                                      |
+
+### Agent(0) Task Dock
+
+When Agent(0) uses its todo tool, the panel shows a compact **Tasks** dock with completed/total count, the active task, and an expandable task list. Status icons map to pending, in progress, completed, and cancelled; priorities are shown as low/medium/high chips.
 
 ### Multi-Agent Sidebar
 

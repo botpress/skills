@@ -71,6 +71,13 @@ adk init customer-support --template hello-world
 
 ```
 my-agent/
+├── package.json         # Common ADK scripts and runtime/evals deps
+├── tsconfig.json        # Generated type includes
+├── .gitignore           # Generated/runtime outputs
+├── AGENTS.md            # Assistant instructions
+├── CLAUDE.md            # Assistant instructions
+├── .agent0/
+│   └── capabilities/    # Project-local Agent(0) capability bundle
 ├── agent.config.ts      # Agent configuration
 └── src/
     ├── actions/         # Functions
@@ -82,6 +89,44 @@ my-agent/
 ```
 
 **Note:** Additional directories like `tools/`, `assets/`, etc. can be created manually as needed.
+
+### adk export
+
+Export the current ADK project as a portable archive.
+
+```bash
+adk export [output] [options]
+```
+
+**Options:**
+
+- `output` - Archive path (default: `<project-name>.adk`)
+- `--no-config` - Omit integration and plugin configuration from dependency snapshots
+- `--format <format>` - Output format (`json`)
+
+The archive includes project files plus dependency snapshots for linked dev/prod bots when available. Config is included by default and may contain sensitive values; use `--no-config` before sharing.
+
+### adk import
+
+Import an ADK project archive and link it to new or existing bots.
+
+```bash
+adk import <archive> [directory] [options]
+```
+
+**Options:**
+
+- `archive` - Archive path created by `adk export`
+- `directory` - Destination directory (default: archive project name)
+- `--workspace <workspaceId>` - Destination workspace ID
+- `--bot <botId>` - Destination production bot ID
+- `--dev <devBotId>` - Destination dev bot ID
+- `--api-url <apiUrl>` - Botpress API URL
+- `-f, --force` - Skip confirmation prompts
+- `--package-manager <packageManager>` - `bun`, `pnpm`, `yarn`, or `npm`
+- `--format <format>` - Output format (`json`)
+
+Interactive import guides workspace/bot selection and package install. Non-interactive import with `--format json` requires `--workspace`, and applying links/dependency snapshots requires `--force`.
 
 ### adk login
 
@@ -211,6 +256,7 @@ adk deploy [options]
 - `-y, --yes` - Auto-approve non-destructive deploy-plan changes without prompting
 - `--confirm-storage-changes` - Explicitly confirm destructive table/KB/asset deletions
 - `--dry-run` - Compute the deploy plan without applying changes
+- `--allow-unconfigured` - Deploy with enabled unconfigured/unresolved dependencies inert instead of blocking
 - `--format <format>` - Output format (`json`; requires `--yes` or `--dry-run`)
 
 **What it does:**
@@ -245,6 +291,8 @@ adk deploy --dry-run --format json
 
 - `--yes` auto-approves non-destructive deploy-plan changes.
 - Destructive table, KB, or asset deletions still require `--confirm-storage-changes`.
+- Enabled dependencies that are unavailable, unconfigured, or unresolved block real deploys unless the user explicitly chooses `--allow-unconfigured`.
+- If dev and prod have the same integration alias/name but different versions, deploy prints a non-blocking warning. Preview promotion with `adk integrations copy --from dev --to prod --dry-run` before applying `--yes`.
 - JSON output requires either `--yes` or `--dry-run`.
 - Deploy still validates configuration and may require interaction if config values are missing.
 - Do not assume `adk deploy --yes` is fully non-interactive.
@@ -352,6 +400,21 @@ adk check [options]
 adk check
 adk check --format json    # machine-readable for automation
 ```
+
+### adk project upgrade
+
+Review and apply ADK project compatibility updates after CLI/runtime upgrades.
+
+```bash
+adk project upgrade [options]
+```
+
+**Options:**
+
+- `--dry-run` - Review required updates without applying them
+- `--format <format>` - Output format (`json`)
+
+Project commands run a runtime preflight before execution. If `@botpress/runtime` is missing, outdated, invalid, or on an unsupported major, the CLI points to `adk project upgrade --dry-run` and then `adk project upgrade`. The upgrade command may update ADK package versions, migrate deprecated integration config object entries to string shorthand when safe, migrate legacy dependency state into Cloud-backed snapshots, and create the project-local Agent(0) capability bundle when missing. If the project runtime is newer than the CLI's supported major, run `adk self-upgrade` instead.
 
 ### adk status
 
@@ -638,37 +701,31 @@ adk evals runs --latest -v
 
 ### adk integrations
 
-Manage integrations, plugins, and interfaces. All subcommands support `--target <env>` (dev or prod, default: dev) and `--format <format>` (text or json).
+Manage integrations, plugins, and interfaces. Mutation/state subcommands support `--target <env>` (dev or prod, default: dev); use `--format json` where listed for scripted output.
 
-> **Deprecated aliases:** The old flat commands (`adk add`, `adk remove`, `adk search`, `adk list`, `adk info`, `adk upgrade`) still work as shims but emit deprecation warnings.
+> **Removed aliases:** The old flat commands (`adk add`, `adk remove`, `adk search`, `adk list`, `adk info`, `adk upgrade`) are no longer part of the public CLI. Use `adk integrations ...`.
 
 #### Discovery
 
 ```bash
-adk integrations search <query>          # Search by keyword
-adk integrations list --available        # Browse all Hub integrations
-adk integrations list                    # Show installed dependencies
-adk integrations info <name>             # Full integration details
+adk integrations search <query>             # Search by keyword
+adk integrations search --interface <name>  # Find implementers of an interface
+adk integrations list                       # Show installed dependencies
+adk integrations info <name[@version]>      # Full integration details
 ```
 
 **`adk integrations search` options:**
 
 - `--format json` - Machine-readable output
-- `--limit <n>` - Max results (default: 20)
+- `--interface <name>` - Find integrations that implement an interface
 
 **`adk integrations list` options:**
 
-- `--available` - Browse Hub instead of installed
 - `--format json` - Machine-readable output
 - `--verbose` - Show config details
-- `--limit <n>` - Max results (default: 50)
 
 **`adk integrations info` options:**
 
-- `--actions` - Show only actions
-- `--channels` - Show only channels
-- `--events` - Show only events
-- `--full` - Show all sections
 - `--format json` - Machine-readable output
 
 #### Mutations
@@ -717,29 +774,29 @@ adk integrations enable slack
 adk integrations remove slack
 ```
 
-#### State Management
+#### State Inspection and Promotion
 
 ```bash
-adk integrations pull-lock               # Pull cloud state into lock file
-adk integrations push-lock               # Push lock file to cloud
-adk integrations copy                    # Copy state between environments
-adk integrations diff                    # Show lock vs cloud differences
+adk integrations status                  # Show availability/remediation
+adk integrations copy                    # Copy integration state between environments
+adk integrations diff                    # Show snapshot vs Cloud differences
 ```
 
-`adk pull-lock` and `adk push-lock` (no subcommand) run pull/push for both integrations and plugins at once.
+**`adk integrations status` options:**
 
-**`adk integrations pull-lock` options:**
+- `--target <env>` - Environment (dev/prod)
+- `--format json` - Machine-readable output
 
-- `--dry-run` - Preview without writing the lock file
+**`adk integrations copy` options:**
 
-**`adk integrations push-lock` options:**
-
+- `--from <env>` - Source environment
+- `--to <env>` - Target environment
 - `--dry-run` - Preview without applying
-- `--yes` - Skip confirmation
+- `--yes` - Skip confirmation for prod/destructive changes
 
 ### adk plugins
 
-Manage plugins (reusable agent extensions). Mirrors the `adk integrations` subcommand structure. All subcommands support `--target <env>` and `--format <format>`.
+Manage plugins (reusable agent extensions). Mirrors the `adk integrations` subcommand structure. Mutation/state subcommands support `--target <env>`; use `--format json` where listed for scripted output.
 
 ```bash
 adk plugins search <query>               # Search by keyword
@@ -751,10 +808,9 @@ adk plugins upgrade <alias>              # Upgrade version
 adk plugins enable <alias>               # Enable a disabled plugin
 adk plugins disable <alias>              # Disable without removing
 adk plugins configure <alias>            # Set config and interface mappings
-adk plugins pull-lock                    # Pull cloud state into lock file
-adk plugins push-lock                    # Push lock file to cloud
+adk plugins status                       # Show availability/remediation
 adk plugins copy                         # Copy state between environments
-adk plugins diff                         # Show lock vs cloud differences
+adk plugins diff                         # Show snapshot vs Cloud differences
 ```
 
 **Plugin-specific flags:**
@@ -767,6 +823,32 @@ adk plugins diff                         # Show lock vs cloud differences
 - `--to <version>` - Target specific version
 
 Plugins require interfaces implemented by installed integrations. The CLI auto-resolves dependencies when unambiguous. See **[Plugins](./plugins.md)** for details.
+
+### adk dependencies
+
+Export or import dependency-only snapshots for integrations and plugins.
+
+```bash
+adk dependencies export [output] [options]
+adk dependencies import <file> [options]
+```
+
+**`adk dependencies export` options:**
+
+- `output` - Snapshot path (default: `<project-name>.dependencies.<target>.json`)
+- `--target <env>` - `dev` or `prod` (default: `dev`)
+- `--no-config` - Omit integration and plugin configuration
+- `--format <format>` - `text` or `json`
+
+**`adk dependencies import` options:**
+
+- `file` - Snapshot path created by `adk dependencies export`
+- `--target <env>` - `dev` or `prod` (default: snapshot env)
+- `--dry-run` - Show what would change without writing
+- `--yes` - Allow prod or destructive changes without confirmation
+- `--format <format>` - `text` or `json`
+
+These artifacts are explicit backups or transfer files. They are not replacements for generated `.adk/dependencies/dev.json` or `.adk/dependencies/prod.json`.
 
 ### adk self-upgrade
 
@@ -803,7 +885,7 @@ adk self-upgrade
 
 **Note:** The ADK automatically checks for updates every 24 hours and shows a notification when a new version is available. On Windows, you may need to restart your terminal after upgrading.
 
-**This is different from `adk upgrade`** which upgrades integrations, not the CLI itself.
+**This is different from `adk integrations upgrade` / `adk plugins upgrade`**, which upgrade installed dependencies, not the CLI itself.
 
 ### adk kb
 
@@ -1201,8 +1283,8 @@ adk dev
 # Search for integrations
 adk integrations search slack
 
-# List all available integrations
-adk integrations list --available
+# Find integrations that implement an interface
+adk integrations search --interface hitl
 
 # Get detailed info about an integration
 adk integrations info slack
@@ -1272,16 +1354,16 @@ adk workflows runs            # List or inspect workflow runs
 # Dependencies (integrations, plugins, interfaces)
 adk integrations search <query>    # Search for integrations
 adk integrations list              # List installed dependencies
-adk integrations list --available  # List all available integrations
 adk integrations info <name>       # Show integration details
 adk integrations add <name>@<ver>  # Add integration
 adk integrations remove <alias>    # Remove integration
-adk integrations upgrade [alias]   # Upgrade dependency
+adk integrations upgrade <alias>   # Upgrade dependency
 adk integrations enable <alias>    # Enable integration
 adk integrations disable <alias>   # Disable integration
 adk integrations configure <alias> # Set/unset config values
-adk integrations pull-lock         # Pull cloud state to lock file
-adk integrations push-lock         # Push lock file to cloud
+adk integrations status            # Show availability/remediation
+adk integrations copy --from dev --to prod --dry-run  # Preview promotion
+adk integrations diff              # Show snapshot vs Cloud differences
 
 # Plugins
 adk plugins search <query>        # Search for plugins
@@ -1289,12 +1371,21 @@ adk plugins list                   # List installed plugins
 adk plugins add <name>@<version>   # Add plugin
 adk plugins remove <alias>         # Remove plugin
 adk plugins configure <alias>      # Set config / remap interfaces
-adk plugins pull-lock              # Pull cloud state to lock file
-adk plugins push-lock              # Push lock file to cloud
+adk plugins status                 # Show availability/remediation
+adk plugins copy --from dev --to prod --dry-run  # Preview promotion
+adk plugins diff                   # Show snapshot vs Cloud differences
 
-# Lock file (both integrations + plugins at once)
-adk pull-lock                      # Pull cloud state for both
-adk push-lock                      # Push lock files to cloud for both
+# Dependency import/export (integrations + plugins)
+adk dependencies export            # Export dev dependency state
+adk dependencies export --target prod --no-config
+adk dependencies import <file> --dry-run
+adk dependencies import <file> --target prod --yes
+
+# Project portability and compatibility
+adk export                         # Export a portable .adk project archive
+adk import <archive>               # Import an ADK project archive
+adk project upgrade --dry-run      # Review project compatibility updates
+adk project upgrade                # Apply project compatibility updates
 
 # MCP (AI Assistant Integration)
 adk mcp                  # Start MCP server

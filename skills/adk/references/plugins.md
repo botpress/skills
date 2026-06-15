@@ -6,13 +6,13 @@ Users consume plugins. They do not author them.
 
 ## Plugin vs Integration
 
-|                        | Plugin                                    | Integration                                       |
-| ---------------------- | ----------------------------------------- | ------------------------------------------------- |
-| **Purpose**            | Adds behavior/logic to your bot           | Connects to an external platform                  |
-| **Installed via**      | `adk plugins add <name>`                  | `adk add <name>` or `adk integrations add <name>` |
-| **May depend on**      | Integrations (via interface wiring)       | Nothing                                           |
-| **Lock file key**      | `plugins`                                 | `integrations`                                    |
-| **Action call format** | `plugins.<alias>.actions.<action>(input)` | `actions.<alias>.<action>(input)`                 |
+|                        | Plugin                                    | Integration                       |
+| ---------------------- | ----------------------------------------- | --------------------------------- |
+| **Purpose**            | Adds behavior/logic to your bot           | Connects to an external platform  |
+| **Installed via**      | `adk plugins add <name>`                  | `adk integrations add <name>`     |
+| **May depend on**      | Integrations (via interface wiring)       | Nothing                           |
+| **Lock file key**      | `plugins`                                 | `integrations`                    |
+| **Action call format** | `plugins.<alias>.actions.<action>(input)` | `actions.<alias>.<action>(input)` |
 
 ## CLI Commands
 
@@ -101,23 +101,17 @@ adk plugins upgrade <alias> --to <version>
 adk plugins upgrade <alias> --target prod
 ```
 
-### Lock File Management
+### Snapshot Inspection and Promotion
 
-Plugin state is tracked in `dependencies.<env>.lock.json` alongside integrations. These commands manage the lock file:
+Plugin state lives in Botpress Cloud and is reflected locally in `.adk/dependencies/<env>.json` alongside integrations. These commands inspect and promote dependency state:
 
 ```bash
-# Pull cloud state into the local lock file
-adk plugins sync
-adk plugins sync --target prod
-adk plugins sync --dry-run          # preview without writing
+# Show per-plugin capability state with remediation
+adk plugins status
+adk plugins status --target prod
+adk plugins status --format json
 
-# Push lock file state to cloud
-adk plugins apply
-adk plugins apply --target prod
-adk plugins apply --dry-run         # preview without writing
-adk plugins apply --yes             # allow destructive changes without confirmation
-
-# Show differences between lock and cloud
+# Show differences between the local snapshot and Cloud
 adk plugins diff
 adk plugins diff --target prod
 
@@ -126,6 +120,8 @@ adk plugins copy --from dev --to prod
 adk plugins copy --from dev --to prod --dry-run
 adk plugins copy --from dev --to prod --yes   # allow destructive changes without confirmation
 ```
+
+Use `adk dependencies export` / `adk dependencies import` for dependency-only restore artifacts covering integrations and plugins together. These files are explicit backups or transfer artifacts, not user-authored replacements for `.adk/dependencies/<env>.json`.
 
 ## Interface Dependencies
 
@@ -171,14 +167,16 @@ The call format is `plugins.<alias>.actions.<action>()`. This differs from integ
 
 Plugin actions are routed through the Botpress client internally -- the runtime proxy calls `client.callAction()` with the format `<alias>#<actionName>`, so you never need to construct this yourself.
 
-## Lock File Structure
+## Snapshot Structure
 
-Plugins live in `dependencies.dev.lock.json` (or `dependencies.prod.lock.json`) under the `plugins` key:
+Plugins live in `.adk/dependencies/dev.json` (or `.adk/dependencies/prod.json`) under the `plugins` key:
 
 ```json
 {
   "version": 1,
   "env": "dev",
+  "botId": "bot_123",
+  "fetchedAt": "2026-06-10T12:00:00.000Z",
   "integrations": { ... },
   "plugins": {
     "desk-hitl": {
@@ -210,7 +208,7 @@ Each plugin entry has:
 
 ## Environment Variable References
 
-Plugin config values support `${env:VAR_NAME}` syntax. The CLI substitutes these from the process environment at apply time while preserving the reference in the lock file. This keeps secrets out of version control.
+Plugin config values support `${env:VAR_NAME}` syntax. The CLI substitutes these from the process environment when applying to Cloud while preserving the reference in the snapshot. This keeps secrets out of version control.
 
 ```bash
 # Set a config value that references an env var
@@ -248,13 +246,13 @@ adk plugins disable my-plugin
 adk plugins enable my-plugin
 ```
 
-### Sync After Manual Cloud Changes
+### Inspect After Manual Cloud Changes
 
 If someone changed plugin state through the Botpress dashboard:
 
 ```bash
-adk plugins sync           # pull cloud state into lock file
-adk plugins diff           # verify lock matches cloud
+adk plugins status         # show availability/remediation
+adk plugins diff           # compare local snapshot with Cloud
 ```
 
 ## Pitfalls
@@ -265,11 +263,11 @@ adk plugins diff           # verify lock matches cloud
 
 3. **Plugin actions vs integration actions** -- Plugin actions use `plugins.<alias>.actions.<name>()`, not `actions.<alias>.<name>()`. Mixing these up gives runtime errors.
 
-4. **Lock file drift** -- If someone adds or removes plugins via the Botpress dashboard, your local lock file becomes stale. Run `adk plugins sync` to reconcile.
+4. **Snapshot drift** -- If someone adds or removes plugins via the Botpress dashboard, refresh with a Cloud-reading command such as `adk plugins status` and check `adk plugins diff`.
 
-5. **Prod requires confirmation** -- `adk plugins apply --target prod` and destructive operations (uninstalls) require `--yes` to proceed. This is intentional.
+5. **Prod requires confirmation** -- `adk plugins copy --from dev --to prod` and destructive operations require confirmation or `--yes`. This is intentional.
 
-6. **Old `adk add plugin:` syntax** -- The legacy `adk add plugin:<name>` command still works but routes through the older dependency path. Prefer `adk plugins add <name>` for the full feature set (config, deps, enable/disable).
+6. **Old `adk add plugin:` syntax** -- The legacy flat command is no longer supported. Use `adk plugins add <name>` for plugin installs, config, interface dependencies, and enable/disable lifecycle.
 
 ## See Also
 
