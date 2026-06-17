@@ -60,7 +60,7 @@ Most primitives must be placed in `src/` directory (assets use the `assets/` dir
 
 The first time you help with an ADK project in a session, silently check the project's health:
 
-1. Run `adk check --format json` and `adk status --format json`.
+1. Run `adk check --format json` and `adk status --format json`. (`adk check` validates primitives but does **not** typecheck — also run `tsc --noEmit` to catch type errors before treating work as done.)
 2. If there are errors or warnings (unconfigured integrations, missing models, validation issues), proactively mention them before answering the user's question: _"Before we start — I noticed [issue]. Want me to help fix that?"_
 3. Only do this once per session. Don't re-run on every question.
 

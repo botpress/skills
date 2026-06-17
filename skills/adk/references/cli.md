@@ -386,6 +386,8 @@ Bot: Hi! How can I help you today?
 
 Offline validation of the project — schema correctness, ADK convention compliance, integration availability — without contacting Botpress Cloud. Use before `adk dev`, before `adk deploy`, and after any code change.
 
+`adk check` does **not** typecheck your TypeScript — a green `valid: true` does not mean the code compiles. Run `tsc --noEmit` separately to catch type errors before treating work as done.
+
 ```bash
 adk check [options]
 ```
