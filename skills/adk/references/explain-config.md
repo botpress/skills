@@ -230,7 +230,7 @@ dependencies: {
 **To get details about a specific integration's capabilities:**
 
 ```bash
-adk info slack
+adk integrations info slack --format json
 ```
 
 **Potential issues:**
@@ -412,7 +412,7 @@ Based on what's present vs missing, suggest concrete next steps:
 1. Run `adk status --format json` — check the `integrations` array
 2. For each integration, explain what it provides
 3. Flag any with `status: "unconfigured"`
-4. Optionally run `adk info <name>` to show available actions/channels
+4. Optionally run `adk integrations info <name> --format json` to show available actions/channels
 
 ### "Explain my config"
 

@@ -142,16 +142,16 @@ Missing or incorrect configuration — integration auth, agent.json, environment
 
 Apply a targeted fix based on the classification:
 
-| Classification           | Where to Fix                         | Reference                                    |
-| ------------------------ | ------------------------------------ | -------------------------------------------- |
-| Runtime error in handler | Action/tool/workflow handler code    | `common-failures.md`                         |
-| Schema mismatch          | Input/output schema definitions      | `common-failures.md` § Build Errors          |
-| Wrong tool selected      | Tool descriptions, instructions      | `llm-debugging.md` § Wrong Tool              |
-| Hallucinated params      | Input schemas, validation            | `llm-debugging.md` § Hallucinated Parameters |
-| Model refusal            | Instructions, tool descriptions      | `llm-debugging.md` § Refusal                 |
-| Model looping            | `onBeforeTool` guard, output clarity | `llm-debugging.md` § Looping                 |
-| Integration failure      | Dev Console config, `adk add`        | `common-failures.md` § Integration Failures  |
-| Config issue             | `agent.json`, `agent.local.json`     | `common-failures.md` § Config Confusion      |
+| Classification           | Where to Fix                               | Reference                                    |
+| ------------------------ | ------------------------------------------ | -------------------------------------------- |
+| Runtime error in handler | Action/tool/workflow handler code          | `common-failures.md`                         |
+| Schema mismatch          | Input/output schema definitions            | `common-failures.md` § Build Errors          |
+| Wrong tool selected      | Tool descriptions, instructions            | `llm-debugging.md` § Wrong Tool              |
+| Hallucinated params      | Input schemas, validation                  | `llm-debugging.md` § Hallucinated Parameters |
+| Model refusal            | Instructions, tool descriptions            | `llm-debugging.md` § Refusal                 |
+| Model looping            | `onBeforeTool` guard, output clarity       | `llm-debugging.md` § Looping                 |
+| Integration failure      | Dev Console config, `adk integrations add` | `common-failures.md` § Integration Failures  |
+| Config issue             | `agent.json`, `agent.local.json`           | `common-failures.md` § Config Confusion      |
 
 ---
 

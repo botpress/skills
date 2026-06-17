@@ -1,10 +1,10 @@
 # Configuration
 
-Configure your bot's behavior, integrations, dependencies, and global state through the unified `agent.config.ts` file.
+Configure your bot's behavior, integration aliases, and global state through the unified `agent.config.ts` file. Installed integration and plugin state is managed through Botpress Cloud dependency snapshots, not through `agent.config.ts`.
 
 ## agent.config.ts
 
-The main configuration file defines your bot's core settings, AI models, dependencies, and state schemas.
+The main configuration file defines your bot's core settings, AI models, integration aliases, and state schemas.
 
 ### Configuration Example
 
@@ -54,7 +54,7 @@ export default defineConfig({
     }),
   },
 
-  // Integrations are managed via lock files (dependencies.dev.lock.json / dependencies.prod.lock.json)
+  // Cloud is the source of truth; .adk/dependencies/ stores generated snapshots.
   // Use `adk integrations add/remove/configure` to manage them — see integrations.md
 })
 ```
@@ -167,14 +167,17 @@ user.state.metadata.lastQuery = 'product pricing'
 
 ## Dependencies (Integrations, Plugins, Interfaces)
 
-Integration state lives in per-environment lock files at the project root, not in `agent.config.ts`:
+Integration and plugin state lives in Botpress Cloud, not in `agent.config.ts`. The ADK writes generated per-environment snapshots under `.adk/dependencies/` for fast/offline reads:
 
-- `dependencies.dev.lock.json` — development environment
-- `dependencies.prod.lock.json` — production environment
+- `.adk/dependencies/dev.json` — development environment snapshot
+- `.adk/dependencies/prod.json` — production environment snapshot
+- `.adk/dependencies/migration.json` — one-way legacy migration marker
 
-Cloud is the source of truth. Lock files are local reflections refreshed after every mutation. Never edit lock files by hand.
+Cloud is the source of truth. Snapshots are refreshed after dependency mutations and Cloud reads. Never edit dependency snapshots by hand.
 
-> **Migration:** Projects with a legacy `dependencies` block in `agent.config.ts` are auto-migrated to lock files on the first CLI command.
+> **Migration:** Projects with a legacy `dependencies` block in `agent.config.ts` or legacy `dependencies.<env>.lock.json` files are auto-migrated on the first CLI command. If the target Cloud bot has no dependency state, legacy state is imported to Cloud automatically, including prod. The migration is one-shot and is skipped whenever `.adk/dependencies/migration.json` exists; the marker contents are informational, so even a corrupt marker still counts as migrated.
+
+Use `adk dependencies export` / `adk dependencies import` only for explicit dependency-only backup or transfer artifacts. These JSON files are not the generated local snapshots and should not become a new source of truth.
 
 ### Managing Dependencies
 
@@ -186,8 +189,9 @@ adk integrations add <name>@<version>     # Add integration
 adk integrations configure <alias> --set key=value  # Configure
 adk integrations enable <alias>           # Enable
 adk integrations remove <alias>           # Remove
-adk integrations upgrade [alias]          # Upgrade
+adk integrations upgrade <alias>          # Upgrade
 adk integrations list                     # List installed
+adk integrations status                   # Show availability/remediation
 ```
 
 ### Using Integration Actions
@@ -410,13 +414,12 @@ export default defineConfig({
 
 ### agent.json
 
-The `agent.json` file stores bot and workspace IDs for deployment. This file is automatically created by `adk link` or `adk dev`.
+The `agent.json` file stores the shared production bot and workspace IDs for deployment. This file is created by `adk link`.
 
 ```json
 {
   "botId": "bot_abc123",
-  "workspaceId": "ws_xyz789",
-  "devId": "bot_dev_123"
+  "workspaceId": "ws_xyz789"
 }
 ```
 
@@ -424,13 +427,20 @@ The `agent.json` file stores bot and workspace IDs for deployment. This file is 
 
 - `botId` - Production bot ID (used by `adk deploy`)
 - `workspaceId` - Workspace ID
-- `devId` - Development bot ID (used by `adk dev`)
+
+The development bot ID is stored in `agent.local.json`:
+
+```json
+{
+  "devId": "bot_dev_123"
+}
+```
 
 **Important:**
 
 - Add `agent.json` to `.gitignore` if you do not want environment-specific IDs committed
-- Each developer/environment can have different IDs
-- Created automatically by `adk link` or `adk dev`
+- Each developer/environment can have a different local `devId`
+- `agent.json` is created by `adk link`; `agent.local.json` is written by local dev flows
 - Current scaffolds do not add `agent.json` to `.gitignore` automatically
 
 ### package.json

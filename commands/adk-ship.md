@@ -14,13 +14,14 @@ This is a deploy-to-production command — treat it as destructive-by-default. C
    - `adk evals --format json` — must pass if any evals exist; if none exist, surface that as a warning and offer `/adk-eval` before shipping.
    - `git status` — surface uncommitted changes; ask whether to ship the working tree as-is or commit first.
    - `adk status --format json` — confirm the project is linked to the intended workspace and bot.
-   - Check `agent.config.ts` for unconfigured integrations (missing secrets, missing models). If any, block the ship and list them.
+   - `adk integrations status --target prod --format json` and `adk plugins status --target prod --format json` — block on unavailable/unconfigured enabled dependencies. Check `agent.config.ts` for missing models.
+   - If a project command reports an ADK runtime/package mismatch, run `adk project upgrade --dry-run`, show the plan, and get approval before `adk project upgrade`.
 
 2. **Summarize.** Show a tight pre-flight report: ✅ checks passed, ⚠️ warnings, ❌ blockers. Include the linked bot and a one-line diff summary if there are uncommitted changes.
 
 3. **Confirm.** Always ask before deploying — the original `/adk-ship` invocation is not consent. If there are blockers, stop and offer to fix each. Otherwise (warnings or fully green), ask: _"Ship to <bot>? (yes / no)"_.
 
-4. **Deploy.** Run `adk deploy`. Stream output. If `adk deploy` prompts for preflight approval, surface the prompt to the user — do not auto-approve.
+4. **Deploy.** Run `adk deploy`. Stream output. If `adk deploy` prompts for preflight approval, surface the prompt to the user — do not auto-approve. If deploy warns that integration versions differ between dev and prod, show the warning and recommend `adk integrations copy --from dev --to prod --dry-run` before any promotion.
 
 5. **Verify.** After deploy, run `adk status --format json` to confirm the deployed version. Report deployed version and any post-deploy warnings. Note: `adk chat` runs against the local dev bot, not the deployed one — do not use it as a production smoke test. Direct the user to the Dev Console for live verification.
 

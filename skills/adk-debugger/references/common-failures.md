@@ -21,7 +21,7 @@ adk check --format json
 - Missing or invalid `agent.config.ts` fields
 - Schema mismatch between action/tool input and output definitions
 - Invalid entity names (too long or contains invalid characters)
-- Missing dependency (integration not added with `adk add`)
+- Missing dependency (integration not added with `adk integrations add`)
 - Import from wrong source (e.g., importing from `@botpress/sdk` instead of `@botpress/runtime`)
 - Invalid table schema definitions
 
@@ -85,7 +85,7 @@ Look for `tool_call` spans with `success: false`. Some tools could be workflows 
 - **Handler error:** Read the error message, fix the handler code
 - **Schema mismatch:** Compare `input` in the trace against the tool's input schema definition
 - **Auth expired:** Reconfigure the integration in the Dev Console (localhost:3001) which must be done interactively
-- **Missing config:** Run `adk info <integration> --format json` to see required config, then configure in Dev Console which must also be done interactively
+- **Missing config:** Run `adk integrations info <integration> --format json` to see required config, then configure in Dev Console which must also be done interactively
 
 ---
 
@@ -143,7 +143,7 @@ Also check the Dev Console at localhost:3001 for integration status.
 
 - **Auth:** Reconfigure the integration in Dev Console
 - **Rate limits:** Add retry logic or reduce request frequency
-- **Config:** Run `adk info <integration> --format json` to verify required fields, update in Dev Console
+- **Config:** Run `adk integrations info <integration> --format json` to verify required fields, update in Dev Console
 - **Events in dev:** Restart `adk dev` — event registration sometimes needs a fresh start
 
 ---
@@ -163,7 +163,7 @@ adk check --format json
 
 - **Import from wrong source:** Using `@botpress/sdk` where `@botpress/runtime` is needed (or vice versa)
 - **Schema mismatch:** Action/tool input or output schema doesn't match the handler's actual types
-- **Missing dependency:** Integration referenced in code but not added with `adk add`
+- **Missing dependency:** Integration referenced in code but not added with `adk integrations add`
 - **Type errors in generated code:** Usually caused by stale generated types — run `adk build` or re-run `adk dev` to regenerate
 
 **Fix:** Start with `adk check --format json` — it catches most issues offline. For type errors, try deleting `.adk/` and running `adk build` or re-running `adk dev` to regenerate.

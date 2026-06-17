@@ -23,7 +23,7 @@ This is the proactive counterpart to `/adk-debug`: nothing is necessarily broken
    - Imports come from `@botpress/runtime` (not the SDK).
    - Each primitive is exported in the shape the ADK expects for its type (see references in the `adk` skill).
    - Zod / schema definitions cover all inputs and outputs the code uses.
-   - Any referenced integration is installed (`adk list --format json`) and configured in `agent.config.ts`.
+   - Any referenced integration is installed (`adk integrations list --format json`) and available/configured (`adk integrations status --format json`).
    - Any referenced model is available in the project's model config.
    - Any referenced sibling primitive (table, action, tool) actually exists in `src/`.
    - **Feature-level only:** the primitives in the set actually wire together — e.g., the workflow's action calls resolve to existing actions, the table the workflow writes to matches the schema the action reads.
