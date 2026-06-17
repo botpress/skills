@@ -9,7 +9,7 @@
       "name": "adk",
       "source": "./.",
       "description": "Complete toolkit for building AI agents with Botpress ADK",
-      "version": "2.0.0-alpha.1",
+      "version": "2.0.1-beta.0",
       "author": {
         "name": "Botpress",
         "url": "https://github.com/botpress"
