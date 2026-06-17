@@ -11,7 +11,7 @@ Users consume plugins. They do not author them.
 | **Purpose**            | Adds behavior/logic to your bot           | Connects to an external platform  |
 | **Installed via**      | `adk plugins add <name>`                  | `adk integrations add <name>`     |
 | **May depend on**      | Integrations (via interface wiring)       | Nothing                           |
-| **Lock file key**      | `plugins`                                 | `integrations`                    |
+| **Snapshot key**       | `plugins`                                 | `integrations`                    |
 | **Action call format** | `plugins.<alias>.actions.<action>(input)` | `actions.<alias>.<action>(input)` |
 
 ## CLI Commands
