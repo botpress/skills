@@ -189,7 +189,7 @@ After fixing, write a regression eval so the bug can't come back. Use the **adk-
 Quick template:
 
 ```typescript
-import { Eval } from '@botpress/adk'
+import { Eval } from '@botpress/evals'
 
 export default new Eval({
   name: 'fix-description-here',
