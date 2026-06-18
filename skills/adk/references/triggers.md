@@ -5,6 +5,8 @@ Triggers allow your bot to react to events from the bot itself or integrated ser
 > **⚠️ IMPORTANT:** Always verify integration events exist before using them! Use `adk integrations info <integration> --format json` and inspect the returned event spec. Integration events change between versions.
 >
 > **⚠️ Dev-mode limitation:** `adk dev` is not a perfect mirror of production for every integration event flow. Some private or custom integration events may not register or route locally even when the event name is valid. If an event-driven flow works in docs but not in local dev, verify the event first, then test against a deployed bot before assuming your trigger code is wrong.
+>
+> **⚠️ Custom event names must be camelCase.** A custom event you define (in a `Conversation`/`Trigger` `events` list or an `agent.config` event schema) must be named in camelCase — `claimUpdate`, not `claim_update`. Production `adk build` rejects snake_case event names and fails the build.
 
 ## Basic Concepts
 
