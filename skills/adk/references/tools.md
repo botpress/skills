@@ -56,6 +56,8 @@ export default new Autonomous.Tool({
 - Can pass directly to `execute()`: `tools: [searchDocs]`
 - Better for tool composition and reusability
 
+> A `Tool`/`Autonomous.Tool` is already a tool — pass it directly (`tools: [myTool]`). Do **not** call `.asTool()` on it; `.asTool()` only adapts an **Action** into a tool.
+
 ## Tool Properties
 
 | Property              | Type                  | Required    | Description                                              |

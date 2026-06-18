@@ -2,6 +2,8 @@
 
 Tables provide structured data storage with automatic schema management, CRUD operations, and optional semantic search capabilities.
 
+> **Use `state`, not a Table, for simple memory.** For per-user or per-bot values (names, preferences, counters), use `user.state` / `bot.state` (see [Context API](./context-api.md)). Reach for a Table only for collections of rows you list, query, or search.
+
 ## Basic Concepts
 
 ### What are Tables?

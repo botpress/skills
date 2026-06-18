@@ -246,11 +246,11 @@ As of ADK 1.9+, knowledge bases are synced using the `adk kb` command, which run
 # Interactive KB management
 adk kb
 
-# Non-interactive sync
-adk kb sync -y
+# Non-interactive sync (dev; use --prod for production)
+adk kb sync --dev -y
 
-# Check sync status
-adk kb status
+# Force a full re-sync, ignoring change detection
+adk kb sync --dev --force -y
 ```
 
 The KB sync:

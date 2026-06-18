@@ -506,6 +506,8 @@ await step('process-all-items', async () => {
 
 ## Communication Patterns
 
+> **For simple turn-by-turn chat (quizzes, multi-step prompts within one conversation), don't use a Workflow.** Keep the sequence in the Conversation handler with per-conversation `state`. Request/provide workflows are for pausing on external or async input — overkill and hard to resume for linear chat.
+
 ### 1. Requesting User Input (Blocking)
 
 Workflows can pause and request data from conversations:
