@@ -70,6 +70,22 @@ export const myTool = new Autonomous.Tool({
 })
 ```
 
+### Event Handling Mistakes
+
+#### Receiving a pushed event — subscribe to `chat:custom`, not a made-up name
+
+An event pushed into a conversation (e.g. an order shipped, a status update relayed in) arrives as `chat:custom`. A handler subscribed to a domain-specific name never fires.
+
+```typescript
+// ❌ WRONG - pushed event is chat:custom, so this never fires
+events: ['claimUpdate'],
+
+// ✅ CORRECT - branch on type === 'event', read event.payload
+events: ['chat:custom'],
+```
+
+The camelCase rule applies only to events you define/emit, not to receiving. See [conversations.md → Custom & Proactive Events](./conversations.md#custom--proactive-events).
+
 ### State Management Mistakes
 
 #### Conversation State Access
