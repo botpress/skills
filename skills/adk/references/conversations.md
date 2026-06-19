@@ -148,7 +148,10 @@ export const Chat = new Conversation({
   events: ['chat:custom'],
   async handler({ type, event, conversation }) {
     if (type === 'event') {
-      await conversation.send({ type: 'text', payload: { text: 'Your order shipped!' } })
+      // The pushed data is in event.payload. On channel '*' the handler types
+      // event as `unknown`, so read its payload with a cast (or use a concrete channel).
+      const { orderId } = (event as { payload: { orderId: string } }).payload
+      await conversation.send({ type: 'text', payload: { text: `Order ${orderId} shipped!` } })
       return
     }
     // ...handle messages as normal

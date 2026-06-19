@@ -26,8 +26,8 @@ Tables provide structured data storage with automatic schema management, CRUD op
 
 1. **DO NOT define `id`, `createdAt`, or `updatedAt` columns in schema** - all three are RESERVED and automatically managed. Defining any of them in `columns` throws an error.
    - ❌ Don't define them: `columns: { id: ..., createdAt: ..., updatedAt: ... }`
-   - ✅ Every row automatically has `id` (`number`), `createdAt`, and `updatedAt`. Read them off the row (e.g. `row.createdAt`); never set them in create/update payloads.
-   - ✅ You can optionally provide `id` (as `number`) when using `upsertRows()` for updates
+   - ✅ Every row automatically has `id` (`number`), `createdAt`, and `updatedAt` — read them off the row (e.g. `row.createdAt`). Never write `createdAt`/`updatedAt` in any payload; they are always system-managed.
+   - ✅ `id` is auto-assigned by `createRows()` (don't pass it). You may pass `id` (as `number`) to `upsertRows()` — there it is the **match key** that locates the row to update, not a column value you set.
 
 2. **Table names MUST end with "Table" suffix** - The `name` property passed to `new Table()` must end with "Table" (e.g., `"UsersTable"`, `"OrdersTable"`). This is enforced by runtime validation.
 
