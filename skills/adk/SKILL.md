@@ -262,9 +262,9 @@ Documentation should be located in `./references/` directory relative to this sk
 - **autonomous-execution.md** - Advanced execute() API: Objects, Exits, hooks, configuration
 - **workflows.md** - Workflows and step-based execution
 - **workflow-steps.md** - Complete Workflow Step API reference (step.request, step.map, step.notify, etc.)
-- **conversations.md** - Conversation handlers and message routing
+- **conversations.md** - Conversation handlers, message routing, and receiving `chat:custom` events
 - **conversation-lifecycle.md** - Nudge/expiration lifecycle management for conversations
-- **triggers.md** - Event-driven automation
+- **triggers.md** - Integration & bot-lifecycle event subscriptions (app-pushed custom events → conversations.md)
 - **messages.md** - Sending messages and events
 - **custom-components.md** - Custom webchat components (`.bp.tsx` files, metadata, usage in conversations)
 

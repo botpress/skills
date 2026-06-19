@@ -138,6 +138,27 @@ export const Chat = new Conversation({
 
 See **[Messages](./messages.md)** for complete guide on all message types, metadata, and sending patterns.
 
+## Custom & Proactive Events
+
+To push a message into a conversation from an external trigger (e.g. an announcement or status update), handle a custom event **inside the Conversation** — declare it in `events` and branch on `type === 'event'`. Don't build a separate `Trigger` + `client.createMessage`; an integration can't post messages as itself.
+
+```typescript
+export const Chat = new Conversation({
+  channel: '*',
+  events: ['chat:custom'],
+  async handler({ type, event, conversation }) {
+    if (type === 'event') {
+      // The pushed data is in event.payload. On channel '*' the handler types
+      // event as `unknown`, so read its payload with a cast (or use a concrete channel).
+      const { orderId } = (event as { payload: { orderId: string } }).payload
+      await conversation.send({ type: 'text', payload: { text: `Order ${orderId} shipped!` } })
+      return
+    }
+    // ...handle messages as normal
+  },
+})
+```
+
 ## Conversation Instance Methods
 
 The `conversation` object provides methods for interacting with the current conversation.

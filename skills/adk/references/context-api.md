@@ -131,6 +131,8 @@ if (conversation) {
 
 **Type:** `Conversation | null`
 
+> Tools and Actions **cannot send messages** — the `conversation` here is read-only (no `.send()`). Return data from the Tool/Action and let the `Conversation` handler send it.
+
 ### message
 
 Incoming message (when triggered by a message event).

@@ -5,6 +5,10 @@ Triggers allow your bot to react to events from the bot itself or integrated ser
 > **⚠️ IMPORTANT:** Always verify integration events exist before using them! Use `adk integrations info <integration> --format json` and inspect the returned event spec. Integration events change between versions.
 >
 > **⚠️ Dev-mode limitation:** `adk dev` is not a perfect mirror of production for every integration event flow. Some private or custom integration events may not register or route locally even when the event name is valid. If an event-driven flow works in docs but not in local dev, verify the event first, then test against a deployed bot before assuming your trigger code is wrong.
+>
+> **⚠️ To _receive_ a pushed event, subscribe to `chat:custom` — not a custom name.** An event pushed into a chat conversation (e.g. an order shipped, a status update relayed in) arrives as `chat:custom`. Subscribe the `Conversation` to `events: ['chat:custom']` and branch on `type === 'event'`; a handler on a made-up name like `orderShipped` never fires. See [Conversations → Custom & Proactive Events](./conversations.md#custom--proactive-events). The camelCase rule below applies only to events you _define/emit_, not to receiving.
+>
+> **⚠️ Events you define must be camelCase** — `orderShipped`, not `order_shipped`; `adk build` rejects snake_case names.
 
 ## Basic Concepts
 

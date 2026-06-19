@@ -53,6 +53,8 @@ export default new Action({
 });
 ```
 
+> **`output` is required.** Declare it as a bare Zui schema (`output: z.object({ ... })`), never `output: { schema: ... }`. Omitting it fails the type check (`adk check` won't catch it).
+
 **Why use `export const`?**
 
 - Enables direct imports: `import { myAction } from "./actions/myAction"`

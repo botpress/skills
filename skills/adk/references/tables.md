@@ -2,6 +2,8 @@
 
 Tables provide structured data storage with automatic schema management, CRUD operations, and optional semantic search capabilities.
 
+> **Use `state`, not a Table, for simple memory.** For per-user or per-bot values (names, preferences, counters), use `user.state` / `bot.state` (see [Context API](./context-api.md)). Reach for a Table only for collections of rows you list, query, or search.
+
 ## Basic Concepts
 
 ### What are Tables?
@@ -22,10 +24,10 @@ Tables provide structured data storage with automatic schema management, CRUD op
 
 **Before creating any table, you MUST follow these two rules or table creation will fail:**
 
-1. **DO NOT define `id` column in schema** - The `id` field is automatically created by the system and is RESERVED. Including it in your `columns` definition will cause an error.
-   - ❌ Don't define `id` in `columns: { id: z.string(), ... }`
-   - ✅ The `id` field is automatically assigned by the server as a `number` when creating rows
-   - ✅ You can optionally provide `id` (as `number`) when using `upsertRows()` for updates
+1. **DO NOT define `id`, `createdAt`, or `updatedAt` columns in schema** - all three are RESERVED and automatically managed. Defining any of them in `columns` throws an error.
+   - ❌ Don't define them: `columns: { id: ..., createdAt: ..., updatedAt: ... }`
+   - ✅ Every row automatically has `id` (`number`), `createdAt`, and `updatedAt` — read them off the row (e.g. `row.createdAt`). Never write `createdAt`/`updatedAt` in any payload; they are always system-managed.
+   - ✅ `id` is auto-assigned by `createRows()` (don't pass it). You may pass `id` (as `number`) to `upsertRows()` — there it is the **match key** that locates the row to update, not a column value you set.
 
 2. **Table names MUST end with "Table" suffix** - The `name` property passed to `new Table()` must end with "Table" (e.g., `"UsersTable"`, `"OrdersTable"`). This is enforced by runtime validation.
 
@@ -61,11 +63,10 @@ export const UsersTable = new Table({
   description: 'Stores user information',
 
   columns: {
-    // Note: id is NOT defined - it's automatic!
+    // Note: id, createdAt, updatedAt are NOT defined - they're automatic!
     name: z.string(),
     email: z.string().email(),
     role: z.enum(['admin', 'user', 'guest']),
-    createdAt: z.date(),
     metadata: z.object({}).passthrough(), // Flexible object
   },
 })
@@ -124,9 +125,7 @@ export const ConversationsTable = new Table({
   description: 'Store conversation data with complex metadata',
 
   columns: {
-    // ISO date strings (common pattern for API data)
-    createdAt: z.string().describe('ISO 8601 date string'),
-    updatedAt: z.string().describe('ISO 8601 date string'),
+    // id, createdAt, updatedAt are automatic — don't define them.
 
     // Optional fields
     waitingSince: z.string().optional(),
@@ -204,7 +203,6 @@ export const DocumentsTable = new Table({
     },
 
     tags: z.array(z.string()),
-    createdAt: z.date(),
   },
 
   // Optional: Search optimization factor
@@ -248,7 +246,6 @@ await UsersTable.createRows({
       name: 'John Doe',
       email: 'john@example.com',
       role: 'user',
-      createdAt: new Date(),
       metadata: { source: 'signup' },
     },
   ],
@@ -261,13 +258,11 @@ await UsersTable.createRows({
       name: 'Alice',
       email: 'alice@example.com',
       role: 'admin',
-      createdAt: new Date(),
     },
     {
       name: 'Bob',
       email: 'bob@example.com',
       role: 'user',
-      createdAt: new Date(),
     },
   ],
 })
@@ -382,7 +377,6 @@ await ContactsTable.upsertRows({
     contactId: contact.id,
     name: contact.name,
     email: contact.email,
-    updatedAt: new Date(),
   })),
   keyColumn: 'contactId',
 })
@@ -484,8 +478,6 @@ export const OrdersTable = new Table({
     }),
     status: z.enum(['pending', 'processing', 'shipped', 'delivered']),
     total: z.number().positive(),
-    createdAt: z.date(),
-    updatedAt: z.date(),
   },
 })
 ```
@@ -758,7 +750,6 @@ export const createUser = new Action({
           name: input.name,
           email: input.email,
           role: input.role,
-          createdAt: new Date(),
           metadata: {},
         },
       ],
@@ -881,16 +872,14 @@ export const UsersTable = new Table({ name: "UsersTable", columns: { ... } });
 export const OrdersTable = new Table({ name: "OrdersTable", columns: { ... } });
 ```
 
-### 2. Add Timestamps
+### 2. Timestamps Are Automatic
+
+Every row already has `createdAt` and `updatedAt` (and `id`) — don't define them. Add your own date column only for a distinct meaning, e.g. a soft delete:
 
 ```typescript
 columns: {
-  // Always include these for audit trails
-  createdAt: z.date(),
-  updatedAt: z.date(),
-
-  // Optional: soft delete
-  deletedAt: z.date().nullable().optional()
+  // createdAt / updatedAt are automatic — read them off the row, don't define them.
+  deletedAt: z.date().nullable().optional() // soft delete
 }
 ```
 
@@ -997,7 +986,6 @@ export const CacheTable = new Table({
     key: z.string(),
     value: z.unknown(),
     expiresAt: z.date(),
-    createdAt: z.date(),
   },
 })
 
@@ -1024,7 +1012,6 @@ export async function getCached<T>(key: string, fetcher: () => Promise<T>, ttlMi
         key,
         value,
         expiresAt: new Date(Date.now() + ttlMinutes * 60 * 1000),
-        createdAt: new Date(),
       },
     ],
     keyColumn: 'key',
