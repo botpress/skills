@@ -1,7 +1,7 @@
 {
   "name": "adk",
   "description": "Skills and commands for building AI agents with the Botpress Agent Development Kit (ADK)",
-  "version": "2.0.1-beta.1",
+  "version": "2.0.1-beta.2",
   "author": {
     "name": "Botpress",
     "url": "https://github.com/botpress"
