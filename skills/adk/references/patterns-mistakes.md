@@ -37,6 +37,16 @@ const { myAction } = await import('./actions/myAction')
 import { myAction } from './actions/myAction'
 ```
 
+### Shipping a bundled data file
+
+To ship a data table your code reads at runtime (menu, catalog, pricing rules), **import the JSON statically** — the bundler inlines it into the build:
+
+```typescript
+import menu from './data/menu.json' // ✅ inlined at build time
+```
+
+Don't reach for `fs.readFile` (the file isn't on disk at runtime → ENOENT), `import.meta`/`fileURLToPath` (undefined in the bundle → throws), or `assets.get()` (returns a URL, not the file's contents). All three pass `adk check` and `tsc` but crash only at runtime.
+
 ### Handler Syntax
 
 #### Action Handlers
@@ -80,11 +90,27 @@ An event pushed into a conversation (e.g. an order shipped, a status update rela
 // ❌ WRONG - pushed event is chat:custom, so this never fires
 events: ['claimUpdate'],
 
-// ✅ CORRECT - branch on type === 'event', read event.payload
+// ✅ CORRECT - branch on type === 'event', read event.payload.payload
 events: ['chat:custom'],
 ```
 
 The camelCase rule applies only to events you define/emit, not to receiving. See [conversations.md → Custom & Proactive Events](./conversations.md#custom--proactive-events).
+
+### Conversation Routing Mistakes
+
+#### Don't hand-roll natural-language parsing
+
+Keyword/regex/exact-string matching on what a user types misses real phrasings, so whole flows silently fail. Route natural language to `execute()`; reserve exact-string branching for explicit slash-commands and structured event `type`s.
+
+```typescript
+// ❌ WRONG - misses "can you sum this up?", "tl;dr", ...
+if (message?.payload.text.includes('summarize')) {
+  /* ... */
+}
+
+// ✅ CORRECT - the model interprets intent; extract fields with zai
+await execute({ instructions: 'Summarize the conversation for the user' })
+```
 
 ### State Management Mistakes
 

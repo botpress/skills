@@ -85,12 +85,11 @@ Each entry in `conversation` is one turn. A turn must have either `user` or `eve
 
 ### Event Trigger
 
-Fire a non-message event (webhook, integration event) instead of a user message.
+Push a custom event instead of a user message. The turn carries only a `payload`; the bot receives it as a `chat:custom` event and reads the data at `event.payload.payload`.
 
 ```typescript
 {
   event: {
-    type: 'checkout:order_placed',
     payload: { orderId: 'ORD-001', total: 49.99 },
   },
   assert: {
@@ -108,7 +107,7 @@ Assert the bot does **not** respond. Add `expectSilence: true` to any turn.
 { user: 'Please ignore this.', expectSilence: true }
 
 // Silence after an event
-{ event: { type: 'internal:ping' }, expectSilence: true }
+{ event: { payload: { kind: 'ping' } }, expectSilence: true }
 ```
 
 > **Note:** `expectSilence` is mutually exclusive with `assert.response`. Every turn must have `user` or `event` — `expectSilence` is a flag on top of that, not a standalone turn type.
@@ -347,13 +346,19 @@ export default defineConfig({
 
 ```typescript
 // WRONG — mutually exclusive
-{ user: 'hello', event: { type: 'payment.failed' } }
+{ user: 'hello', event: { payload: { amount: 50 } } }
 ```
 
 ✅ **Correct — use separate turns**
 
 ```typescript
-{ event: { type: 'payment.failed', payload: { amount: 50 } } }
+{
+  event: {
+    payload: {
+      amount: 50
+    }
+  }
+}
 ```
 
 ## See Also

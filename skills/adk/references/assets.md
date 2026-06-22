@@ -67,6 +67,8 @@ console.log(logo.mime) // "image/png"
 console.log(logo.size) // bytes
 ```
 
+> `assets.get()` returns **metadata only** (URL, mime, size) — never the file's bytes. To ship a data table your code reads in-process (menu, catalog, rules), don't use assets — `import` the JSON statically instead. See [patterns-mistakes.md → Shipping a bundled data file](./patterns-mistakes.md#shipping-a-bundled-data-file).
+
 ### List All Assets
 
 ```typescript

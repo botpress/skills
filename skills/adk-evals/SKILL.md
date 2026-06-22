@@ -94,11 +94,11 @@ export default new Eval({
 
 ### Turn types
 
-| Turn                       | When to use                                      |
-| -------------------------- | ------------------------------------------------ |
-| `user: 'message'`          | Standard user message                            |
-| `event: { type, payload }` | Non-message trigger (webhook, integration event) |
-| `expectSilence: true`      | Assert bot does NOT respond                      |
+| Turn                  | When to use                                    |
+| --------------------- | ---------------------------------------------- |
+| `user: 'message'`     | Standard user message                          |
+| `event: { payload }`  | Push a custom event (arrives as `chat:custom`) |
+| `expectSilence: true` | Assert bot does NOT respond                    |
 
 ### Assertion categories
 
@@ -134,7 +134,7 @@ adk evals runs --latest -v       # with full details
 ```typescript
 // CORRECT
 { user: 'hello', expectSilence: true }
-{ event: { type: 'payment.failed' }, expectSilence: true }
+{ event: { payload: { kind: 'payment.failed' } }, expectSilence: true }
 ```
 
 ❌ **`expectSilence` alone is not a valid turn**

@@ -362,11 +362,13 @@ adk chat [options]
 
 ```bash
 adk chat                                          # interactive
-adk chat --single "<message>"                     # one-shot
-adk chat --single "<message>" --format json
-adk chat --single "Run the full analysis" --timeout 30s
-adk chat --single "Follow up" --conversation-id <id>
+adk chat --single '<message>'                     # one-shot
+adk chat --single '<message>' --format json
+adk chat --single 'Run the full analysis' --timeout 30s
+adk chat --single 'Follow up' --conversation-id <id>
 ```
+
+> **Single-quote the message.** In double quotes the shell expands `$`, so `"I spent $5"` reaches the bot as `I spent ` (and `$10`→`0`, `$84.50`→`4.50`). It looks like the bot can't parse the input, but it's shell mangling. Use single quotes: `adk chat --single 'I spent $5'`.
 
 **Requires:**
 

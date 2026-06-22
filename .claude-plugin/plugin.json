@@ -9,11 +9,6 @@
   "homepage": "https://github.com/botpress/skills",
   "repository": "https://github.com/botpress/skills",
   "license": "MIT",
-  "keywords": [
-    "botpress",
-    "adk",
-    "agent",
-    "ai"
-  ],
+  "keywords": ["botpress", "adk", "agent", "ai"],
   "category": "development"
 }
