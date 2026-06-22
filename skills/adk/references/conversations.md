@@ -138,7 +138,7 @@ export const Chat = new Conversation({
 
 See **[Messages](./messages.md)** for complete guide on all message types, metadata, and sending patterns.
 
-> **Route natural language to `execute()` — don't hand-roll parsers.** Match exact strings only for explicit slash-commands (`/help`) or structured event `type`s. For anything users phrase in their own words, call `execute({ instructions })` and pull structured fields with `adk.zai.extract`; keyword/regex/`startsWith` matching silently misses real phrasings.
+> **Route natural language to `execute()` — don't hand-roll parsers.** Match exact strings only for explicit slash-commands (`/help`) or structured event `type`s. For anything users phrase in their own words, call `execute({ instructions })` and pull structured fields with `adk.zai.extract` (see [zai-agent-reference.md](./zai-agent-reference.md)); keyword/regex/`startsWith` matching silently misses real phrasings.
 
 ## Custom & Proactive Events
 

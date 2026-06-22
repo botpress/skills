@@ -104,7 +104,7 @@ Keyword/regex/exact-string matching on what a user types misses real phrasings, 
 
 ```typescript
 // ❌ WRONG - misses "can you sum this up?", "tl;dr", ...
-if (message.payload.text.includes('summarize')) {
+if (message?.payload.text.includes('summarize')) {
   /* ... */
 }
 
