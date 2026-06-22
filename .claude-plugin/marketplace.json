@@ -9,7 +9,7 @@
       "name": "adk",
       "source": "./.",
       "description": "Complete toolkit for building AI agents with Botpress ADK",
-      "version": "2.0.1-beta.0",
+      "version": "2.0.1-beta.1",
       "author": {
         "name": "Botpress",
         "url": "https://github.com/botpress"
@@ -17,7 +17,16 @@
       "homepage": "https://github.com/botpress/skills",
       "repository": "https://github.com/botpress/skills",
       "license": "MIT",
-      "keywords": ["botpress", "adk", "agent", "integration", "ai", "evals", "debugging", "frontend"],
+      "keywords": [
+        "botpress",
+        "adk",
+        "agent",
+        "integration",
+        "ai",
+        "evals",
+        "debugging",
+        "frontend"
+      ],
       "category": "development",
       "strict": false
     }
