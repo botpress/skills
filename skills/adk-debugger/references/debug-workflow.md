@@ -51,6 +51,8 @@ adk chat --single "the message that triggers the bug" --format json
 
 **Why minimal?** A single message isolates the problem. Most often, multi-turn conversations add noise — the issue might be in turn 3 but caused by context from turn 1. That being said, some bugs are only reproducible by going through many turns.
 
+**Pushed-event or proactive bug?** `adk chat --single` only sends user text — it can't push a `chat:custom` event. Reproduce with an eval `event` turn (`event: { payload: {...} }`) and run `adk evals`; don't curl the chat webhook.
+
 **Save the conversation ID** from the JSON output — you'll need it for trace queries and follow up conversations.
 
 If the issue requires multi-turn context:

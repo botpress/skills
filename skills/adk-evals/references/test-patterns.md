@@ -192,7 +192,6 @@ export default new Eval({
   conversation: [
     {
       event: {
-        type: 'payment:failed',
         payload: { amount: 99.99, currency: 'USD', customerId: 'cust-001' },
       },
       assert: {
@@ -213,8 +212,8 @@ export default new Eval({
 
   conversation: [
     {
-      event: { type: 'internal:heartbeat' },
-      expectSilence: true, // bot should not respond to internal events
+      event: { payload: { kind: 'heartbeat' } },
+      expectSilence: true, // bot should not respond to heartbeat payloads
     },
   ],
 })

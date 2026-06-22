@@ -14,10 +14,10 @@ If `$ARGUMENTS` is empty, list the user's primitives and ask which to test.
 
 1. **Locate and identify type.** Glob `src/**/<name>.ts`. The directory tells you the type (action / tool / workflow / conversation / table / trigger / knowledge base).
 2. **Build an invocation appropriate for the type.** If the user provided input after the primitive name, use it as-is; otherwise generate a realistic probe from the primitive's schema:
-   - **Tool / conversation handler / agent step:** `adk chat --single "<probe message that exercises this primitive>" --format json`. The probe should plausibly cause the LLM to call the tool / route to the handler.
+   - **Tool / conversation handler / agent step:** `adk chat --single '<probe message that exercises this primitive>' --format json`. The probe should plausibly cause the LLM to call the tool / route to the handler. Single-quote the message — in double quotes the shell expands `$`, so a probe like `"I spent $5"` reaches the bot mangled.
    - **Action:** invoke through `adk run .adk/scratch/test-<name>.ts` after writing a small disposable runner under `.adk/scratch/`, or via a chat probe that triggers a tool which calls the action. Prefer the runner when the action has a deterministic input shape.
    - **Workflow:** trigger via the documented entry point (chat probe, action call, or trigger event).
-   - **Trigger:** simulate the source event the trigger subscribes to. If the event source is external, explain the limitation and fall back to invoking the trigger handler directly via `adk run`.
+   - **Trigger:** a `Trigger` fires on an external source event that usually can't be produced locally — invoke its handler directly via `adk run` with a synthetic event. (A Conversation's pushed `chat:custom` event is different: test it with an eval `event` turn and `adk evals` — see `/adk-eval`. `adk chat --single` only sends user text and can't push one.)
    - **Table:** insert a sample row, run a representative query, then **delete the row** before reporting. Tag the test row with a recognizable marker (e.g., a `__test_<timestamp>` value in a string column) so the cleanup query is unambiguous. If the project is linked to a shared or production workspace, ask the user before inserting at all — offer to scope the test to a local dev table instead.
    - **Knowledge base:** run a search query against it.
 3. **Run it and read traces.** Capture the response. Run `adk traces --format json` filtered to the most recent invocation if the response alone is not enough to judge correctness.

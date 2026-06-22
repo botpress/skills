@@ -138,6 +138,8 @@ export const Chat = new Conversation({
 
 See **[Messages](./messages.md)** for complete guide on all message types, metadata, and sending patterns.
 
+> **Route natural language to `execute()` — don't hand-roll parsers.** Match exact strings only for explicit slash-commands (`/help`) or structured event `type`s. For anything users phrase in their own words, call `execute({ instructions })` and pull structured fields with `adk.zai.extract`; keyword/regex/`startsWith` matching silently misses real phrasings.
+
 ## Custom & Proactive Events
 
 To push a message into a conversation from an external trigger (e.g. an announcement or status update), handle a custom event **inside the Conversation** — declare it in `events` and branch on `type === 'event'`. Don't build a separate `Trigger` + `client.createMessage`; an integration can't post messages as itself.
@@ -148,9 +150,9 @@ export const Chat = new Conversation({
   events: ['chat:custom'],
   async handler({ type, event, conversation }) {
     if (type === 'event') {
-      // The pushed data is in event.payload. On channel '*' the handler types
-      // event as `unknown`, so read its payload with a cast (or use a concrete channel).
-      const { orderId } = (event as { payload: { orderId: string } }).payload
+      // The pushed data is nested at event.payload.payload. On channel '*' the handler
+      // types event as `unknown`, so read it with a cast (or use a concrete channel).
+      const { orderId } = (event as { payload: { payload: { orderId: string } } }).payload.payload
       await conversation.send({ type: 'text', payload: { text: `Order ${orderId} shipped!` } })
       return
     }
@@ -158,6 +160,8 @@ export const Chat = new Conversation({
   },
 })
 ```
+
+To test a pushed event without an external trigger, fire it from an eval `event` turn (`event: { payload: {...} }`) and run `adk evals` — `adk chat --single` only sends user text. See the `adk-evals` skill.
 
 ## Conversation Instance Methods
 
