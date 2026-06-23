@@ -1,7 +1,7 @@
 {
   "name": "adk",
   "description": "Skills and commands for building AI agents with the Botpress Agent Development Kit (ADK)",
-  "version": "2.0.1-beta.2",
+  "version": "2.0.1-beta.3",
   "author": {
     "name": "Botpress",
     "url": "https://github.com/botpress"
@@ -9,6 +9,11 @@
   "homepage": "https://github.com/botpress/skills",
   "repository": "https://github.com/botpress/skills",
   "license": "MIT",
-  "keywords": ["botpress", "adk", "agent", "ai"],
+  "keywords": [
+    "botpress",
+    "adk",
+    "agent",
+    "ai"
+  ],
   "category": "development"
 }
