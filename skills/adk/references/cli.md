@@ -691,7 +691,7 @@ adk tables list --prod --format json
 adk tables rows <Table> [limit=<n>] [offset=<n>] [--filter <json>] [--search <term>] [--prod] [--format json]
 ```
 
-- `limit=<n>` / `offset=<n>` — pagination tokens
+- `limit=<n>` / `offset=<n>` — pagination parameters
 - `--filter <json>` — MongoDB-style filter, e.g. `'{"status":{"$eq":"open"}}'`
 - `--search <term>` — semantic search over the table's searchable columns
 
