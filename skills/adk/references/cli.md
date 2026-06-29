@@ -671,6 +671,38 @@ adk conversations show <id> --include-llm --format json
 
 **Requires:** `adk dev` run at least once (populates the local trace store).
 
+### adk tables
+
+Read a bot's tables from the terminal. Defaults to the dev bot; pass `--prod` for production. Both subcommands accept `--format json`.
+
+- `adk tables list` — list the bot's tables
+- `adk tables rows <Table>` — print a table's rows
+
+#### adk tables list
+
+```bash
+adk tables                  # list (default)
+adk tables list --prod --format json
+```
+
+#### adk tables rows
+
+```bash
+adk tables rows <Table> [limit=<n>] [offset=<n>] [--filter <json>] [--search <term>] [--prod] [--format json]
+```
+
+- `limit=<n>` / `offset=<n>` — pagination tokens
+- `--filter <json>` — MongoDB-style filter, e.g. `'{"status":{"$eq":"open"}}'`
+- `--search <term>` — semantic search over the table's searchable columns
+
+**Examples:**
+
+```bash
+adk tables rows ContactsTable limit=20 offset=40
+adk tables rows ContactsTable --filter '{"status":{"$eq":"open"}}'
+adk tables rows ContactsTable --search "billing issue" --format json
+```
+
 ### adk evals
 
 Run automated conversation tests defined under `evals/`.
