@@ -270,6 +270,8 @@ await UsersTable.createRows({
 
 ### Finding Rows
 
+> To read rows from the terminal, use `adk tables rows <Table>` ([CLI reference](./cli.md#adk-tables)). The API below runs inside the agent.
+
 ```typescript
 // Find by condition
 const { rows } = await UsersTable.findRows({
