@@ -220,8 +220,6 @@ adk dev [options]
 6. Dev Console available at http://localhost:3001
 7. Watches files and hot-reloads
 
-`adk dev` honors a project-root `.adkignore` for ADK source scanning and hot reload. Use it for generated files, fixtures, or draft source files under `src/` that should not be treated as primitives. Rules are gitignore-like: comments, `!` negation, leading slash anchoring, trailing slash directory patterns, `*`, `**`, and `?`.
-
 Running `adk dev` in multiple project directories registers each agent with the same Dev Console. Switch between agents in the sidebar. See the [Dev Console multi-agent dashboard](../../adk-dev-console/references/multi-agent-dashboard.md) for details.
 
 **Example:**

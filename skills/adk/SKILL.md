@@ -47,7 +47,6 @@ Most primitives must be placed in `src/` directory (assets use the `assets/` dir
 │       ├── dev.json             # Generated dependency snapshot (dev)
 │       ├── prod.json            # Generated dependency snapshot (prod)
 │       └── migration.json       # One-way legacy migration marker
-├── .adkignore         # Optional source-scan and hot-reload exclusions
 ├── .agent0/
 │   └── capabilities/            # Project-local Agent(0) capability bundle
 └── agent.config.ts    # Bot configuration

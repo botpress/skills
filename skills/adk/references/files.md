@@ -523,6 +523,11 @@ const INDEXABLE_TYPES = {
   mdx: 'text/mdx',
   html: 'text/html',
   htm: 'text/html',
+
+  // Images (with vision processing)
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
 }
 ```
 
@@ -530,7 +535,7 @@ The Dev Console knowledge connector picker uses file extensions as its only sign
 
 ### Vision Processing
 
-For PDFs with vision enabled:
+For images and PDFs with vision enabled:
 
 ```typescript
 await client.uploadFile({
