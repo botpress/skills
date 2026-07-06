@@ -27,5 +27,5 @@ This is the proactive counterpart to `/adk-debug`: nothing is necessarily broken
    - Any referenced model is available in the project's model config.
    - Any referenced sibling primitive (table, action, tool) actually exists in `src/`.
    - **Feature-level only:** the primitives in the set actually wire together — e.g., the workflow's action calls resolve to existing actions, the table the workflow writes to matches the schema the action reads.
-   - No hardcoded secrets, tokens, or API keys.
+   - No hardcoded secrets, tokens, or API keys. Bot runtime credentials should be declared in `agent.config.ts`, set with `adk secret:set`, and read through `secrets.KEY`.
 6. **Report.** Group findings as ❌ Errors → ⚠️ Warnings → ✅ Passed, with each finding tagged by file. For a feature target, also include a short "wiring" subsection that summarizes how the primitives connect. End with one line: _"Run `/adk-test <name>` to actually invoke it."_ Do not apply fixes from this command — let the user decide which to take.

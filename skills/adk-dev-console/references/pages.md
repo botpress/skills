@@ -172,6 +172,8 @@ Manage knowledge bases and uploaded files.
 - Sort by name, date, or size
 - File detail drawer: metadata, embedding status, delete/sync/copy path
 - KB sync dialog to upload and sync files
+- "Add knowledge connector" opens the connector panel. In dev, if the project has no KBs yet, the empty state can create `src/knowledge/connectors.ts` and sync a `connectors` KB first.
+- Connector file selection accepts `.pdf`, `.html`, `.htm`, `.txt`, `.doc`, `.docx`, `.md`, `.mdx`, and extensionless provider files.
 - Pagination for large file lists
 
 ### Tables (`/tables`)
@@ -212,14 +214,14 @@ Browse agent files.
 
 View all conversations with the agent.
 
-**Layout:** Full-page table
+**Layout:** Conversation table + read-only detail viewer
 
 **Features:**
 
 - Table columns: ID, Integration → Channel, Created, Updated, Preview
 - Sortable columns
 - Real-time polling for new conversations
-- Click row to inspect conversation
+- Click row to inspect a live transcript without sending messages
 
 ### Traces (`/traces`) — dev only
 
@@ -265,7 +267,7 @@ Agent configuration management.
 
 1. **Overview** — Agent metadata: name, Bot ID, Workspace ID, file path, created/updated dates. Copy buttons for IDs.
 2. **Configuration Variables** (dev only) — Runtime config schema and values. Add/edit/delete variables.
-3. **Secrets** (dev only) — Secret schema and values. Add/edit/delete secrets.
+3. **Secrets** — Secret schema and set/unset status for the selected target. Dev values are local; prod values are remote and write-only. Add/edit/delete declared secret values.
 4. **LLM Config** (dev only) — Model selection and parameters.
 
 ### Integrations (`/integrations`)
@@ -289,7 +291,7 @@ The deploy dialog computes the same deploy plan as `adk deploy`.
 
 **Warnings and blockers:**
 
-- Missing required secrets block deploy until values are provided.
+- Missing required prod secrets warn by default. Deploy does not write secret values; use `adk secret:set <KEY> <value> --prod` or Settings -> Secrets to set them. CI can require them with `adk deploy --require-secrets`.
 - Enabled dependencies that are unavailable, unconfigured, or unresolved block deploy.
 - Integration version mismatches are non-blocking: if dev and prod have the same alias/name but different versions, the dialog shows a warning and points to Integrations dependency actions for Compare Dev vs Prod and Promote Dev to Prod.
 - Destructive table, KB, or asset changes require explicit confirmation.

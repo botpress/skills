@@ -205,6 +205,7 @@ adk dev [options]
 - `-p, --port <port>` - Bot port (default: 3000)
 - `--port-console <port>` - UI console port (default: 3001)
 - `--non-interactive` - Emit structured NDJSON events to stdout without the Ink/TUI (CI/agent-friendly)
+- `--no-watch` - Disable file watching and hot reload
 - `-v, --verbose` - Show additional details (project path, log file)
 - `--otlp` - Enable OTLP trace export to an external collector (default port 4318)
 - `--port-otlp <port>` - Port for the OTLP collector endpoint (Jaeger, otel-tui, etc.)
@@ -218,6 +219,8 @@ adk dev [options]
 5. Registers the agent with the shared Dev Console (starts the singleton if needed)
 6. Dev Console available at http://localhost:3001
 7. Watches files and hot-reloads
+
+`adk dev` honors a project-root `.adkignore` for ADK source scanning and hot reload. Use it for generated files, fixtures, or draft source files under `src/` that should not be treated as primitives. Rules are gitignore-like: comments, `!` negation, leading slash anchoring, trailing slash directory patterns, `*`, `**`, and `?`.
 
 Running `adk dev` in multiple project directories registers each agent with the same Dev Console. Switch between agents in the sidebar. See the [Dev Console multi-agent dashboard](../../adk-dev-console/references/multi-agent-dashboard.md) for details.
 
@@ -257,6 +260,7 @@ adk deploy [options]
 - `--confirm-storage-changes` - Explicitly confirm destructive table/KB/asset deletions
 - `--dry-run` - Compute the deploy plan without applying changes
 - `--allow-unconfigured` - Deploy with enabled unconfigured/unresolved dependencies inert instead of blocking
+- `--require-secrets` - Fail when required prod secrets are unset on the remote bot
 - `--format <format>` - Output format (`json`; requires `--yes` or `--dry-run`)
 
 **What it does:**
@@ -292,6 +296,7 @@ adk deploy --dry-run --format json
 - `--yes` auto-approves non-destructive deploy-plan changes.
 - Destructive table, KB, or asset deletions still require `--confirm-storage-changes`.
 - Enabled dependencies that are unavailable, unconfigured, or unresolved block real deploys unless the user explicitly chooses `--allow-unconfigured`.
+- Missing required prod secrets warn by default. Deploy never sends secret values. Set them on the remote bot with `adk secret:set <KEY> <value> --prod`, or use `--require-secrets` to make missing prod secrets a hard CI failure.
 - If dev and prod have the same integration alias/name but different versions, deploy prints a non-blocking warning. Preview promotion with `adk integrations copy --from dev --to prod --dry-run` before applying `--yes`.
 - JSON output requires either `--yes` or `--dry-run`.
 - Deploy still validates configuration and may require interaction if config values are missing.
@@ -1141,7 +1146,7 @@ adk config:get botId --prod
 
 ### adk secret
 
-Manage the bot's secrets in the local store. `adk secret` (no subcommand) shows the declared secrets and whether each is set.
+Manage declared bot secrets. `adk secret` (no subcommand) shows the declared secrets and whether each is set in dev and prod.
 
 ```bash
 adk secret [options]                      # show declared secrets + status
@@ -1154,7 +1159,7 @@ adk secret:delete <key> [options]         # delete a secret
 - `--prod` - Target the production bot (default: dev)
 - `--format <format>` - Output format (`json`)
 
-`<key>` is `SCREAMING_SNAKE_CASE`. `secret:set` never echoes the value back.
+`<key>` is `SCREAMING_SNAKE_CASE` and must be declared in `agent.config.ts`. Dev values live in `.adk/secrets.json`. Prod values live on the remote bot and are write-only: ADK can list names/status but cannot read values. `secret:set` never echoes the value back.
 
 ```bash
 adk secret                                # list declared secrets and set/unset status
@@ -1348,7 +1353,7 @@ adk integrations remove slack
 
 - Use `adk dev` for development (hot reload)
 - Keep `agent.config.ts` in git
-- Use `.env` for secrets
+- Use declared ADK secrets for bot runtime credentials
 - Run `adk chat` for quick testing
 
 **DON'T:**
