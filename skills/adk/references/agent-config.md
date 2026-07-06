@@ -54,6 +54,16 @@ export default defineConfig({
     }),
   },
 
+  secrets: {
+    OPENAI_API_KEY: {
+      description: 'OpenAI API key used by custom model calls',
+    },
+    OPTIONAL_WEBHOOK_SECRET: {
+      optional: true,
+      description: 'Shared secret for optional webhook verification',
+    },
+  },
+
   // Cloud is the source of truth; .adk/dependencies/ stores generated snapshots.
   // Use `adk integrations add/remove/configure` to manage them — see integrations.md
 })
@@ -96,6 +106,18 @@ if (configuration.featureFlags.enableBetaFeatures) {
 ```
 
 See **[Context API](./context-api.md)** for details on accessing other runtime values.
+
+#### Secrets
+
+Declare secret names in `agent.config.ts`, then read values at runtime with the typed `secrets` proxy:
+
+```typescript
+import { secrets } from '@botpress/runtime'
+
+const apiKey = secrets.OPENAI_API_KEY
+```
+
+Secret names must be `SCREAMING_SNAKE_CASE` and cannot use reserved prefixes such as `SECRET_`, `BP_`, or `BOTPRESS_`. Values are set separately with `adk secret:set <KEY> <value>` for dev or `adk secret:set <KEY> <value> --prod` for prod. Dev values live in `.adk/secrets.json`. Prod values live on the remote bot and are write-only; ADK can show set/unset status, but cannot read values back.
 
 ### Model Configuration
 
@@ -323,7 +345,7 @@ export const Chat = new Conversation({
 
 ## Best Practices
 
-### 1. Use Environment Variables for Secrets
+### 1. Use Declared Secrets for Runtime Credentials
 
 ```typescript
 // ❌ Bad - hardcoded secrets
@@ -331,11 +353,20 @@ config: {
   apiKey: 'sk-abc123def456'
 }
 
-// ✅ Good - environment variable
-config: {
-  apiKey: process.env.OPENAI_API_KEY
+// ✅ Good - declared in agent.config.ts
+secrets: {
+  OPENAI_API_KEY: {
+    description: 'OpenAI API key'
+  }
 }
+
+// ✅ Good - read in runtime code
+import { secrets } from '@botpress/runtime'
+
+const apiKey = secrets.OPENAI_API_KEY
 ```
+
+Use `${env:VAR_NAME}` only for integration or plugin configuration values that the CLI applies to Cloud. For credentials read by bot code, declare a secret and access it through `secrets.KEY`.
 
 ### 2. Validate Configuration
 

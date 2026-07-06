@@ -301,11 +301,11 @@ Check the `secrets` block in `agent.config.ts` for declared secrets, and look fo
 > - `SLACK_BOT_TOKEN` — Used to authenticate the Slack integration
 > - `LINEAR_API_KEY` — Used to authenticate the Linear integration
 >
-> Secrets are managed via `adk secrets` and injected at runtime. Make sure they're set for both dev and production environments.
+> Secrets are managed via `adk secret` and injected at runtime. Make sure they're set for both dev and production environments.
 
 **Potential issues:**
 
-- Hardcoded secrets in `agent.config.ts` — should use the ADK secrets API instead.
+- Hardcoded secrets in `agent.config.ts` or source code. Declare them in `agent.config.ts`, set values with `adk secret:set`, and read them through `secrets.KEY`.
 - Declared secrets that aren't set — the integration won't work at runtime.
 
 ### Registered Primitives

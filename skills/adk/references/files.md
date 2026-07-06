@@ -508,18 +508,21 @@ const { file } = await client.copyFile({
 
 ### Indexable Formats
 
-These file types support semantic search indexing:
+These file types support semantic search indexing in knowledge bases:
 
 ```typescript
 const INDEXABLE_TYPES = {
   // Documents
   pdf: 'application/pdf',
+  doc: 'application/msword',
   docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 
   // Text
   txt: 'text/plain',
   md: 'text/markdown',
+  mdx: 'text/markdown',
   html: 'text/html',
+  htm: 'text/html',
 
   // Images (with vision processing)
   jpg: 'image/jpeg',
@@ -527,6 +530,8 @@ const INDEXABLE_TYPES = {
   png: 'image/png',
 }
 ```
+
+The Dev Console knowledge connector picker uses file extensions as its only signal. It accepts `.pdf`, `.html`, `.htm`, `.txt`, `.doc`, `.docx`, `.md`, `.mdx`, plus extensionless provider files such as native Google Docs. It rejects other extensions before sync and lets the backend decide on extensionless files.
 
 ### Vision Processing
 

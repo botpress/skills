@@ -41,7 +41,7 @@ export const DocsKnowledgeBase = new Knowledge({
 
 ### 1. Local Files (Directory)
 
-Index local markdown, PDF, and text files:
+Index local PDF, HTML, Word, markdown, and text files:
 
 ```typescript
 const docsSource = DataSource.Directory.fromPath('src/knowledge', {
@@ -49,12 +49,16 @@ const docsSource = DataSource.Directory.fromPath('src/knowledge', {
 
   // Filter specific file types
   filter: (path) => {
-    return path.endsWith('.md') || path.endsWith('.pdf') || path.endsWith('.txt')
+    return /\.(pdf|html?|docx?|mdx?|txt)$/i.test(path)
   },
 })
 ```
 
-**Note**: Local file sources are for development only and won't work in production.
+**Note**: Local file sources are for development only and won't work in production. Pass a project-root-relative, non-empty path like `src/knowledge/docs`; `DataSource.Directory.fromPath()` rejects empty/non-string paths and paths that escape the agent directory. Do not use `import.meta.dirname` for the directory path because it is undefined in the compiled bundle.
+
+### Connector Knowledge Base
+
+The Dev Console Knowledge page can bootstrap a dev-only connector target when the project has no knowledge bases. Clicking **Add knowledge connector** creates `src/knowledge/connectors.ts` with a `connectors` knowledge base, waits for hot reload to pick it up, then syncs it to the dev bot so provider files can be attached. This is not available for prod targets; declare the knowledge base in source and redeploy for production.
 
 ### 2. Website Crawling
 
