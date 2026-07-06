@@ -19,18 +19,18 @@ adk traces conversation=<id> --include-llm --format json
 adk traces --include-llm --format json
 ```
 
-**Always pass `--include-llm`** when summarizing. Without it, `think` spans are omitted and you lose the model's reasoning, which is essential for explaining _why_ the agent did what it did.
+**Always pass `--include-llm`** when summarizing. Without it, span `data` is omitted and you lose the model's reasoning, which is essential for explaining _why_ the agent did what it did.
 
 **Pass `--format json`** when piping into `jq`; for reading, the default text output is already condensed.
 
 **Keep it small.** Narrow to the spans you need instead of dumping the whole trace (`--format json` caps long `data` by default; `--full` for the complete blob):
 
 ```bash
-# reasoning spans only, as a flat list
-adk traces trace=<id> span=iteration,cognitive,tool_call,think --include-llm
+# iteration/LLM/tool spans only, as a flat list (substring match on span name)
+adk traces trace=<id> span=iteration,cognitive,tool --include-llm
 
 # or jq to a specific span (the field is `name`, not `type`)
-adk traces trace=<id> --include-llm --format json | jq '.spans[] | select(.name=="code_execution_exception")'
+adk traces trace=<id> --include-llm --format json | jq '.spans[] | select(.name=="autonomous.tool")'
 ```
 
 ---

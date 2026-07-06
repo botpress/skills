@@ -545,7 +545,7 @@ adk traces [tokens...] [options]
 - `trigger=<name>` — filter by trigger name
 - `conversation=<id>` — filter by conversation id
 - `trace=<id>` — drill into a specific trace (shows the full span tree)
-- `span=<type>` — drill-in only: keep only spans whose name/label matches (comma-separated substring, e.g. `tool_call,think`). Renders as a flat list.
+- `span=<type>` — drill-in only: keep only spans whose name/label matches (comma-separated substring, e.g. `tool,cognitive`). Renders as a flat list.
 - `since=<duration>` / `until=<duration>` — e.g. `30s`, `5m`, `1h`, `2d`, `1w`
 - `limit=<n>` — max traces to show (default: 20)
 
@@ -564,7 +564,7 @@ adk traces error                          # error traces only
 adk traces workflow=onboarding            # traces for a workflow
 adk traces conversation=<id> --format json
 adk traces trace=<id> --include-llm       # drill into one trace with LLM content
-adk traces trace=<id> span=tool_call,think --include-llm   # only those spans
+adk traces trace=<id> span=iteration,cognitive,tool --include-llm   # only those spans
 adk traces since=1h limit=50 --format json
 adk traces error --follow                 # stream errors live
 ```
@@ -572,9 +572,9 @@ adk traces error --follow                 # stream errors live
 > For a drill-in, prefer smaller output over the raw JSON dump:
 >
 > - Default text output (`adk traces trace=<id> --include-llm`) is already condensed — start here.
-> - Narrow with `span=` (e.g. `span=iteration,cognitive,tool_call,think`) to drop noise.
+> - Narrow with `span=` (e.g. `span=iteration,cognitive,tool`) to drop noise.
 > - `--format json` caps long `data` by default; add `--full` only for the complete blob.
-> - `jq` to specific spans, e.g. `... --format json | jq '.spans[] | select(.name=="tool_call")'`.
+> - `jq` to specific spans, e.g. `... --format json | jq '.spans[] | select(.name=="autonomous.tool")'`.
 
 ### adk workflows
 
