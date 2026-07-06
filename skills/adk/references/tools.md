@@ -60,17 +60,17 @@ export default new Autonomous.Tool({
 
 ## Tool Properties
 
-| Property              | Type                  | Required    | Description                                                                                                                                                                              |
-| --------------------- | --------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **name**              | `string`              | Yes         | Unique TypeScript-compatible identifier                                                                                                                                                  |
-| **description**       | `string`              | Recommended | Helps AI understand when and how to use the tool                                                                                                                                         |
-| **input**             | `z.ZodType`           | No          | Zod schema for input validation (defaults to `z.any()`)                                                                                                                                  |
-| **output**            | `z.ZodType`           | Recommended | Zod schema for output validation (defaults to `z.any()`). Declare a real shape so the model can echo concrete values — see [Surfacing Tool Results](#surfacing-tool-results-to-the-user) |
-| **handler**           | `function`            | Yes         | Async function implementing tool logic                                                                                                                                                   |
-| **aliases**           | `string[]`            | No          | Alternative names the AI can use to call this tool                                                                                                                                       |
-| **metadata**          | `Record<string, any>` | No          | Custom information for tool categorization                                                                                                                                               |
-| **staticInputValues** | `object`              | No          | Pre-set parameter values                                                                                                                                                                 |
-| **retry**             | `function`            | No          | Custom retry logic for failures                                                                                                                                                          |
+| Property              | Type                  | Required    | Description                                              |
+| --------------------- | --------------------- | ----------- | -------------------------------------------------------- |
+| **name**              | `string`              | Yes         | Unique TypeScript-compatible identifier                  |
+| **description**       | `string`              | Recommended | Helps AI understand when and how to use the tool         |
+| **input**             | `z.ZodType`           | No          | Zod schema for input validation (defaults to `z.any()`)  |
+| **output**            | `z.ZodType`           | Recommended | Zod schema for output validation (defaults to `z.any()`) |
+| **handler**           | `function`            | Yes         | Async function implementing tool logic                   |
+| **aliases**           | `string[]`            | No          | Alternative names the AI can use to call this tool       |
+| **metadata**          | `Record<string, any>` | No          | Custom information for tool categorization               |
+| **staticInputValues** | `object`              | No          | Pre-set parameter values                                 |
+| **retry**             | `function`            | No          | Custom retry logic for failures                          |
 
 ## Tool Handler Syntax
 
@@ -153,36 +153,19 @@ export const anotherTool = new Autonomous.Tool({
 
 ## Surfacing Tool Results to the User
 
-> **The single most common cause of "the agent called the tool but the answer is empty/wrong."**
+A tool's return value is **not** auto-echoed — only the text the model explicitly emits reaches the user. Left to itself the model often sends a placeholder ("see the tool output above"), an empty `<></>`, or `[object Object]`. To keep the real values in the reply:
 
-In autonomous mode the agent's reply is **only** the text (and components) it explicitly emits. A tool's return value lands in a sandbox variable — it is **not** auto-echoed into the reply. If the model doesn't put the concrete values into the message it sends, the user sees a placeholder ("Please see the tool output above"), an empty `<></>` fragment, or `[object Object]` (an object coerced to a string).
+1. Declare a typed `output` schema (not the `z.any()` default) so the model can read fields like `result.count`.
+2. Instruct the conversation to answer in plain text with the concrete returned values, never placeholders.
 
-Two things prevent this — do both:
-
-1. **Declare a typed `output` schema** on the tool. Don't leave it as the `z.any()` default. With a real shape the model reads concrete fields (`result.count`, `result.results[0].price`) instead of string-coercing an opaque object into `[object Object]`.
-
-   ```typescript
-   export const queryVendors = new Autonomous.Tool({
-     name: 'queryVendors',
-     description: 'Look up vendor rows',
-     input: z.object({ term: z.string() }),
-     // ✅ typed output — the model sees the shape and can echo real values
-     output: z.object({
-       results: z.array(z.object({ name: z.string(), rate: z.number() })),
-       count: z.number(),
-     }),
-     handler: async ({ term }) => queryRows(term),
-   })
-   ```
-
-2. **Tell the conversation to answer with the real values, never placeholders.** Add a line to the `execute()` instructions:
-
-   ```
-   Always answer in plain text with the concrete values the tools/KB return —
-   never placeholders like "see above" or "[object Object]".
-   ```
-
-For guidance that must reach the model even mid-turn, [ThinkSignal](#using-thinksignal) can attach the formatted result plus an instruction to relay it verbatim.
+```typescript
+export const queryVendors = new Autonomous.Tool({
+  name: 'queryVendors',
+  input: z.object({ term: z.string() }),
+  output: z.object({ results: z.array(z.object({ name: z.string(), rate: z.number() })), count: z.number() }),
+  handler: async ({ term }) => queryRows(term),
+})
+```
 
 ## Accessing Context in Tools
 

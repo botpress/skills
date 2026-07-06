@@ -21,21 +21,16 @@ adk traces --include-llm --format json
 
 **Always pass `--include-llm`** when summarizing. Without it, `think` spans are omitted and you lose the model's reasoning, which is essential for explaining _why_ the agent did what it did.
 
-**Always pass `--format json`** for structured, parseable output.
+**Pass `--format json`** when piping into `jq`; for reading, the default text output is already condensed.
 
-**Mind the size — don't read the whole blob into context.** A drill-in with `--include-llm --format json` is routinely 50–70 KB for a multi-iteration turn, and every byte persists in every cached turn afterward. Two built-in levers keep it small (`--format json` is already capped by default — long `data` strings are truncated with a `…[truncated N chars; --full for complete]` marker; pass `--full` only when you truly need everything):
+**Keep it small.** Narrow to the spans you need instead of dumping the whole trace (`--format json` caps long `data` by default; `--full` for the complete blob):
 
 ```bash
-# narrow to the reasoning spans — flat list, drops noisy botpress.client/state spans
+# reasoning spans only, as a flat list
 adk traces trace=<id> span=iteration,cognitive,tool_call,think --include-llm
 
-# or jq to specific spans (the span field is `name`, not `type`)
-adk traces trace=<id> --include-llm --format json \
-  | jq '.spans[] | select(.name=="think" or .name=="tool_call") | {name, data}'
-
-# just the failing span
-adk traces trace=<id> --include-llm --format json \
-  | jq '.spans[] | select(.name=="code_execution_exception")'
+# or jq to a specific span (the field is `name`, not `type`)
+adk traces trace=<id> --include-llm --format json | jq '.spans[] | select(.name=="code_execution_exception")'
 ```
 
 ---
