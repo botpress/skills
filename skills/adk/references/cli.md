@@ -545,6 +545,7 @@ adk traces [tokens...] [options]
 - `trigger=<name>` — filter by trigger name
 - `conversation=<id>` — filter by conversation id
 - `trace=<id>` — drill into a specific trace (shows the full span tree)
+- `span=<type>` — drill-in only: keep only spans whose name/label matches (comma-separated, case-insensitive substring, e.g. `tool_call,think`). Renders as a flat list.
 - `since=<duration>` / `until=<duration>` — e.g. `30s`, `5m`, `1h`, `2d`, `1w`
 - `limit=<n>` — max traces to show (default: 20)
 
@@ -552,6 +553,7 @@ adk traces [tokens...] [options]
 
 - `-f, --follow` — stream new traces as they complete
 - `--include-llm` — include LLM instructions, code, and tools in drill-in mode
+- `--full` — with `--include-llm --format json`: do **not** truncate large `data` fields (raw dump). Omit it and long strings are capped by default.
 - `--format <format>` — `json` only (omit for default text output)
 
 **Examples:**
@@ -562,15 +564,17 @@ adk traces error                          # error traces only
 adk traces workflow=onboarding            # traces for a workflow
 adk traces conversation=<id> --format json
 adk traces trace=<id> --include-llm       # drill into one trace with LLM content
+adk traces trace=<id> span=tool_call,think --include-llm   # only those spans
 adk traces since=1h limit=50 --format json
 adk traces error --follow                 # stream errors live
 ```
 
-> **Don't read a raw `--include-llm --format json` dump into your working context.** A single drill-in with LLM content is routinely 50–70 KB (instructions + generated code + tools per iteration), and it persists in every subsequent cached turn. Instead:
+> **Keep trace drill-ins small — don't flood your context.** A full `--include-llm --format json` dump is routinely 50–70 KB (instructions + generated code + tools, repeated per iteration) and persists in every subsequent cached turn. Order of preference:
 >
-> - Start with the **default text output** (`adk traces trace=<id> --include-llm`) — it's already condensed for reading.
-> - Reach for one span's `data` only when you need it, via `jq` — e.g. `adk traces trace=<id> --include-llm --format json | jq '.spans[] | select(.type=="tool_call") | {name, data}'`.
-> - Filter to the failing turn first (`error`, `action=<name>`, a specific `trace=<id>`) rather than pulling every trace.
+> - **Default text output** (`adk traces trace=<id> --include-llm`) — already condensed for reading.
+> - **Narrow with `span=`** — e.g. `adk traces trace=<id> span=iteration,cognitive,tool_call,think --include-llm` drops the noisy `botpress.client`/state spans (10×+ smaller in practice).
+> - **`--format json` is capped by default** — long `data` strings are truncated (marker: `…[truncated N chars; --full for complete]`). Only add `--full` when you genuinely need the complete blob.
+> - **`jq` to the spans you need** — e.g. `adk traces trace=<id> --include-llm --format json | jq '.spans[] | select(.name=="tool_call") | {name, data}'` (span field is `name`, not `type`).
 
 ### adk workflows
 
