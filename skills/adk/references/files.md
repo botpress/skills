@@ -520,7 +520,7 @@ const INDEXABLE_TYPES = {
   // Text
   txt: 'text/plain',
   md: 'text/markdown',
-  mdx: 'text/mdx',
+  mdx: 'text/markdown',
   html: 'text/html',
   htm: 'text/html',
 

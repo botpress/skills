@@ -359,6 +359,11 @@ secrets: {
     description: 'OpenAI API key'
   }
 }
+
+// ✅ Good - read in runtime code
+import { secrets } from '@botpress/runtime'
+
+const apiKey = secrets.OPENAI_API_KEY
 ```
 
 Use `${env:VAR_NAME}` only for integration or plugin configuration values that the CLI applies to Cloud. For credentials read by bot code, declare a secret and access it through `secrets.KEY`.
