@@ -23,6 +23,18 @@ adk traces --include-llm --format json
 
 **Always pass `--format json`** for structured, parseable output.
 
+**Mind the size — don't read the whole blob into context.** A drill-in with `--include-llm --format json` is routinely 50–70 KB for a multi-iteration turn, and every byte persists in every cached turn afterward. For anything beyond a couple of iterations, extract the spans you need with `jq` instead of reading the full dump:
+
+```bash
+# just the think + tool_call spans (the reasoning narrative)
+adk traces trace=<id> --include-llm --format json \
+  | jq '.spans[] | select(.type=="think" or .type=="tool_call") | {type, name, data}'
+
+# just the failing span
+adk traces trace=<id> --include-llm --format json \
+  | jq '.spans[] | select(.type=="code_execution_exception")'
+```
+
 ---
 
 ## Reading the Span Tree

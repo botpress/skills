@@ -566,6 +566,12 @@ adk traces since=1h limit=50 --format json
 adk traces error --follow                 # stream errors live
 ```
 
+> **Don't read a raw `--include-llm --format json` dump into your working context.** A single drill-in with LLM content is routinely 50–70 KB (instructions + generated code + tools per iteration), and it persists in every subsequent cached turn. Instead:
+>
+> - Start with the **default text output** (`adk traces trace=<id> --include-llm`) — it's already condensed for reading.
+> - Reach for one span's `data` only when you need it, via `jq` — e.g. `adk traces trace=<id> --include-llm --format json | jq '.spans[] | select(.type=="tool_call") | {name, data}'`.
+> - Filter to the failing turn first (`error`, `action=<name>`, a specific `trace=<id>`) rather than pulling every trace.
+
 ### adk workflows
 
 Inspect workflow definitions and runs on the linked dev bot. All `adk workflows ...` commands target the dev bot (same credentials path as `adk dev`) and only accept `--format json` — any other `--format` value is rejected.
