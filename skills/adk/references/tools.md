@@ -65,7 +65,7 @@ export default new Autonomous.Tool({
 | **name**              | `string`              | Yes         | Unique TypeScript-compatible identifier                  |
 | **description**       | `string`              | Recommended | Helps AI understand when and how to use the tool         |
 | **input**             | `z.ZodType`           | No          | Zod schema for input validation (defaults to `z.any()`)  |
-| **output**            | `z.ZodType`           | No          | Zod schema for output validation (defaults to `z.any()`) |
+| **output**            | `z.ZodType`           | Recommended | Zod schema for output validation (defaults to `z.any()`) |
 | **handler**           | `function`            | Yes         | Async function implementing tool logic                   |
 | **aliases**           | `string[]`            | No          | Alternative names the AI can use to call this tool       |
 | **metadata**          | `Record<string, any>` | No          | Custom information for tool categorization               |
@@ -150,6 +150,22 @@ export const anotherTool = new Autonomous.Tool({
 | Context access    | Via imports or context API      | Via imports (automatically available)                    |
 | Typical use       | Internal functions, any context | AI-callable, conversation context                        |
 | Handler signature | `handler({ input, client })`    | `handler(input, ctx?)` or `handler({ ...fields }, ctx?)` |
+
+## Surfacing Tool Results to the User
+
+A tool's return value is **not** auto-echoed — only the text the model explicitly emits reaches the user. Left to itself the model often sends a placeholder ("see the tool output above"), an empty `<></>`, or `[object Object]`. To keep the real values in the reply:
+
+1. Declare a typed `output` schema (not the `z.any()` default) so the model can read fields like `result.count`.
+2. Instruct the conversation to answer in plain text with the concrete returned values, never placeholders.
+
+```typescript
+export const queryVendors = new Autonomous.Tool({
+  name: 'queryVendors',
+  input: z.object({ term: z.string() }),
+  output: z.object({ results: z.array(z.object({ name: z.string(), rate: z.number() })), count: z.number() }),
+  handler: async ({ term }) => queryRows(term),
+})
+```
 
 ## Accessing Context in Tools
 
