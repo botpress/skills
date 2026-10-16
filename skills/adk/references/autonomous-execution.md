@@ -722,6 +722,7 @@ await execute({
 
 ## Pitfalls
 
+- **Tool results are not auto-echoed into the reply.** Declare a typed `output` schema and instruct the agent to answer with the real values, never placeholders — see [Surfacing Tool Results](./tools.md#surfacing-tool-results-to-the-user).
 - **Do not redefine built-in exits.** Creating an exit named `listen`, `think`, or `done` will conflict with the built-in ListenExit, ThinkExit, and DefaultExit.
 - **Exits require good descriptions.** The LLM decides which exit to use based on the `description`. Vague descriptions lead to wrong exit selection.
 - **Writable properties need a schema.** If `writable: true` without `type`, the sandbox cannot validate writes and they will be unchecked.
